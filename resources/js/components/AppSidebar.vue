@@ -30,11 +30,6 @@ const mainNavItems: NavItem[] = [
         href: personas.index.url(),
         icon: User,
     },
-    {
-        title: 'Adultos',
-        href: adultos.index.url(),
-        icon: User,
-    },
 ];
 
 const footerNavItems: NavItem[] = [

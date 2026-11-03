@@ -1,78 +1,213 @@
 <script setup>
-import { Link, router } from '@inertiajs/vue3';
-import { destroy } from '@/actions/App/Http/Controllers/PersonaController';
-import UserInfo from '@/components/UserInfo.vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { Eye, Pencil, Plus, Search, Trash2, Users } from '@lucide/vue';
+import { onBeforeUnmount, ref, watch } from 'vue';
+import { create, destroy, edit, index, show } from '@/routes/personas';
+import Pagination from '@/components/Pagination.vue';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 
 const props = defineProps({
     personas: {
-        type: Array,
+        type: Object,
         required: true,
+    },
+    filters: {
+        type: Object,
+        default: () => ({ search: '' }),
     },
 });
 
-function deletePersona(personaId) {
-    if (window.confirm('¿Estás seguro de que deseas eliminar esta persona?')) {
-        router.delete(destroy.url(personaId));
+const search = ref(props.filters.search ?? '');
+let timeout;
+
+watch(search, (value) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        router.get(
+            index.url(),
+            { search: value || undefined },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    }, 300);
+});
+
+onBeforeUnmount(() => clearTimeout(timeout));
+
+function deletePersona(persona) {
+    if (
+        window.confirm(
+            `¿Estás seguro de que deseas eliminar a ${persona.full_name}?`,
+        )
+    ) {
+        router.delete(destroy.url(persona.id), { preserveScroll: true });
     }
+}
+
+// Evita el desfase de zona horaria al parsear "YYYY-MM-DD"
+function formatDate(value) {
+    if (!value) return '—';
+    const [y, m, d] = value.substring(0, 10).split('-');
+    return `${d}-${m}-${y}`;
 }
 </script>
 
 <template>
-    <div class="col mx-auto mt-10 rounded bg-white p-6 shadow">
-        <Link
-            href="/personas/create"
-            class="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-            >Crear Persona</Link
+    <Head title="Personas" />
+
+    <div class="mx-auto flex max-w-7xl flex-col gap-6 p-4 md:p-6">
+        <!-- Encabezado -->
+        <div
+            class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
         >
-        <!-- Botón para crear persona -->
-    </div>
-    <div class="mx-auto mt-10 max-w-md rounded bg-white p-6 shadow">
-        <h1 class="mb-4 text-2xl font-bold">Listado de Personas</h1>
-    </div>
-    <div class="table">
-        <table class="table-responsive striped min-w-full bg-white">
-            <thead>
-                <tr>
-                    <th class="border-b px-4 py-2">RUT</th>
-                    <th class="border-b px-4 py-2">Nombre completo</th>
-                    <th class="border-b px-4 py-2">Fecha de Nacimiento</th>
-                    <th class="border-b px-4 py-2">Edad</th>
-                    <th class="border-b px-4 py-2">Sexo</th>
-                    <th class="border-b px-4 py-2">Email</th>
-                    <th class="border-b px-4 py-2">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="persona in props.personas" :key="persona.id">
-                    <td class="border-b px-4 py-2">{{ persona.rut }}</td>
-                    <td class="border-b px-4 py-2">{{ persona.full_name }}</td>
-                    <td class="border-b px-4 py-2">
-                        {{ persona.fecha_nacimiento }}
-                    </td>
-                    <td class="border-b px-4 py-2">{{ persona.edad }}</td>
-                    <td class="border-b px-4 py-2">{{ persona.sexo }}</td>
-                    <td class="border-b px-4 py-2">{{ persona.email }}</td>
-                    <td class="border-b px-4 py-2">
-                        <Link
-                            :href="`/personas/${persona.id}/edit`"
-                            class="text-blue-500 hover:text-blue-700"
-                            >Editar</Link
-                        >
-                        <Link
-                            :href="`/personas/${persona.id}`"
-                            class="ml-2 text-green-500 hover:text-green-700"
-                            >Ver</Link
-                        >
-                        <button
-                            type="button"
-                            class="ml-2 text-red-500 hover:text-red-700"
-                            @click="deletePersona(persona.id)"
-                        >
-                            Eliminar
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <div>
+                <h1 class="text-2xl font-bold">Personas</h1>
+                <p class="text-sm text-muted-foreground">
+                    {{ personas.total }}
+                    {{ personas.total === 1 ? 'registro' : 'registros' }}
+                </p>
+            </div>
+            <Button as-child>
+                <Link :href="create.url()">
+                    <Plus class="size-4" />
+                    Crear Persona
+                </Link>
+            </Button>
+        </div>
+
+        <Card>
+            <CardContent class="flex flex-col gap-4">
+                <!-- Buscador -->
+                <div class="relative max-w-sm">
+                    <Search
+                        class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                    />
+                    <Input
+                        v-model="search"
+                        type="search"
+                        placeholder="Buscar por RUT, nombres y apellidos..."
+                        class="pl-9"
+                    />
+                </div>
+
+                <!-- Tabla -->
+                <div class="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>RUT</TableHead>
+                                <TableHead>Nombre completo</TableHead>
+                                <TableHead>Fecha de nacimiento</TableHead>
+                                <TableHead>Edad</TableHead>
+                                <TableHead>Sexo</TableHead>
+                                <TableHead>Email</TableHead>
+                                <TableHead class="text-right">
+                                    Acciones
+                                </TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow
+                                v-for="persona in personas.data"
+                                :key="persona.id"
+                            >
+                                <TableCell class="font-mono">
+                                    {{ persona.rut }}
+                                </TableCell>
+                                <TableCell class="font-medium">
+                                    {{ persona.full_name }}
+                                </TableCell>
+                                <TableCell>
+                                    {{ formatDate(persona.fecha_nacimiento) }}
+                                </TableCell>
+                                <TableCell>{{ persona.edad }}</TableCell>
+                                <TableCell>
+                                    <Badge
+                                        variant="secondary"
+                                        class="capitalize"
+                                    >
+                                        {{ persona.sexo }}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell>{{ persona.email }}</TableCell>
+                                <TableCell>
+                                    <div class="flex justify-end gap-1">
+                                        <Button
+                                            as-child
+                                            variant="ghost"
+                                            size="icon"
+                                            title="Ver"
+                                        >
+                                            <Link :href="show.url(persona.id)">
+                                                <Eye class="size-4" />
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            as-child
+                                            variant="ghost"
+                                            size="icon"
+                                            title="Editar"
+                                        >
+                                            <Link :href="edit.url(persona.id)">
+                                                <Pencil class="size-4" />
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            title="Eliminar"
+                                            class="text-destructive hover:text-destructive"
+                                            @click="deletePersona(persona)"
+                                        >
+                                            <Trash2 class="size-4" />
+                                        </Button>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+
+                            <!-- Estado vacío -->
+                            <TableRow v-if="personas.data.length === 0">
+                                <TableCell colspan="7" class="h-32 text-center">
+                                    <div
+                                        class="flex flex-col items-center gap-2 text-muted-foreground"
+                                    >
+                                        <Users class="size-8" />
+                                        <span>
+                                            {{
+                                                search
+                                                    ? 'No se encontraron resultados para tu búsqueda.'
+                                                    : 'Aún no hay personas registradas.'
+                                            }}
+                                        </span>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
+
+                <!-- Pie: resumen + paginación -->
+                <div
+                    v-if="personas.total > 0"
+                    class="flex flex-col items-center justify-between gap-3 sm:flex-row"
+                >
+                    <p class="text-sm text-muted-foreground">
+                        Mostrando {{ personas.from }} a {{ personas.to }} de
+                        {{ personas.total }}
+                    </p>
+                    <Pagination :links="personas.links" />
+                </div>
+            </CardContent>
+        </Card>
     </div>
 </template>

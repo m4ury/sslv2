@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreAdultoRequest;
-use App\Http\Requests\UpdateAdultoRequest;
+use App\Http\Requests\AdultoRequest;
 use App\Models\Adulto;
+use App\Models\Persona;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AdultoController extends Controller
 {
@@ -13,26 +15,39 @@ class AdultoController extends Controller
      */
     public function index()
     {
-        $adultos = Adulto::all();
-        return inertia('adultos/Index', compact('adultos'));
+       // 
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return inertia('adultos/Create');
+        $persona = Persona::findOrFail($request->query('persona_id'));
+
+        // Si ya es adulto, no tiene sentido crear otro registro
+        if ($persona->adulto) {
+            return redirect()->route('adultos.show', $persona->adulto->id)
+                ->with('error', 'Esta persona ya está registrada como adulto.');
+        }
+
+        return Inertia::render('adultos/Create', [
+            'persona' => $persona,
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAdultoRequest $request)
+    public function store(AdultoRequest $request)
     {
-        $adulto = Adulto::create($request->validated());
+            $adulto = Adulto::create([
+            ...$request->validated(),
+            'estado' => Adulto::ESTADO_INICIAL,
+        ]);
 
-        return redirect()->route('adultos.index')->with('success', 'Adulto created successfully.');
+        return redirect()->route('personas.show', $adulto->persona_id)
+            ->with('success', 'Persona registrada como adulto.');
     }
 
     /**
@@ -40,7 +55,9 @@ class AdultoController extends Controller
      */
     public function show(Adulto $adulto)
     {
-        return inertia('adultos/Show', compact('adulto'));
+        return Inertia::render('adultos/Show', [
+            'adulto' => $adulto,
+        ]);
     }
 
     /**
@@ -48,17 +65,21 @@ class AdultoController extends Controller
      */
     public function edit(Adulto $adulto)
     {
-        return inertia('adultos/Edit', compact('adulto'));
+        return Inertia::render('adultos/Edit', [
+        'adulto' => $adulto,
+        'persona' => $adulto->persona,
+    ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAdultoRequest $request, Adulto $adulto)
+    public function update(AdultoRequest $request, Adulto $adulto)
     {
         $adulto->update($request->validated());
 
-        return redirect()->route('adultos.index')->with('success', 'Adulto updated successfully.');
+        return redirect()->route('personas.show', $adulto->persona_id)
+        ->with('success', 'Datos del adulto actualizados.');
     }
 
     /**
@@ -68,6 +89,6 @@ class AdultoController extends Controller
     {
         $adulto->delete();
 
-        return redirect()->route('adultos.index')->with('success', 'Adulto deleted successfully.');
+        return redirect()->route('personas.index')->with('success', 'Adulto deleted successfully.');
     }
 }

@@ -19,8 +19,18 @@ class Adulto extends Model
         'telefono_emergencia',
     ];
 
+    public const ESTADO_INICIAL = 'Activo';
+
     public function persona()
     {
         return $this->belongsTo(Persona::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'fecha_ingreso' => 'date:Y-m-d',
+            'fecha_salida' => 'date:Y-m-d',
+        ];
     }
 }

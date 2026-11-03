@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreSocioRequest;
-use App\Http\Requests\UpdateSocioRequest;
+use App\Http\Requests\SocioRequest;
 use App\Models\Socio;
+use App\Models\Persona;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class SocioController extends Controller
 {
@@ -19,17 +21,32 @@ class SocioController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $persona = Persona::findOrFail($request->query('persona_id'));
+
+        if ($persona->socio) {
+            return redirect()->route('socios.show', $persona->socio->id)
+                ->with('error', 'Esta persona ya está registrada como socio.');
+        }
+
+        return Inertia::render('socios/Create', [
+            'persona' => $persona,
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSocioRequest $request)
+    public function store(SocioRequest $request)
     {
-        //
+        $socio = Socio::create([
+            ...$request->validated(),
+            'estado' => Socio::ESTADO_INICIAL,
+        ]);
+
+        return redirect()->route('personas.show', $socio->persona_id)
+            ->with('success', 'Persona registrada como socio.');
     }
 
     /**
@@ -37,7 +54,10 @@ class SocioController extends Controller
      */
     public function show(Socio $socio)
     {
-        //
+        return Inertia::render('socios/Show', [
+            'socio' => $socio,
+            'persona' => $socio->persona,
+        ]);
     }
 
     /**
@@ -45,15 +65,21 @@ class SocioController extends Controller
      */
     public function edit(Socio $socio)
     {
-        //
+        return Inertia::render('socios/Edit', [
+        'socio' => $socio,
+        'persona' => $socio->persona,
+    ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSocioRequest $request, Socio $socio)
+    public function update(SocioRequest $request, Socio $socio)
     {
-        //
+        $socio->update($request->validated());
+
+        return redirect()->route('personas.show', $socio->persona_id)
+        ->with('success', 'Datos del socio actualizados.');
     }
 
     /**
