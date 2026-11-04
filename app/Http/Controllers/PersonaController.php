@@ -65,9 +65,9 @@ class PersonaController extends Controller
         return Inertia::render('personas/Show', [
             'persona' => $persona,
             'roles' => [
-                'socio' => $persona->socio?->only('id'),
-                'adulto' => $persona->adulto?->only('id'),
-                'colaborador' => $persona->colaborador?->only('id'),
+                'socio' => $persona->socio?->only('id', 'estado'),
+                'adulto' => $persona->adulto?->only('id', 'estado'),
+                'colaborador' => $persona->colaborador?->only('id', 'estado'),
             ],
         ]);
     }

@@ -21,7 +21,7 @@ export const colaboradorSections = [
                 type: 'select',
                 required: true,
                 editOnly: true,
-                options: ['Activo', 'Inactivo'],
+                options: ['activo', 'inactivo'],
             },
         ],
     },

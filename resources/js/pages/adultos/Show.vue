@@ -9,6 +9,7 @@ import {
     Pencil,
     Trash2,
     UserRound,
+    RotateCcw
 } from '@lucide/vue';
 import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
@@ -68,34 +69,65 @@ const transiciones = computed(() => [
         label: 'Socio',
         description: 'Registrar a esta persona como socio de la agrupación.',
         icon: Handshake,
-        createUrl: `/socios/create?persona_id=${props.persona.id}`,
-        showUrl: props.roles.socio ? `/socios/${props.roles.socio.id}` : null,
+        base:'/socios',
+        /* createUrl: `/socios/create?persona_id=${props.persona.id}`,
+        showUrl: props.roles.socio ? `/socios/${props.roles.socio.id}` : null, */
     },
     {
         key: 'adulto',
         label: 'Adulto mayor',
         description: 'Incorporar como adulto mayor perteneciente a la agrupación.',
         icon: UserRound,
-        createUrl: `/adultos/create?persona_id=${props.persona.id}`,
+        base: '/adultos',
+        /* createUrl: `/adultos/create?persona_id=${props.persona.id}`,
         showUrl: props.roles.adulto
             ? `/adultos/${props.roles.adulto.id}`
-            : null,
+            : null, */
     },
     {
         key: 'colaborador',
         label: 'Colaborador',
         description: 'Registrar como colaborador de la agrupación.',
         icon: HandHeart,
-        createUrl: `/adultos/colaborador?persona_id=${props.persona.id}`,
+        base: '/colaboradores',
+        /* createUrl: `/adultos/colaborador?persona_id=${props.persona.id}`,
         showUrl: props.roles.colaborador
             ? `/adultos/colaborador/${props.roles.colaborador.id}`
-            : null,
+            : null, */
     },
-]);
+].map((rol) => {
+    const registro = props.roles[rol.key];
 
-const rolesActivos = computed(() =>
-    transiciones.value.filter((t) => t.showUrl),
+    return {
+        ...rol,
+        registro,
+        activo: registro?.estado === 'Activo',
+        inactivo: registro?.estado === 'Inactivo',
+        createUrl: `${rol.base}/create?persona_id=${props.persona.id}`,
+        showUrl: registro ? `${rol.base}/${registro.id}/edit` : null,
+        reactivarUrl: registro
+            ? `${rol.base}/${registro.id}/reactivar`
+            : null,
+    };
+    }),
 );
+
+// El badge del encabezado solo muestra los roles vigentes
+const rolesActivos = computed(() => transiciones.value.filter((t) => t.activo));
+
+function reingresar(rol) {
+    if (
+        window.confirm(
+            `¿Reingresar a ${fullName.value} como ${rol.label.toLowerCase()}?`,
+        )
+    ) {
+        router.patch(rol.reactivarUrl, {}, { preserveScroll: true });
+    }
+}
+
+/* const rolesActivos = computed(() =>
+    transiciones.value.filter((t) => t.showUrl),
+); */
 
 function deletePersona() {
     if (
@@ -218,7 +250,31 @@ function formatDate(value) {
                             </div>
                         </div>
 
-                        <Button
+                        <template v-if="rol.registro">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <Button as-child variant="secondary" size="sm">
+                                    <Link :href="rol.showUrl">
+                                        <CheckCircle2 class="size-4" />
+                                        Ver ficha
+                                    </Link>
+                                </Button>
+                                <Badge :variant="rol.activo ? 'default' : 'outline'">
+                                    {{ rol.registro.estado }}
+                                </Badge>
+                                <Button v-if="rol.inactivo" size="sm" @click="reingresar(rol)">
+                                    <RotateCcw class="size-4" />
+                                    Reingresar
+                                </Button>
+                            </div>
+                        </template>
+                        <Button v-else as-child size="sm">
+                            <Link :href="rol.createUrl">
+                                Registrar como {{ rol.label.toLowerCase() }}
+                                <ArrowRight class="size-4" />
+                            </Link>
+                        </Button>
+
+                        <!-- <Button
                             v-if="rol.showUrl"
                             as-child
                             variant="secondary"
@@ -234,7 +290,7 @@ function formatDate(value) {
                                 Registrar como {{ rol.label.toLowerCase() }}
                                 <ArrowRight class="size-4" />
                             </Link>
-                        </Button>
+                        </Button> -->
                     </div>
                 </CardContent>
             </Card>

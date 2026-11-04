@@ -21,7 +21,7 @@ export const adultoSections = [
                 type: 'select',
                 required: true,
                 editOnly: true,
-                options: ['Activo', 'Inactivo'],
+                options: ['activo', 'inactivo'],
             },
         ],
     },

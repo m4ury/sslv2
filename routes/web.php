@@ -4,6 +4,7 @@ use App\Http\Controllers\AdultoController;
 use App\Http\Controllers\ColaboradorController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\SocioController;
+use App\Http\Controllers\FichaClinicaController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -12,9 +13,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 
     Route::resource('personas', PersonaController::class);
+    
     Route::resource('adultos', AdultoController::class)->except(['index']);
+    Route::patch('adultos/{adulto}/baja', [AdultoController::class, 'baja'])->name('adultos.baja');
+    Route::patch('adultos/{adulto}/reactivar', [AdultoController::class, 'reactivar'])->name('adultos.reactivar');
+
     Route::resource('socios', SocioController::class)->except(['index']);
     Route::resource('colaboradores', ColaboradorController::class)->except(['index']);
+
+    Route::prefix('adultos/{adulto}/ficha')
+    ->name('ficha.')
+    ->where([
+        'seccion' => 'controles|prestaciones|programados|credenciales|documentos',
+        'id' => '[0-9]+',
+        'documento' => '[0-9]+',
+    ])
+    ->group(function () {
+        Route::get('/', [FichaClinicaController::class, 'show'])->name('show');
+        Route::get('documentos/{documento}/descargar', [FichaClinicaController::class, 'descargar'])->name('descargar');
+        Route::post('{seccion}', [FichaClinicaController::class, 'store'])->name('store');
+        Route::put('{seccion}/{id}', [FichaClinicaController::class, 'update'])->name('update');
+        Route::delete('{seccion}/{id}', [FichaClinicaController::class, 'destroy'])->name('destroy');
+    });
 
 });
 

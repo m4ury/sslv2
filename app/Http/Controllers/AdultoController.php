@@ -91,4 +91,28 @@ class AdultoController extends Controller
 
         return redirect()->route('personas.index')->with('success', 'Adulto deleted successfully.');
     }
+
+    public function baja(Adulto $adulto)
+    {
+        if (! $adulto->estaActivo()) {
+            return back()->with('error', 'El adulto no está activo.');
+        }
+
+        $adulto->darDeBaja();
+
+        return redirect()->route('personas.show', $adulto->persona_id)
+            ->with('success', 'Adulto dado de baja. Los datos de la persona se mantienen.');
+    }
+
+    public function reactivar(Adulto $adulto)
+    {
+        if (! $adulto->estaInactivo()) {
+            return back()->with('error', 'Solo se puede reingresar a un adulto inactivo.');
+        }
+
+        $adulto->reactivar();
+
+        return redirect()->route('personas.show', $adulto->persona_id)
+            ->with('success', 'Adulto reingresado correctamente.');
+    }
 }

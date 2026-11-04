@@ -9,8 +9,9 @@ import {
     Pencil,
     Trash2,
     UserRound,
+    RotateCcw
 } from '@lucide/vue';
-import { computed } from 'vue';
+import { computed, registerRuntimeCompiler } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -87,6 +88,11 @@ const transiciones = computed(() => [
         editUrl: props.roles.adulto
             ? `/adultos/${props.roles.adulto.id}/edit`
             : null,
+        /* showUrl: registro
+            ? rol.key === 'adulto'
+                ? `/adultos/${registro.id}/ficha`
+                : `${rol.base}/${registro.id}/edit`
+            : null, */
         showUrl: props.roles.adulto ? `/adultos/${props.roles.adulto.id}` : null,
     },
     {

@@ -17,5 +17,7 @@ const props = defineProps({
         :sections="adultoSections"
         :store-url="store.url()"
         :update-url="update.url(adulto.id)"
+        :baja-url="baja.url(adulto.id)"
+        :reactivar-url="reactivar.url(adulto.id)"
     />
 </template>

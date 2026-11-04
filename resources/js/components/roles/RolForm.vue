@@ -4,6 +4,7 @@ import { ArrowLeft, Loader2, Save } from '@lucide/vue';
 import { computed } from 'vue';
 import InputError from '@/components/InputError.vue';
 import PersonaResumen from '@/components/personas/PersonaResumen.vue';
+import RolEstadoCard from '@/components/roles/RolEstadoCard.vue';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -29,6 +30,9 @@ const props = defineProps({
     sections: { type: Array, required: true },
     storeUrl: { type: String, required: true },
     updateUrl: { type: String, default: null },
+    //dar de baja y reactivar
+    bajaUrl: { type: String, default: null },
+    reactivarUrl: { type: String, default: null },
 });
 
 const isEdit = computed(() => !!props.registro?.id);
@@ -135,6 +139,15 @@ function minFor(field) {
         </div>
 
         <PersonaResumen :persona="persona" />
+
+        <RolEstadoCard
+            v-if="isEdit && bajaUrl && reactivarUrl"
+            :registro="registro"
+            :rol-label="rolLabel"
+            :nombre="fullName"
+            :baja-url="bajaUrl"
+            :reactivar-url="reactivarUrl"
+        />
 
         <form @submit.prevent="submitForm">
             <Card>
