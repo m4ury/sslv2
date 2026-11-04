@@ -30,7 +30,7 @@ export const adultoSections = [
         fields: [
             { name: 'contacto_emergencia_nombre', label: 'Nombre del contacto' },
             {
-                name: 'telefono_emergencia_telefono',
+                name: 'contacto_emergencia_telefono',
                 label: 'Teléfono',
                 type: 'tel',
                 placeholder: '+56 9 1234 5678',

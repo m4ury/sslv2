@@ -20,6 +20,11 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    create as createColaborador,
+    edit as editColaborador,
+    show as showColaborador,
+} from '@/routes/colaboradores';
 import { destroy, edit, index } from '@/routes/personas';
 
 const props = defineProps({
@@ -85,15 +90,19 @@ const transiciones = computed(() => [
         showUrl: props.roles.adulto ? `/adultos/${props.roles.adulto.id}` : null,
     },
     {
-        key: 'colaborador',
+        key: 'colaboradores',
         label: 'Colaborador',
         description: 'Registrar como colaborador de la agrupación.',
         icon: HandHeart,
-        createUrl: `/adultos/colaborador?persona_id=${props.persona.id}`,
+        createUrl: createColaborador.url({
+            query: { persona_id: props.persona.id },
+        }),
         editUrl: props.roles.colaborador
-            ? `/adultos/colaborador/${props.roles.colaborador.id}/edit`
+            ? editColaborador.url(props.roles.colaborador.id)
             : null,
-        showUrl: props.roles.colaborador ? `/adultos/colaborador/${props.roles.colaborador.id}` : null,
+        showUrl: props.roles.colaborador
+            ? showColaborador.url(props.roles.colaborador.id)
+            : null,
     },
 ]);
 
@@ -179,7 +188,7 @@ function formatDate(value) {
                                 {{ dato.label }}
                             </dt>
                             <dd
-                                class="text-sm break-words"
+                                class="text-sm wrap-break-word"
                                 :class="{
                                     'font-mono': dato.mono,
                                     capitalize: dato.capitalize,

@@ -15,8 +15,9 @@ class Adulto extends Model
         'fecha_salida',
         'estado',
         'persona_id',
-        'contacto_emergencia',
-        'telefono_emergencia',
+        'contacto_emergencia_nombre',
+        'contacto_emergencia_telefono',
+        'observaciones',
     ];
 
     public const ESTADO_INICIAL = 'Activo';
