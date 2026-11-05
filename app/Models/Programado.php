@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Programado extends Model
 {
     /** @use HasFactory<\Database\Factories\ProgramadoFactory> */
-    use HasFactory, softDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'adulto_id',

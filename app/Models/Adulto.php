@@ -5,8 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Concerns\TieneEstadoDeRol;
 
 class Adulto extends Model
@@ -53,7 +51,7 @@ class Adulto extends Model
 
     public function documentos()
     {
-        return $this->hasMany(Documentos::class);
+        return $this->hasMany(Documento::class);
     }
 
     protected function casts(): array

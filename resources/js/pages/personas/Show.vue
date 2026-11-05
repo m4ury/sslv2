@@ -86,13 +86,8 @@ const transiciones = computed(() => [
         icon: UserRound,
         createUrl: `/adultos/create?persona_id=${props.persona.id}`,
         editUrl: props.roles.adulto
-            ? `/adultos/${props.roles.adulto.id}/edit`
+            ? `/adultos/${props.roles.adulto.id}/ficha`
             : null,
-        /* showUrl: registro
-            ? rol.key === 'adulto'
-                ? `/adultos/${registro.id}/ficha`
-                : `${rol.base}/${registro.id}/edit`
-            : null, */
         showUrl: props.roles.adulto ? `/adultos/${props.roles.adulto.id}` : null,
     },
     {
@@ -103,7 +98,7 @@ const transiciones = computed(() => [
         createUrl: createColaborador.url({
             query: { persona_id: props.persona.id },
         }),
-        editUrl: props.roles.colaborador
+         editUrl: props.roles.colaborador
             ? editColaborador.url(props.roles.colaborador.id)
             : null,
         showUrl: props.roles.colaborador

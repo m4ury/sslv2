@@ -70,8 +70,8 @@ const transiciones = computed(() => [
         description: 'Registrar a esta persona como socio de la agrupación.',
         icon: Handshake,
         base:'/socios',
-        /* createUrl: `/socios/create?persona_id=${props.persona.id}`,
-        showUrl: props.roles.socio ? `/socios/${props.roles.socio.id}` : null, */
+        createUrl: `/socios/create?persona_id=${props.persona.id}`,
+        showUrl: props.roles.socio ? `/socios/${props.roles.socio.id}` : null,
     },
     {
         key: 'adulto',
@@ -79,10 +79,10 @@ const transiciones = computed(() => [
         description: 'Incorporar como adulto mayor perteneciente a la agrupación.',
         icon: UserRound,
         base: '/adultos',
-        /* createUrl: `/adultos/create?persona_id=${props.persona.id}`,
+        createUrl: `/adultos/create?persona_id=${props.persona.id}`,
         showUrl: props.roles.adulto
             ? `/adultos/${props.roles.adulto.id}`
-            : null, */
+            : null,
     },
     {
         key: 'colaborador',
@@ -90,10 +90,10 @@ const transiciones = computed(() => [
         description: 'Registrar como colaborador de la agrupación.',
         icon: HandHeart,
         base: '/colaboradores',
-        /* createUrl: `/adultos/colaborador?persona_id=${props.persona.id}`,
+        createUrl: `/adultos/colaborador?persona_id=${props.persona.id}`,
         showUrl: props.roles.colaborador
-            ? `/adultos/colaborador/${props.roles.colaborador.id}`
-            : null, */
+             ? `/adultos/colaborador/${props.roles.colaborador.id}`
+             : null,
     },
 ].map((rol) => {
     const registro = props.roles[rol.key];

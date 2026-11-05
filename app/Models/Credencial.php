@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Credencial extends Model
 {
     /** @use HasFactory<\Database\Factories\CredencialFactory> */
-    use HasFactory, softDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'adulto_id',

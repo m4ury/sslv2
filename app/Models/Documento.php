@@ -9,18 +9,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Documento extends Model
 {
     /** @use HasFactory<\Database\Factories\DocumentoFactory> */
-    use HasFactory, softDeletes;
+    use HasFactory;
 
     protected $fillable = [
-        'adulto_id', 
-        'user_id', 
+        'adulto_id',
+        'user_id',
         'tipo_documento_id',
-        'nombre', 
-        'descripcion', 
-        'fecha_documento', 
-        'archivo_ruta', 
-        'archivo_original', 
-        'mime_type', 
+        'nombre',
+        'descripcion',
+        'fecha_documento',
+        'archivo_ruta',
+        'archivo_original',
+        'mime_type',
         'tamano_bytes',
         'fecha_carga'
         ];

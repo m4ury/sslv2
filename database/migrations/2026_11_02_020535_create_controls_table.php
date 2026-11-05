@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('observacion')->nullable();
             $table->text('indicaciones')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

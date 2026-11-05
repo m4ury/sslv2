@@ -18,14 +18,14 @@ class FichaClinicaController extends Controller
         return Inertia::render('adultos/Ficha', [
             'adulto' => $adulto->only('id', 'estado', 'fecha_ingreso'),
             'persona' => $adulto->persona,
-            'patologias' => $adulto->patologias()->orderByDesc('fecha_diagnostico')->get(),
+            //'patologias' => $adulto->patologias()->orderByDesc('fecha_diagnostico')->get(),
             'controles' => $adulto->controles()
                 ->with(['mediciones', 'autor:id,name'])
-                ->orderByDesc('fecha')->orderByDesc('id')
+                ->orderByDesc('created_at')->orderByDesc('id')
                 ->get(),
-            'prestaciones' => $adulto->prestaciones()->orderByDesc('fecha')->get(),
+            //'prestaciones' => $adulto->prestaciones()->orderByDesc('created_at')->get(),
             'programados' => $adulto->programados()->orderBy('fecha_programada')->get(),
-            'credenciales' => $adulto->credenciales()->orderBy('fecha_vencimiento')->get(),
+            'credenciales' => $adulto->credenciales()->orderBy('fecha_expiracion')->get(),
             'documentos' => $adulto->documentos()->latest()->get(),
             'catalogos' => config('ficha'),
         ]);
