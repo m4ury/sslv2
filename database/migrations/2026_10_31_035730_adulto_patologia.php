@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('adulto_patologia', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('adulto_id')->constrained('adultos')->onDelete('cascade');
-            $table->foreignId('patologia_id')->constrained('patologias')->onDelete('cascade');
+            $table->foreignId('adulto_id')->constrained('adultos');
+            $table->foreignId('patologia_id')->constrained('patologias');
             $table->date('fecha_diagnostico')->nullable();
             $table->string('observaciones', 255)->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

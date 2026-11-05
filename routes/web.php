@@ -6,6 +6,8 @@ use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\SocioController;
 use App\Http\Controllers\FichaClinicaController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PatologiaController;
+
 
 Route::inertia('/', 'Welcome')->name('home');
 
@@ -35,6 +37,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('{seccion}/{id}', [FichaClinicaController::class, 'update'])->name('update');
         Route::delete('{seccion}/{id}', [FichaClinicaController::class, 'destroy'])->name('destroy');
     });
+
+    Route::prefix('catalogos')->name('catalogos.')->group(function () {
+    Route::get('patologias', [PatologiaController::class, 'index'])->name('patologias.index');
+    Route::post('patologias', [PatologiaController::class, 'store'])->name('patologias.store');
+    Route::put('patologias/{patologia}', [PatologiaController::class, 'update'])->name('patologias.update');
+    Route::delete('patologias/{patologia}', [PatologiaController::class, 'destroy'])->name('patologias.destroy');
+});
 
 });
 

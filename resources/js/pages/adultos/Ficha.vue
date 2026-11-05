@@ -29,7 +29,8 @@ const props = defineProps({
     programados: { type: Array, default: () => [] },
     credenciales: { type: Array, default: () => [] },
     documentos: { type: Array, default: () => [] },
-    catalogos: { type: Object, required: true },
+    //catalogos: { type: Object, required: true },
+    catalogoPatologias: { type: Array, default: () => [] },
 });
 
 const base = computed(() => `/adultos/${props.adulto.id}/ficha`);
@@ -55,7 +56,7 @@ const controlesPlanos = computed(() =>
     props.controles.map((c) => ({
         ...c,
         ...Object.fromEntries(
-            (c.mediciones ?? []).map((m) => [`med_${m.tipo}`, m.valor]),
+            (c.medicions ?? []).map((m) => [`med_${m.tipo}`, m.valor]),
         ),
     })),
 );
@@ -110,7 +111,7 @@ const ultimasMediciones = computed(() => {
         });
     }
 
-    for (const [tipo, def] of Object.entries(props.catalogos.mediciones)) {
+    /* for (const [tipo, def] of Object.entries(props.catalogos.mediciones)) {
         if (tipo.startsWith('pa_')) continue;
         const r = buscarMedicion(tipo);
         if (r) {
@@ -121,7 +122,7 @@ const ultimasMediciones = computed(() => {
                 fecha: r.control.fecha,
             });
         }
-    }
+    } */
 
     const peso = buscarMedicion('peso');
     const talla = buscarMedicion('talla');

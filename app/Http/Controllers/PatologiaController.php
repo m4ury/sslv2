@@ -5,62 +5,50 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePatologiaRequest;
 use App\Http\Requests\UpdatePatologiaRequest;
 use App\Models\Patologia;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class PatologiaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Inertia::render('catalogos/Patologias', [
+            'patologias' => Patologia::withCount('registros')->orderBy('nombre')->get(),
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request)
     {
-        //
+        Patologia::create($this->validar($request));
+
+        return back()->with('success', 'Patología agregada al catálogo.');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorePatologiaRequest $request)
+    public function update(Request $request, Patologia $patologia)
     {
-        //
+        $patologia->update($this->validar($request, $patologia));
+
+        return back()->with('success', 'Patología actualizada.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Patologia $patologia)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Patologia $patologia)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePatologiaRequest $request, Patologia $patologia)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Patologia $patologia)
     {
-        //
+        // withTrashed: también cuenta registros eliminados, que siguen ligados por FK
+        if ($patologia->registros()->withTrashed()->exists()) {
+            return back()->with('error', 'No se puede eliminar: está asociada a registros de adultos.');
+        }
+
+        $patologia->delete();
+
+        return back()->with('success', 'Patología eliminada del catálogo.');
+    }
+
+    private function validar(Request $request, ?Patologia $patologia = null): array
+    {
+        return $request->validate([
+            'nombre' => ['required', 'string', 'max:255', Rule::unique('patologias', 'nombre')->ignore($patologia)],
+            'codigo_cie10' => ['nullable', 'string', 'max:10'],
+        ]);
     }
 }

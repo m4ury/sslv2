@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('archivo_ruta', 255)->nullable();
             $table->string('observaciones', 255)->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

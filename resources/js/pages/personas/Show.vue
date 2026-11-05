@@ -64,6 +64,9 @@ const datos = computed(() => [
     },
     { label: 'Sexo', value: props.persona.sexo, capitalize: true },
     { label: 'Email', value: props.persona.email },
+    { label: 'Direccion', value: props.persona.direccion },
+    { label: 'Comuna', value: props.persona.comuna },
+
 ]);
 
 // Cada rol: al transicionar se abre su formulario con ?persona_id=
@@ -140,9 +143,9 @@ function formatDate(value) {
             <div class="flex flex-col gap-2">
                 <h1 class="text-2xl font-bold">{{ fullName }}</h1>
                 <div class="flex flex-wrap items-center gap-2">
-                    <span class="font-mono text-sm text-muted-foreground">
+<!--                    <span class="font-mono text-sm text-muted-foreground">
                         {{ persona.rut }}
-                    </span>
+                    </span>-->
                     <Badge v-for="rol in rolesActivos" :key="rol.key">
                         {{ rol.label }}
                     </Badge>
@@ -174,7 +177,7 @@ function formatDate(value) {
                 <CardHeader>
                     <CardTitle>Datos de la persona</CardTitle>
                     <CardDescription>
-                        Información compartida con todos sus roles en la
+                        Información compartida con sus roles en la
                         agrupación.
                     </CardDescription>
                 </CardHeader>

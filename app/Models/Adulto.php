@@ -54,6 +54,19 @@ class Adulto extends Model
         return $this->hasMany(Documento::class);
     }
 
+    public function patologias()
+    {
+        return $this->hasMany(AdultoPatologia::class);
+    }
+
+    // Acceso n:m directo al catálogo
+    public function diagnosticos()
+    {
+        return $this->belongsToMany(Patologia::class, 'adulto_patologia')
+            ->wherePivotNull('deleted_at')
+            ->withPivot('estado', 'fecha_diagnostico');
+    }
+
     protected function casts(): array
     {
         return [

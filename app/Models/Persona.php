@@ -6,11 +6,12 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Appends(['full_name', 'edad'])]
 class Persona extends Model
 {
-    use HasFactory;
+    use HasFactory, softDeletes;
 
     protected $fillable = [
         'nombres',
@@ -20,6 +21,9 @@ class Persona extends Model
         'email',
         'fecha_nacimiento',
         'sexo',
+        'direccion',
+        'comuna',
+        'telefono',
     ];
 
     public function getFullNameAttribute()
@@ -36,9 +40,18 @@ class Persona extends Model
         return null;
     }
 
-    public function socio() { return $this->hasOne(Socio::class); }
+    public function socio()
+    {
+        return $this->hasOne(Socio::class);
+    }
 
-    public function adulto() { return $this->hasOne(Adulto::class); }
-    
-    public function colaborador() { return $this->hasOne(Colaborador::class); }
+    public function adulto()
+    {
+        return $this->hasOne(Adulto::class);
+    }
+
+    public function colaborador()
+    {
+        return $this->hasOne(Colaborador::class);
+    }
 }

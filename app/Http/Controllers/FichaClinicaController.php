@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Adulto;
 use App\Models\Control;
+use App\Models\Patologia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -18,9 +19,14 @@ class FichaClinicaController extends Controller
         return Inertia::render('adultos/Ficha', [
             'adulto' => $adulto->only('id', 'estado', 'fecha_ingreso'),
             'persona' => $adulto->persona,
-            //'patologias' => $adulto->patologias()->orderByDesc('fecha_diagnostico')->get(),
+            /* 'patologias' => $adulto->patologias()->orderByDesc('fecha_diagnostico')->get(), */
+            'patologias' => $adulto->patologias()
+                ->with('patologia:id,nombre')
+                ->orderByDesc('fecha_diagnostico')
+                ->get(),
+            'catalogoPatologias' => Patologia::orderBy('nombre')->get(['id', 'nombre']),
             'controles' => $adulto->controles()
-                ->with(['mediciones', 'autor:id,name'])
+                ->with(['medicions', 'autor:id,name'])
                 ->orderByDesc('created_at')->orderByDesc('id')
                 ->get(),
             //'prestaciones' => $adulto->prestaciones()->orderByDesc('created_at')->get(),
@@ -90,9 +96,9 @@ class FichaClinicaController extends Controller
             $control = $adulto->controles()->create($atributos);
         }
 
-        $control->mediciones()->delete();
+        $control->medicion()->delete();
 
-        foreach (config('ficha.mediciones') as $tipo => $def) {
+        /* foreach (config('ficha.medicions') as $tipo => $def) {
             $valor = $data["med_{$tipo}"] ?? null;
 
             if ($valor !== null && $valor !== '') {
@@ -102,7 +108,7 @@ class FichaClinicaController extends Controller
                     'unidad' => $def['unidad'],
                 ]);
             }
-        }
+        } */
     }
 
     private function guardarDocumento(Request $request, Adulto $adulto, array $data): void
@@ -111,12 +117,12 @@ class FichaClinicaController extends Controller
 
         $adulto->documentos()->create([
             'nombre' => $data['nombre'],
-            'tipo' => $data['tipo'],
+            'tipo_documento_id' => $data['tipo_documento_id'],
             'fecha_documento' => $data['fecha_documento'] ?? null,
-            'ruta' => $archivo->store("fichas/{$adulto->id}", 'local'),
-            'nombre_original' => $archivo->getClientOriginalName(),
-            'mime' => $archivo->getMimeType(),
-            'tamano' => $archivo->getSize(),
+            'archivo_ruta' => $archivo->store("fichas/{$adulto->id}", 'local'),
+            'archivo_original' => $archivo->getClientOriginalName(),
+            'mime_type' => $archivo->getMimeType(),
+            'tamano_bytes' => $archivo->getSize(),
         ]);
     }
 
@@ -125,19 +131,27 @@ class FichaClinicaController extends Controller
         $c = config('ficha');
 
         return match ($seccion) {
-            /* 'patologias' => [
-                'nombre' => ['required', 'string', 'max:255'],
-                'codigo_cie10' => ['nullable', 'string', 'max:10'],
-                'fecha_diagnostico' => ['nullable', 'date', 'before_or_equal:today'],
-                'estado' => ['required', Rule::in($c['estados_patologia'])],
-                'observaciones' => ['nullable', 'string'],
-            ], */
+            'patologias' => [
+            'patologia_id' => [
+                'required',
+                Rule::exists('patologias', 'id'),
+                // Evita dos registros vigentes de la misma patología en el mismo adulto
+                /* ...($vigente ? [
+                    Rule::unique('adulto_patologia', 'patologia_id')
+                        ->where('adulto_id', $adulto->id)
+                        ->whereNull('deleted_at')
+                        ->ignore($request->route('id')),
+                ] : []), */
+            ],
+            'fecha_diagnostico' => ['nullable', 'date', 'before_or_equal:today'],
+            'observaciones' => ['nullable', 'string'],
+],
 
             'controles' => [
                 'fecha' => ['required', 'date', 'before_or_equal:today'],
                 'tipo' => ['required', Rule::in($c['tipos_control'])],
                 'observaciones' => ['nullable', 'string'],
-                ...collect($c['mediciones'])->mapWithKeys(fn ($def, $tipo) => [
+                ...collect($c['medicions'])->mapWithKeys(fn ($def, $tipo) => [
                     "med_{$tipo}" => ['nullable', 'numeric', "between:{$def['min']},{$def['max']}"],
                 ])->all(),
             ],

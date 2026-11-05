@@ -27,3 +27,4 @@ return [
     'tipos_credencial' => ['Credencial de discapacidad', 'Carnet de control', 'Seguro de salud', 'Otra'],
     'tipos_documento' => ['Examen', 'Epicrisis', 'Receta', 'Informe', 'Consentimiento', 'Otro'],
 ];
+

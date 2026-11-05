@@ -20,9 +20,11 @@ return new class extends Migration
             $table->string('sexo')->nullable();
             $table->date('fecha_nacimiento')->nullable();
             $table->string('direccion')->nullable();
+            $table->enum('comuna', ['Cauquenes', 'Chanco', 'Pelluhue', 'Curico', 'Hualane', 'Licanten', 'Molina', 'Rauco', 'Romeral', 'Sgda Familia', 'Teno', 'Vichuquen', 'Linares', 'Colbun', 'Longabi', 'Parral', 'Retiro', 'San Javier', 'Villa Alegre', 'Yerbas Buenas', 'Talca', 'Constitucion', 'Empedrado', 'Maule', 'Pelarco', 'Pencahue', 'Rio Claro', 'San Clemente', 'San Rafael', 'Curepto'])->nullable();
             $table->string('telefono')->nullable();
             $table->string('email')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

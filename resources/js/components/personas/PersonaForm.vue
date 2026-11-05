@@ -23,6 +23,39 @@ const props = defineProps({
     },
 });
 
+const comunaOptions = [
+    'Cauquenes',
+    'Chanco',
+    'Pelluhue',
+    'Curico',
+    'Hualane',
+    'Licanten',
+    'Molina',
+    'Rauco',
+    'Romeral',
+    'Sgda Familia',
+    'Teno',
+    'Vichuquen',
+    'Linares',
+    'Colbun',
+    'Longabi',
+    'Parral',
+    'Retiro',
+    'San Javier',
+    'Villa Alegre',
+    'Yerbas Buenas',
+    'Talca',
+    'Constitucion',
+    'Empedrado',
+    'Maule',
+    'Pelarco',
+    'Pencahue',
+    'Rio Claro',
+    'San Clemente',
+    'San Rafael',
+    'Curepto',
+];
+
 const isEdit = computed(() => !!props.persona?.id);
 
 const title = computed(() => (isEdit.value ? 'Editar Persona' : 'Crear Persona'));
@@ -42,6 +75,8 @@ const form = useForm({
     // El input type="date" requiere formato YYYY-MM-DD
     fecha_nacimiento: props.persona?.fecha_nacimiento?.substring(0, 10) ?? '',
     sexo: props.persona?.sexo ?? '',
+    direccion: props.persona?.direccion ?? '',
+    comuna: props.persona?.comuna ?? '',
 });
 
 function submitForm() {
@@ -217,7 +252,6 @@ function submitForm() {
                             <div class="flex flex-col gap-2 md:col-span-2">
                                 <Label for="email">
                                     Email
-                                    <span class="text-destructive">*</span>
                                 </Label>
                                 <Input
                                     id="email"
@@ -225,9 +259,62 @@ function submitForm() {
                                     type="email"
                                     placeholder="correo@ejemplo.cl"
                                     :aria-invalid="!!form.errors.email"
-                                    required
                                 />
                                 <InputError :message="form.errors.email" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <!--Datos de ubicacion --> 
+                    <section class="flex flex-col gap-4">
+                        <h2
+                            class="border-b pb-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase"
+                        >
+                            Datos ubicacion
+                        </h2>
+
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="flex flex-col gap-2">
+                                <Label for="direccion">
+                                    Direccion
+                                    <span class="text-destructive">*</span>
+                                </Label>
+                                <Input
+                                    id="direccion"
+                                    v-model="form.direccion"
+                                    type="text"
+                                    :aria-invalid="
+                                        !!form.errors.direccion
+                                    "
+                                    required
+                                />
+                                <InputError
+                                    :message="form.errors.direccion"
+                                />
+                            </div>
+
+                            <div class="flex flex-col gap-2">
+                                <Label for="comuna">
+                                    Comuna
+                                    <span class="text-destructive">*</span>
+                                </Label>
+                                <select
+                                    id="comuna"
+                                    v-model="form.comuna"
+                                    class="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive"
+                                    :aria-invalid="!!form.errors.comuna"
+                                    required
+                                >
+                                    <option value="">Seleccione...</option>
+                                    <option
+                                        v-for="comuna in comunaOptions"
+                                        :key="comuna"
+                                        :value="comuna"
+                                    >
+                                        {{ comuna }}
+                                    </option>
+                                </select>
+                                <InputError :message="form.errors.comuna" />
                             </div>
                         </div>
                     </section>

@@ -28,7 +28,7 @@ function formatTamano(bytes) {
 
 function resumenMediciones(control, catalogo) {
     const m = Object.fromEntries(
-        (control.mediciones ?? []).map((x) => [x.tipo, x.valor]),
+        (control.medicion ?? []).map((x) => [x.tipo, x.valor]),
     );
     const partes = [];
 
@@ -59,7 +59,7 @@ const VARIANTES = {
 
 const variante = (valor) => VARIANTES[valor] ?? 'secondary';
 
-export function crearSecciones({ catalogos, controles }) {
+export function crearSecciones({ catalogos, controles, catalogoPatologias = [] }) {
     const etiquetaControl = (c) => `${formatDate(c.fecha)} · ${c.tipo}`;
 
     const camposMediciones = Object.entries(catalogos.mediciones).map(
@@ -75,26 +75,36 @@ export function crearSecciones({ catalogos, controles }) {
     );
 
     return {
-        /* patologias: {
+        patologias: {
             titulo: 'Patologías',
             singular: 'patología',
-            descripcion: 'Diagnósticos y antecedentes mórbidos.',
+            descripcion: 'Diagnósticos del adulto, tomados del catálogo de patologías.',
             vacio: 'Sin patologías registradas.',
             columns: [
-                { key: 'nombre', label: 'Patología' },
-                { key: 'codigo_cie10', label: 'CIE-10' },
+                { key: 'patologia', label: 'Patología', format: (i) => i.patologia?.nombre ?? '—' },
+                /* { key: 'codigo', label: 'CIE-10', format: (i) => i.patologia?.codigo_cie10 ?? '—' }, */
                 { key: 'fecha_diagnostico', label: 'Diagnóstico', type: 'date' },
-                { key: 'estado', label: 'Estado', badge: true, variant: (i) => variante(i.estado) },
+                /* { key: 'estado', label: 'Estado', badge: true, variant: (i) => variante(i.estado) }, */
                 { key: 'observaciones', label: 'Observaciones', class: 'max-w-xs truncate' },
             ],
             fields: [
-                { name: 'nombre', label: 'Patología', required: true, span: 2 },
-                { name: 'codigo_cie10', label: 'Código CIE-10' },
+                {
+                    name: 'patologia_id',
+                    label: 'Patología',
+                    type: 'select',
+                    required: true,
+                    span: 2,
+                    options: catalogoPatologias.map((p) => ({
+                        value: p.id,
+                        /* label: p.codigo_cie10 ? `${p.nombre} (${p.codigo_cie10})` : p.nombre, */
+                        label:`${p.nombre}`
+                    })),
+                },
                 { name: 'fecha_diagnostico', label: 'Fecha de diagnóstico', type: 'date' },
-                { name: 'estado', label: 'Estado', type: 'select', required: true, options: catalogos.estados_patologia },
+                /* { name: 'estado', label: 'Estado', type: 'select', required: true, options: catalogos.estados_patologia }, */
                 { name: 'observaciones', label: 'Observaciones', type: 'textarea', span: 2 },
             ],
-        }, */
+        },
 
         controles: {
             titulo: 'Controles',

@@ -110,7 +110,6 @@ function formatDate(value) {
                                 <TableHead>Fecha de nacimiento</TableHead>
                                 <TableHead>Edad</TableHead>
                                 <TableHead>Sexo</TableHead>
-                                <TableHead>Email</TableHead>
                                 <TableHead class="text-right">
                                     Acciones
                                 </TableHead>
@@ -139,7 +138,6 @@ function formatDate(value) {
                                         {{ persona.sexo }}
                                     </Badge>
                                 </TableCell>
-                                <TableCell>{{ persona.email }}</TableCell>
                                 <TableCell>
                                     <div class="flex justify-end gap-1">
                                         <Button

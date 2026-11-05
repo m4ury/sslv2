@@ -37,6 +37,8 @@ const datos = computed(() => [
     },
     { label: 'Sexo', value: props.persona.sexo, capitalize: true },
     { label: 'Email', value: props.persona.email },
+    { label: 'Direccion', value: props.persona.direccion, capitalize: true },
+    { label: 'Comuna', value: props.persona.comuna },
 ]);
 </script>
 
