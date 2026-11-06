@@ -6,7 +6,6 @@ use App\Models\Adulto;
 use App\Models\Control;
 use App\Models\Patologia;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -26,9 +25,17 @@ class FichaClinicaController extends Controller
                 ->get(),
             'catalogoPatologias' => Patologia::orderBy('nombre')->get(['id', 'nombre']),
             'controles' => $adulto->controles()
-                ->with(['mediciones', 'autor:id,name'])
+                ->with(['mediciones', 'user:id,name'])
                 ->orderByDesc('created_at')->orderByDesc('id')
-                ->get(),
+                ->get()
+                ->map(fn (Control $control) => [
+                    'id' => $control->id,
+                    'fecha' => $control->fecha_control,
+                    'tipo' => $control->tipo_control,
+                    'observaciones' => $control->observacion,
+                    'mediciones' => $control->mediciones,
+                    'autor' => $control->user,
+                ]),
             //'prestaciones' => $adulto->prestaciones()->orderByDesc('created_at')->get(),
             'programados' => $adulto->programados()->orderBy('fecha_programada')->get(),
             'credenciales' => $adulto->credenciales()->orderBy('fecha_expiracion')->get(),
@@ -43,7 +50,7 @@ class FichaClinicaController extends Controller
 
         DB::transaction(function () use ($request, $adulto, $seccion, $data) {
             match ($seccion) {
-                'controles' => $this->guardarControl($adulto, $data),
+                'controles' => $this->guardarControl($adulto, $data, $request->user()->id),
                 'documentos' => $this->guardarDocumento($request, $adulto, $data),
                 'programados' => $adulto->programados()->create([...$data, 'estado' => 'Pendiente']),
                 default => $adulto->{$seccion}()->create($data),
@@ -59,9 +66,9 @@ class FichaClinicaController extends Controller
         $registro = $adulto->{$seccion}()->findOrFail($id);
         $data = $request->validate($this->reglas($seccion, $adulto, $request, true));
 
-        DB::transaction(function () use ($adulto, $seccion, $registro, $data) {
+        DB::transaction(function () use ($request, $adulto, $seccion, $registro, $data) {
             if ($seccion === 'controles') {
-                $this->guardarControl($adulto, $data, $registro);
+                $this->guardarControl($adulto, $data, $request->user()->id, $registro);
             } else {
                 $registro->update($data);
             }
@@ -86,17 +93,21 @@ class FichaClinicaController extends Controller
         return Storage::disk('local')->download($doc->ruta, $doc->nombre_original);
     }
 
-    private function guardarControl(Adulto $adulto, array $data, ?Control $control = null): void
+    private function guardarControl(Adulto $adulto, array $data, int $userId, ?Control $control = null): void
     {
-        $atributos = Arr::only($data, ['fecha', 'tipo', 'observaciones']);
+        $atributos = [
+            'fecha_control' => $data['fecha'],
+            'tipo_control' => $data['tipo'],
+            'observacion' => $data['observaciones'] ?? null,
+        ];
 
         if ($control) {
             $control->update($atributos);
         } else {
-            $control = $adulto->controles()->create($atributos);
+            $control = $adulto->controles()->create([...$atributos, 'user_id' => $userId]);
         }
 
-        $control->medicion()->delete();
+        $control->mediciones()->delete();
 
         foreach (config('ficha.mediciones') as $tipo => $def) {
             $valor = $data["med_{$tipo}"] ?? null;

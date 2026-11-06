@@ -49,6 +49,8 @@ test('persona date of birth and sex can be updated', function () {
             'email' => 'ana@example.com',
             'fecha_nacimiento' => '1992-06-15',
             'sexo' => 'masculino',
+            'direccion' => 'Av. Principal 123',
+            'comuna' => 'Talca',
         ])
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('personas.index'));
@@ -57,6 +59,81 @@ test('persona date of birth and sex can be updated', function () {
         'id' => $persona->id,
         'fecha_nacimiento' => '1992-06-15',
         'sexo' => 'masculino',
+    ]);
+});
+
+test('persona address and commune are saved and shown on the detail page', function () {
+    $persona = Persona::query()->create([
+        'nombres' => 'Ana Maria',
+        'rut' => '12.345.678-5',
+        'apellido_paterno' => 'Perez',
+        'apellido_materno' => 'Gonzalez',
+        'email' => 'ana@example.com',
+        'fecha_nacimiento' => '1990-01-01',
+        'sexo' => 'femenino',
+    ]);
+
+    $this->actingAs(User::factory()->create())
+        ->put(route('personas.update', $persona), [
+            'nombres' => 'Ana Maria',
+            'rut' => '12.345.678-5',
+            'apellido_paterno' => 'Perez',
+            'apellido_materno' => 'Gonzalez',
+            'email' => 'ana@example.com',
+            'fecha_nacimiento' => '1990-01-01',
+            'sexo' => 'femenino',
+            'direccion' => 'Av. Principal 123',
+            'comuna' => 'Talca',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('personas.index'));
+
+    $this->assertDatabaseHas('personas', [
+        'id' => $persona->id,
+        'direccion' => 'Av. Principal 123',
+        'comuna' => 'Talca',
+    ]);
+
+    $this->get(route('personas.show', $persona))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('personas/Show')
+            ->where('persona.direccion', 'Av. Principal 123')
+            ->where('persona.comuna', 'Talca'),
+        );
+});
+
+test('persona update rejects a commune outside the database enum', function () {
+    $persona = Persona::query()->create([
+        'nombres' => 'Ana Maria',
+        'rut' => '12.345.678-5',
+        'apellido_paterno' => 'Perez',
+        'apellido_materno' => 'Gonzalez',
+        'email' => 'ana@example.com',
+        'fecha_nacimiento' => '1990-01-01',
+        'sexo' => 'femenino',
+        'direccion' => 'Av. Principal 123',
+        'comuna' => 'Talca',
+    ]);
+
+    $this->actingAs(User::factory()->create())
+        ->from(route('personas.edit', $persona))
+        ->put(route('personas.update', $persona), [
+            'nombres' => 'Ana Maria',
+            'rut' => '12.345.678-5',
+            'apellido_paterno' => 'Perez',
+            'apellido_materno' => 'Gonzalez',
+            'email' => 'ana@example.com',
+            'fecha_nacimiento' => '1990-01-01',
+            'sexo' => 'femenino',
+            'direccion' => 'Av. Principal 123',
+            'comuna' => 'Comuna inválida',
+        ])
+        ->assertSessionHasErrors('comuna');
+
+    $this->assertDatabaseHas('personas', [
+        'id' => $persona->id,
+        'comuna' => 'Talca',
     ]);
 });
 

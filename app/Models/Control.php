@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
+use Database\Factories\ControlFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Control extends Model
 {
-    /** @use HasFactory<\Database\Factories\ControlFactory> */
+    /** @use HasFactory<ControlFactory> */
     use HasFactory, softDeletes;
 
     protected $fillable = [
@@ -47,9 +47,9 @@ class Control extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function medicion(): HasOne
+    public function mediciones(): HasMany
     {
-        return $this->hasOne(Medicion::class);
+        return $this->hasMany(Medicion::class);
     }
 
     public function prestaciones(): HasMany

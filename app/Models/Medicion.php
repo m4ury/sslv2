@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\MedicionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Medicion extends Model
 {
-    /** @use HasFactory<\Database\Factories\MedicionFactory> */
+    /** @use HasFactory<MedicionFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -21,13 +23,13 @@ class Medicion extends Model
         'clasificacion_imc', */
         'tipo',
         'valor',
-        'unidad'
+        'unidad',
     ];
 
     protected function casts(): array
     {
         return [
-            'valor' => 'float'
+            'valor' => 'float',
             /* 'presion_sistolica' => 'float',
             'presion_diastolica' => 'float',
             'hemoglobina_glicosilada' => 'float',

@@ -28,7 +28,7 @@ function formatTamano(bytes) {
 
 function resumenMediciones(control, catalogo) {
     const m = Object.fromEntries(
-        (control.medicion ?? []).map((x) => [x.tipo, x.valor]),
+        (control.mediciones ?? []).map((x) => [x.tipo, x.valor]),
     );
     const partes = [];
 
