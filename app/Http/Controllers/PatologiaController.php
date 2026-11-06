@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePatologiaRequest;
 use App\Http\Requests\UpdatePatologiaRequest;
+use App\Models\Adulto;
 use App\Models\Patologia;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -11,10 +12,16 @@ use Inertia\Inertia;
 
 class PatologiaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $adulto = Adulto::with('persona')->find($request->integer('adulto'));
+
         return Inertia::render('catalogos/Patologias', [
             'patologias' => Patologia::withCount('registros')->orderBy('nombre')->get(),
+            'volver' => $adulto ? [
+                'url' => "/adultos/{$adulto->id}/ficha",
+                'nombre' => $adulto->persona?->full_name,
+            ] : null,
         ]);
     }
 
@@ -48,7 +55,7 @@ class PatologiaController extends Controller
     {
         return $request->validate([
             'nombre' => ['required', 'string', 'max:255', Rule::unique('patologias', 'nombre')->ignore($patologia)],
-            'codigo_cie10' => ['nullable', 'string', 'max:10'],
+            /* 'codigo_cie10' => ['nullable', 'string', 'max:10'], */
         ]);
     }
 }

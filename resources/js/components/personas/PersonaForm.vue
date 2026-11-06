@@ -243,8 +243,8 @@ function submitForm() {
                                     required
                                 >
                                     <option value="">Seleccione...</option>
-                                    <option value="masculino">Masculino</option>
-                                    <option value="femenino">Femenino</option>
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Femenino">Femenino</option>
                                 </select>
                                 <InputError :message="form.errors.sexo" />
                             </div>
@@ -265,7 +265,7 @@ function submitForm() {
                         </div>
                     </section>
 
-                    <!--Datos de ubicacion --> 
+                    <!--Datos de ubicacion -->
                     <section class="flex flex-col gap-4">
                         <h2
                             class="border-b pb-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase"

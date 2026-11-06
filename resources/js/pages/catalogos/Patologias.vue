@@ -1,9 +1,12 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
+import { ArrowLeft } from '@lucide/vue';
 import FichaSeccion from '@/components/ficha/FichaSeccion.vue';
+import { Button } from '@/components/ui/button';
 
 defineProps({
     patologias: { type: Array, required: true },
+    volver: { type: Object, default: null },
 });
 
 const seccion = {
@@ -14,12 +17,12 @@ const seccion = {
     vacio: 'El catálogo está vacío.',
     columns: [
         { key: 'nombre', label: 'Patología' },
-        { key: 'codigo_cie10', label: 'CIE-10' },
+        /* { key: 'codigo_cie10', label: 'CIE-10' }, */
         { key: 'registros_count', label: 'Registros asociados' },
     ],
     fields: [
         { name: 'nombre', label: 'Nombre', required: true, span: 2 },
-        { name: 'codigo_cie10', label: 'Código CIE-10' },
+        /* { name: 'codigo_cie10', label: 'Código CIE-10' }, */
     ],
 };
 </script>
@@ -28,6 +31,15 @@ const seccion = {
     <Head title="Catálogo de patologías" />
 
     <div class="mx-auto flex max-w-4xl flex-col gap-6 p-4 md:p-6">
+        <div v-if="volver">
+            <Button as-child variant="outline">
+                <Link :href="volver.url">
+                    <ArrowLeft class="size-4" />
+                    Volver a la ficha{{ volver.nombre ? ` de ${volver.nombre}` : '' }}
+                </Link>
+            </Button>
+        </div>
+
         <FichaSeccion
             :seccion="seccion"
             :items="patologias"

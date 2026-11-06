@@ -29,7 +29,7 @@ const props = defineProps({
     programados: { type: Array, default: () => [] },
     credenciales: { type: Array, default: () => [] },
     documentos: { type: Array, default: () => [] },
-    //catalogos: { type: Object, required: true },
+    catalogos: { type: Object, required: true },
     catalogoPatologias: { type: Array, default: () => [] },
 });
 
@@ -48,7 +48,7 @@ const fullName = computed(
 );
 
 const secciones = computed(() =>
-    crearSecciones({ catalogos: props.catalogos, controles: props.controles }),
+    crearSecciones({ catalogos: props.catalogos, controles: props.controles, catalogoPatologias: props.catalogoPatologias, }),
 );
 
 // Cada medición del control se aplana como med_<tipo> para el formulario genérico
@@ -56,7 +56,7 @@ const controlesPlanos = computed(() =>
     props.controles.map((c) => ({
         ...c,
         ...Object.fromEntries(
-            (c.medicions ?? []).map((m) => [`med_${m.tipo}`, m.valor]),
+            (c.mediciones ?? []).map((m) => [`med_${m.tipo}`, m.valor]),
         ),
     })),
 );
@@ -111,7 +111,7 @@ const ultimasMediciones = computed(() => {
         });
     }
 
-    /* for (const [tipo, def] of Object.entries(props.catalogos.mediciones)) {
+    for (const [tipo, def] of Object.entries(props.catalogos.mediciones)) {
         if (tipo.startsWith('pa_')) continue;
         const r = buscarMedicion(tipo);
         if (r) {
@@ -122,7 +122,7 @@ const ultimasMediciones = computed(() => {
                 fecha: r.control.fecha,
             });
         }
-    } */
+    }
 
     const peso = buscarMedicion('peso');
     const talla = buscarMedicion('talla');
@@ -214,12 +214,18 @@ const ultimasMediciones = computed(() => {
                                 v-if="patologiasActivas.length"
                                 class="flex flex-wrap gap-2"
                             >
-                                <Badge
+                                <!-- <Badge
                                     v-for="p in patologiasActivas"
                                     :key="p.id"
                                     variant="secondary"
                                 >
                                     {{ p.nombre }}
+                                </Badge> -->
+                                <Badge    v-for="p in patologiasActivas"
+                                         :key="p.id"
+                                          variant="secondary"
+                                >
+                                    {{ p.patologia?.nombre }}
                                 </Badge>
                             </div>
                             <p v-else class="text-sm text-muted-foreground">
@@ -311,12 +317,28 @@ const ultimasMediciones = computed(() => {
                 </Card>
             </TabsContent>
 
-            <TabsContent value="patologias">
+            <!-- <TabsContent value="patologias">
                 <FichaSeccion
                     :seccion="secciones.patologias"
                     :items="patologias"
                     :url="`${base}/patologias`"
                 />
+            </TabsContent> -->
+            <TabsContent value="patologias" class="flex flex-col gap-3">
+                <FichaSeccion
+                    :seccion="secciones.patologias"
+                    :items="patologias"
+                    :url="`${base}/patologias`"
+                />
+                <p class="text-sm text-muted-foreground">
+                    ¿No encuentras la patología?
+                    <Link
+                        :href="`/catalogos/patologias?adulto=${adulto.id}`"
+                        class="underline underline-offset-4"
+                    >
+                        Agrégala al catálogo
+                    </Link>
+                </p>
             </TabsContent>
 
             <TabsContent value="controles">

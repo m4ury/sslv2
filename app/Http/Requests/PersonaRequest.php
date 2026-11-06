@@ -32,7 +32,7 @@ class PersonaRequest extends FormRequest
             'apellido_materno' => ['required', 'string', 'max:100'],
             'email' => ['nullable', Rule::unique('personas', 'email')->ignore($persona)],
             'fecha_nacimiento' => ['required', 'date'],
-            'sexo' => ['required', Rule::in(['masculino', 'femenino'])],
+            'sexo' => ['required', Rule::in(['Masculino', 'Femenino'])],
             'direccion' => ['required', 'string', 'max:255'],
             'comuna' => [
                 'required',

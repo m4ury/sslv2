@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('adultos/{adulto}/ficha')
     ->name('ficha.')
     ->where([
-        'seccion' => 'controles|prestaciones|programados|credenciales|documentos',
+        'seccion' => 'patologias|controles|prestaciones|programados|credenciales|documentos',
         'id' => '[0-9]+',
         'documento' => '[0-9]+',
     ])

@@ -26,7 +26,7 @@ class FichaClinicaController extends Controller
                 ->get(),
             'catalogoPatologias' => Patologia::orderBy('nombre')->get(['id', 'nombre']),
             'controles' => $adulto->controles()
-                ->with(['medicions', 'autor:id,name'])
+                ->with(['mediciones', 'autor:id,name'])
                 ->orderByDesc('created_at')->orderByDesc('id')
                 ->get(),
             //'prestaciones' => $adulto->prestaciones()->orderByDesc('created_at')->get(),
@@ -98,7 +98,7 @@ class FichaClinicaController extends Controller
 
         $control->medicion()->delete();
 
-        /* foreach (config('ficha.medicions') as $tipo => $def) {
+        foreach (config('ficha.mediciones') as $tipo => $def) {
             $valor = $data["med_{$tipo}"] ?? null;
 
             if ($valor !== null && $valor !== '') {
@@ -108,7 +108,7 @@ class FichaClinicaController extends Controller
                     'unidad' => $def['unidad'],
                 ]);
             }
-        } */
+        }
     }
 
     private function guardarDocumento(Request $request, Adulto $adulto, array $data): void
@@ -151,7 +151,7 @@ class FichaClinicaController extends Controller
                 'fecha' => ['required', 'date', 'before_or_equal:today'],
                 'tipo' => ['required', Rule::in($c['tipos_control'])],
                 'observaciones' => ['nullable', 'string'],
-                ...collect($c['medicions'])->mapWithKeys(fn ($def, $tipo) => [
+                ...collect($c['mediciones'])->mapWithKeys(fn ($def, $tipo) => [
                     "med_{$tipo}" => ['nullable', 'numeric', "between:{$def['min']},{$def['max']}"],
                 ])->all(),
             ],
