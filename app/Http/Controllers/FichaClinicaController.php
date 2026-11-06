@@ -19,7 +19,7 @@ class FichaClinicaController extends Controller
         return Inertia::render('adultos/Ficha', [
             'adulto' => $adulto->only('id', 'estado', 'fecha_ingreso'),
             'persona' => $adulto->persona,
-            /* 'patologias' => $adulto->patologias()->orderByDesc('fecha_diagnostico')->get(), */
+            //'patologias' => $adulto->patologias()->orderByDesc('fecha_diagnostico')->get(),
             'patologias' => $adulto->patologias()
                 ->with('patologia:id,nombre')
                 ->orderByDesc('fecha_diagnostico')
@@ -129,6 +129,7 @@ class FichaClinicaController extends Controller
     private function reglas(string $seccion, Adulto $adulto, Request $request, bool $editando): array
     {
         $c = config('ficha');
+        $vigente = in_array($request->input('estado'), ['Activa', 'Controlada'], true);
 
         return match ($seccion) {
             'patologias' => [
@@ -136,14 +137,16 @@ class FichaClinicaController extends Controller
                 'required',
                 Rule::exists('patologias', 'id'),
                 // Evita dos registros vigentes de la misma patología en el mismo adulto
-                /* ...($vigente ? [
+                ...($vigente ? [
                     Rule::unique('adulto_patologia', 'patologia_id')
                         ->where('adulto_id', $adulto->id)
                         ->whereNull('deleted_at')
+                        ->whereIn('estado', ['Activa', 'Controlada'])
                         ->ignore($request->route('id')),
-                ] : []), */
+                ] : []),
             ],
             'fecha_diagnostico' => ['nullable', 'date', 'before_or_equal:today'],
+            'estado' => ['required', Rule::in($c['estados_patologia'])],
             'observaciones' => ['nullable', 'string'],
 ],
 

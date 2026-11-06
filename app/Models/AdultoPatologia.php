@@ -11,7 +11,7 @@ class AdultoPatologia extends Model
 
     protected $table = 'adulto_patologia';
 
-    protected $fillable = ['adulto_id', 'patologia_id', 'fecha_diagnostico', 'observaciones'];
+    protected $fillable = ['adulto_id', 'patologia_id', 'fecha_diagnostico', 'observaciones', 'estado'];
 
     protected function casts(): array
     {

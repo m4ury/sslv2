@@ -84,7 +84,7 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [] }
                 { key: 'patologia', label: 'Patología', format: (i) => i.patologia?.nombre ?? '—' },
                 /* { key: 'codigo', label: 'CIE-10', format: (i) => i.patologia?.codigo_cie10 ?? '—' }, */
                 { key: 'fecha_diagnostico', label: 'Diagnóstico', type: 'date' },
-                /* { key: 'estado', label: 'Estado', badge: true, variant: (i) => variante(i.estado) }, */
+                { key: 'estado', label: 'Estado', badge: true, variant: (i) => variante(i.estado) },
                 { key: 'observaciones', label: 'Observaciones', class: 'max-w-xs truncate' },
             ],
             fields: [
@@ -101,7 +101,7 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [] }
                     })),
                 },
                 { name: 'fecha_diagnostico', label: 'Fecha de diagnóstico', type: 'date' },
-                /* { name: 'estado', label: 'Estado', type: 'select', required: true, options: catalogos.estados_patologia }, */
+                { name: 'estado', label: 'Estado', type: 'select', required: true, options: catalogos.estados_patologia },
                 { name: 'observaciones', label: 'Observaciones', type: 'textarea', span: 2 },
             ],
         },

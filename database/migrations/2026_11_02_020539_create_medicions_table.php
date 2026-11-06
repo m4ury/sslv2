@@ -13,14 +13,18 @@ return new class extends Migration
     {
         Schema::create('medicions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('control_id')->constrained('controls')->onDelete('cascade');
-            $table->float('presion_sistolica', 10, 2)->nullable();
+            $table->foreignId('control_id')->constrained('controls')->nullable();
+            $table->string('tipo', 40);
+            $table->decimal('valor', 8, 2);
+            $table->string('unidad', 20)->nullable();
+            /* $table->float('presion_sistolica', 10, 2)->nullable();
             $table->float('presion_diastolica', 10, 2)->nullable();
             $table->float('hemoglobina_glicosilada', 10, 2)->nullable();
             $table->float('peso_actual', 10, 2)->nullable();
             $table->float('talla_actual', 10, 2)->nullable();
             $table->float('imc', 10, 2)->nullable();
-            $table->string('clasificacion_imc', 100)->nullable();
+            $table->string('clasificacion_imc', 100)->nullable(); */
+            $table->unique(['control_id', 'tipo']);
             $table->timestamps();
         });
     }

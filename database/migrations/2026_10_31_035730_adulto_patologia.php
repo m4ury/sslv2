@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('adulto_id')->constrained('adultos');
             $table->foreignId('patologia_id')->constrained('patologias');
+            $table->string('estado')->default('Activa');
             $table->date('fecha_diagnostico')->nullable();
             $table->string('observaciones', 255)->nullable();
             $table->timestamps();

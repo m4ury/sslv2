@@ -12,24 +12,28 @@ class Medicion extends Model
 
     protected $fillable = [
         'control_id',
-        'presion_sistolica',
+        /* 'presion_sistolica',
         'presion_diastolica',
         'hemoglobina_glicosilada',
         'peso_actual',
         'talla_actual',
         'imc',
-        'clasificacion_imc',
+        'clasificacion_imc', */
+        'tipo',
+        'valor',
+        'unidad'
     ];
 
     protected function casts(): array
     {
         return [
-            'presion_sistolica' => 'float',
+            'valor' => 'float'
+            /* 'presion_sistolica' => 'float',
             'presion_diastolica' => 'float',
             'hemoglobina_glicosilada' => 'float',
             'peso_actual' => 'float',
             'talla_actual' => 'float',
-            'imc' => 'float',
+            'imc' => 'float', */
         ];
     }
 
