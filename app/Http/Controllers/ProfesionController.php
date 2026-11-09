@@ -2,65 +2,74 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreProfesionRequest;
-use App\Http\Requests\UpdateProfesionRequest;
 use App\Models\Profesion;
+use App\Models\User;
+use App\Support\Permisos;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class ProfesionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Inertia::render('admin/Profesiones', [
+            'profesiones' => Profesion::withCount('usuarios')->orderBy('nombre')->get(),
+            'grupos' => config('permisos.grupos'),
+            'plantillas' => config('permisos.plantillas'),
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request)
     {
-        //
+        Profesion::create($this->validar($request));
+
+        return back()->with('success', 'Profesión creada.');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreProfesionRequest $request)
+    public function update(Request $request, Profesion $profesion)
     {
-        //
+        $data = $this->validar($request, $profesion);
+
+        // No se puede quitar el rol de administrador si no queda otro administrador activo
+        if ($profesion->es_admin && ! $data['es_admin'] && ! $this->hayOtroAdmin($profesion)) {
+            return back()->with('error', 'Debe quedar al menos un administrador activo.');
+        }
+
+        $profesion->update($data);
+
+        return back()->with('success', 'Profesión actualizada.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Profesion $profesion)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Profesion $profesion)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateProfesionRequest $request, Profesion $profesion)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Profesion $profesion)
     {
-        //
+        if ($profesion->usuarios()->exists()) {
+            return back()->with('error', 'No se puede eliminar: tiene usuarios asignados.');
+        }
+
+        $profesion->delete();
+
+        return back()->with('success', 'Profesión eliminada.');
+    }
+
+    private function validar(Request $request, ?Profesion $profesion = null): array
+    {
+        $data = $request->validate([
+            'nombre' => ['required', 'string', 'max:255', Rule::unique('profesiones', 'nombre')->ignore($profesion)],
+            'es_admin' => ['required', 'boolean'],
+            'permisos' => ['nullable', 'array'],
+            'permisos.*' => ['string', Rule::in(Permisos::claves())],
+        ]);
+
+        $data['permisos'] = array_values($data['permisos'] ?? []);
+
+        return $data;
+    }
+
+    private function hayOtroAdmin(Profesion $excluir): bool
+    {
+        return User::where('activo', true)
+            ->whereHas('profesion', fn ($q) => $q->where('es_admin', true)->whereKeyNot($excluir->id))
+            ->exists();
     }
 }

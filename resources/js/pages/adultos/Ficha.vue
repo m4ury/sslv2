@@ -20,6 +20,10 @@ import {
     formatDate,
 } from '@/config/ficha';
 
+import { usePermisos } from '@/composables/usePermisos';
+
+const { puede } = usePermisos();
+
 const props = defineProps({
     adulto: { type: Object, required: true },
     persona: { type: Object, required: true },
@@ -194,28 +198,30 @@ const ultimasMediciones = computed(() => {
             </div>
         </div>
 
-        <Tabs default-value="resumen" class="gap-4">
-            <TabsList class="h-auto w-full flex-wrap justify-start">
-                <TabsTrigger value="resumen">Resumen</TabsTrigger>
-                <TabsTrigger value="patologias">
+        <Tabs default-value="resumen" class="min-w-0 gap-4">
+            <TabsList
+                class="h-auto min-h-9 w-full flex-wrap content-start items-start justify-start gap-1"
+            >
+                <TabsTrigger value="resumen" class="h-9 flex-none">Resumen</TabsTrigger>
+                <TabsTrigger value="patologias" class="h-9 flex-none">
                     Patologías ({{ patologias.length }})
                 </TabsTrigger>
-                <TabsTrigger value="controles">
+                <TabsTrigger value="controles" class="h-9 flex-none">
                     Controles ({{ controles.length }})
                 </TabsTrigger>
-                <TabsTrigger value="prestaciones">
+                <TabsTrigger value="prestaciones" class="h-9 flex-none">
                     Prestaciones ({{ prestaciones.length }})
                 </TabsTrigger>
-                <TabsTrigger value="programados">
+                <TabsTrigger value="programados" class="h-9 flex-none">
                     Programados ({{ pendientes.length }})
                 </TabsTrigger>
-                <TabsTrigger value="credenciales">
+                <TabsTrigger value="credenciales" class="h-9 flex-none">
                     Credenciales ({{ credenciales.length }})
                 </TabsTrigger>
-                <TabsTrigger value="documentos">
+                <TabsTrigger value="documentos" class="h-9 flex-none">
                     Documentos ({{ documentos.length }})
                 </TabsTrigger>
-                <TabsTrigger value="cuidadores">
+                <TabsTrigger value="cuidadores" class="h-9 flex-none">
                     Cuidadores ({{ cuidadores.filter((c) => !c.fecha_fin).length }})
                 </TabsTrigger>
             </TabsList>
@@ -232,13 +238,6 @@ const ultimasMediciones = computed(() => {
                                 v-if="patologiasActivas.length"
                                 class="flex flex-wrap gap-2"
                             >
-                                <!-- <Badge
-                                    v-for="p in patologiasActivas"
-                                    :key="p.id"
-                                    variant="secondary"
-                                >
-                                    {{ p.nombre }}
-                                </Badge> -->
                                 <Badge    v-for="p in patologiasActivas"
                                          :key="p.id"
                                           variant="secondary"
@@ -345,13 +344,6 @@ const ultimasMediciones = computed(() => {
                 </Card>
             </TabsContent>
 
-            <!-- <TabsContent value="patologias">
-                <FichaSeccion
-                    :seccion="secciones.patologias"
-                    :items="patologias"
-                    :url="`${base}/patologias`"
-                />
-            </TabsContent> -->
             <TabsContent value="patologias" class="flex flex-col gap-3">
                 <FichaSeccion
                     :seccion="secciones.patologias"
@@ -422,7 +414,7 @@ const ultimasMediciones = computed(() => {
                     :items="cuidadoresPlanos"
                     :url="`${base}/cuidadores`"
                 />
-                <p class="text-sm text-muted-foreground">
+                <p v-if="puede('patologias.catalogo')" class="text-sm text-muted-foreground">
                     ¿No aparece el cuidador? Primero debe estar registrado: ábrelo en
                     <Link href="/personas" class="underline underline-offset-4">Personas</Link>
                     y usa "Registrar como cuidador".

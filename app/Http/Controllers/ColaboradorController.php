@@ -7,6 +7,8 @@ use App\Models\Colaborador;
 use App\Models\Persona;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Gate;
+
 
 class ColaboradorController extends Controller
 {

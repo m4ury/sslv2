@@ -15,6 +15,7 @@ use App\Models\Documento;
 use App\Models\Prestacion;
 use App\Models\Programado;
 use App\Models\Tipo_documento;
+use Illuminate\Support\Facades\Gate;
 
 class FichaClinicaController extends Controller
 {
@@ -95,6 +96,8 @@ class FichaClinicaController extends Controller
 
     public function store(Request $request, Adulto $adulto, string $seccion)
     {
+        Gate::authorize($this->permisoDe($seccion));
+
         $data = $request->validate($this->reglas($seccion, $adulto, $request, false));
 
         DB::transaction(function () use ($request, $adulto, $seccion, $data) {
@@ -124,6 +127,7 @@ class FichaClinicaController extends Controller
 
     public function update(Request $request, Adulto $adulto, string $seccion, int $id)
     {
+        Gate::authorize($this->permisoDe($seccion));
         // Se busca a través de la relación: solo registros de este adulto
         $registro = $adulto->{$seccion}()->findOrFail($id);
         $data = $request->validate($this->reglas($seccion, $adulto, $request, true));
@@ -165,6 +169,8 @@ class FichaClinicaController extends Controller
 
     public function destroy(Adulto $adulto, string $seccion, int $id)
     {
+        Gate::authorize($this->permisoDe($seccion));
+        
         // Soft delete: el registro deja de mostrarse pero se conserva en la base
         $adulto->{$seccion}()->findOrFail($id)->delete();
 
@@ -333,5 +339,14 @@ class FichaClinicaController extends Controller
                 'observaciones' => ['nullable', 'string'],
             ],
         };
+    }
+
+    private const PERMISO_POR_SECCION = [
+        'cuidadores' => 'cuidadores.asignar',
+    ];
+
+    private function permisoDe(string $seccion): string
+    {
+        return self::PERMISO_POR_SECCION[$seccion] ?? 'ficha.registrar';
     }
 }

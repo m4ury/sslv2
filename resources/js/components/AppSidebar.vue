@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { LayoutGrid, User, Wallet, HandCoins } from '@lucide/vue';
+import { LayoutGrid, User, Wallet, HandCoins, Users, Stethoscope, UserCog, ShieldCheck } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -18,6 +18,18 @@ import { dashboard } from '@/routes';
 import  personas  from '@/routes/personas';
 import  adultos  from '@/routes/adultos';
 import type { NavItem } from '@/types';
+import { usePermisos } from '@/composables/usePermisos';
+
+const { puede } = usePermisos();
+
+const todos = [
+    { title: 'Personas', href: '/personas', icon: Users, permiso: 'personas.ver' },
+    { title: 'Cuotas', href: '/cuotas', icon: Wallet, permiso: 'cuotas.ver' },
+    { title: 'Aportes', href: '/aportes', icon: HandCoins, permiso: 'aportes.ver' },
+    { title: 'Patologías', href: '/catalogos/patologias', icon: Stethoscope, permiso: 'patologias.catalogo' },
+    { title: 'Usuarios', href: '/admin/usuarios', icon: UserCog, permiso: 'usuarios.gestionar' },
+    { title: 'Profesiones', href: '/admin/profesiones', icon: ShieldCheck, permiso: 'profesiones.gestionar' },
+];
 
 const mainNavItems: NavItem[] = [
     {
@@ -39,8 +51,23 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Aportes',
         href: '/aportes',
-        icon: HandCoins },
+        icon: HandCoins 
+    },
+
+    {
+        title: 'Usuarios',
+        href: '/admin/usuarios',
+        icon: Users 
+    },
+
+    {
+        title: 'Profesiones',
+        href: '/admin/profesiones',
+        icon: Stethoscope 
+    },
 ];
+
+
 
 const footerNavItems: NavItem[] = [
     /* {

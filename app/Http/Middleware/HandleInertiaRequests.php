@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Support\Permisos;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -40,6 +41,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                'can' => fn () => Permisos::paraUsuario($request->user()),
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),

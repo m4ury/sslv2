@@ -7,6 +7,8 @@ use App\Models\Socio;
 use App\Models\Persona;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Gate;
+
 
 class SocioController extends Controller
 {
@@ -69,7 +71,8 @@ class SocioController extends Controller
         return Inertia::render('socios/Edit', [
             'socio' => $socio,
             'persona' => $socio->persona,
-            'cuotas' => $socio->cuotas()
+            'cuotas' => Gate::allows('cuotas.ver')
+                ? $socio->cuotas()
                 ->with([
                     'socio.persona', // los diálogos muestran el nombre del socio
                     'configuracion:id,nombre_cuota',
@@ -79,7 +82,8 @@ class SocioController extends Controller
                         ->orderByDesc('id'),
                 ])
                 ->orderByDesc('periodo')
-                ->get(),
+                ->get()
+                :[],
             'medios' => config('cuotas.medios_pago'),
         ]);
     }

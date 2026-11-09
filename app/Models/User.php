@@ -42,4 +42,29 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    protected $fillable = ['profesion_id'];
+
+    public function profesion()
+    {
+        return $this->belongsTo(Profesion::class);
+    }
+
+    public function esAdmin(): bool
+    {
+        return $this->activo && (bool) $this->profesion?->es_admin;
+    }
+
+    public function tienePermiso(string $permiso): bool
+    {
+        if (! $this->activo) {
+            return false;
+        }
+
+        if ($this->profesion?->es_admin) {
+            return true;
+        }
+
+        return in_array($permiso, $this->profesion?->permisos ?? [], true);
+    }
 }

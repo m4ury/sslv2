@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('profesions', function (Blueprint $table) {
+        Schema::create('profesiones', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 100);
             $table->text('descripcion')->nullable();
-            $table->boolean('estado')->default(true);
+            $table->json('permisos')->nullable();
+            $table->boolean('es_admin')->default(false);
             $table->timestamps();
         });
     }

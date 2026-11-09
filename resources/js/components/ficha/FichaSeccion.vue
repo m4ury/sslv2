@@ -40,6 +40,8 @@ const props = defineProps({
     seccion: { type: Object, required: true },
     items: { type: Array, required: true },
     url: { type: String, required: true },
+    soloLectura: { type: Boolean, default: false },
+    sinEliminar: { type: Boolean, default: false },
 });
 
 const open = ref(false);
@@ -107,12 +109,6 @@ function guardar() {
     }
 }
 
-/* function eliminar(item) {
-    if (window.confirm(`¿Eliminar este registro de ${props.seccion.singular}?`)) {
-        router.delete(`${props.url}/${item.id}`, { preserveScroll: true });
-    }
-} */
-
 function opciones(field) {
     return (field.options ?? []).map((o) =>
         typeof o === 'string' ? { value: o, label: o } : o,
@@ -128,8 +124,8 @@ function celda(col, item) {
 </script>
 
 <template>
-    <Card>
-        <CardHeader class="flex flex-row items-start justify-between gap-4">
+    <Card class="w-full min-w-0">
+        <CardHeader class="flex flex-col items-start justify-between gap-4 sm:flex-row">
             <div class="flex flex-col gap-1.5">
                 <CardTitle>{{ seccion.titulo }}</CardTitle>
                 <CardDescription>{{ seccion.descripcion }}</CardDescription>
@@ -140,7 +136,7 @@ function celda(col, item) {
             </Button>
         </CardHeader>
 
-        <CardContent>
+        <CardContent class="min-w-0">
             <div class="rounded-md border">
                 <Table>
                     <TableHeader>

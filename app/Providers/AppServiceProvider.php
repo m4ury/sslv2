@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use App\Models\User;
+use App\Support\Permisos;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +26,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::before(function (User $user, string $ability) {
+        // Permisos del catálogo: se resuelven por la profesión del usuario
+        if (Permisos::existe($ability)) {
+            return $user->tienePermiso($ability);
+        }
+
+        // Cualquier otra habilidad (futuras Policies): el administrador pasa
+        return $user->esAdmin() ? true : null;
+    });
         $this->configureDefaults();
     }
 
