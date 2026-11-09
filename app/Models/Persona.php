@@ -54,4 +54,9 @@ class Persona extends Model
     {
         return $this->hasOne(Colaborador::class);
     }
+
+    public function cuidador()
+    {
+        return $this->hasOne(Cuidador::class);
+    }
 }

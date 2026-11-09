@@ -68,6 +68,12 @@ class ColaboradorController extends Controller
         return Inertia::render('colaboradores/Edit', [
             'colaborador' => $colaborador,
             'persona' => $colaborador->persona,
+            'aportes' => $colaborador->aportes()
+                ->with(['usuario:id,name', 'anulador:id,name'])
+                ->orderByDesc('fecha_aporte')
+                ->orderByDesc('id')
+                ->get(),
+            'medios' => config('cuotas.medios_pago'),
         ]);
     }
 

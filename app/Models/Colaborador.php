@@ -11,6 +11,8 @@ class Colaborador extends Model
     /** @use HasFactory<ColaboradorFactory> */
     use HasFactory;
 
+    protected $table = 'colaboradores';
+
     protected $fillable = [
         'fecha_ingreso',
         'fecha_salida',
@@ -21,6 +23,11 @@ class Colaborador extends Model
     public function persona()
     {
         return $this->belongsTo(Persona::class);
+    }
+
+    public function aportes()
+    {
+        return $this->hasMany(Aporte::class);
     }
 
     public const ESTADO_INICIAL = 'Activo';

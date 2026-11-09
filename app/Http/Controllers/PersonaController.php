@@ -18,6 +18,12 @@ class PersonaController extends Controller
         $rutSearch = str_replace(['.', ' '], '', $search); // permite buscar "12.345.678-9"
 
         $personas = Persona::query()
+            ->with([
+                'socio:id,persona_id,estado',
+                'adulto:id,persona_id,estado',
+                'colaborador:id,persona_id,estado',
+                'cuidador:id,persona_id,estado',
+            ])
             ->when($search !== '', function ($query) use ($search, $rutSearch) {
                 $query->where(function ($q) use ($search, $rutSearch) {
                     $q->where('rut', 'like', "%{$rutSearch}%")
@@ -60,7 +66,7 @@ class PersonaController extends Controller
      */
     public function show(Persona $persona)
     {
-        $persona->load(['socio', 'adulto', 'colaborador']);
+        $persona->load(['socio', 'adulto', 'colaborador', 'cuidador']);
 
         return Inertia::render('personas/Show', [
             'persona' => $persona,
@@ -68,6 +74,7 @@ class PersonaController extends Controller
                 'socio' => $persona->socio?->only('id', 'estado'),
                 'adulto' => $persona->adulto?->only('id', 'estado'),
                 'colaborador' => $persona->colaborador?->only('id', 'estado'),
+                'cuidador' => $persona->cuidador?->only('id', 'estado'),
             ],
         ]);
     }
@@ -87,7 +94,7 @@ class PersonaController extends Controller
     {
         $persona->update($request->validated());
 
-        return redirect()->route('personas.index')->with('success', 'Persona updated successfully.');
+        return redirect()->route('personas.index')->with('success', 'Persona actualizada con exito!.');
     }
 
     /**
@@ -97,6 +104,6 @@ class PersonaController extends Controller
     {
         $persona->delete();
 
-        return redirect()->route('personas.index')->with('success', 'Persona deleted successfully.');
+        return redirect()->route('personas.index')->with('success', 'Persona eliminada exitosamente!.');
     }
 }

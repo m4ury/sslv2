@@ -65,10 +65,23 @@ class SocioController extends Controller
      */
     public function edit(Socio $socio)
     {
+
         return Inertia::render('socios/Edit', [
-        'socio' => $socio,
-        'persona' => $socio->persona,
-    ]);
+            'socio' => $socio,
+            'persona' => $socio->persona,
+            'cuotas' => $socio->cuotas()
+                ->with([
+                    'socio.persona', // los diálogos muestran el nombre del socio
+                    'configuracion:id,nombre_cuota',
+                    'pagos' => fn ($q) => $q
+                        ->with(['usuario:id,name', 'anulador:id,name'])
+                        ->orderByDesc('fecha_pago')
+                        ->orderByDesc('id'),
+                ])
+                ->orderByDesc('periodo')
+                ->get(),
+            'medios' => config('cuotas.medios_pago'),
+        ]);
     }
 
     /**

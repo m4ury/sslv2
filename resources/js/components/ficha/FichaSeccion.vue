@@ -32,6 +32,9 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDate } from '@/config/ficha';
+import { useConfirm } from '@/composables/useConfirm';
+
+const { confirmar } = useConfirm();
 
 const props = defineProps({
     seccion: { type: Object, required: true },
@@ -56,6 +59,19 @@ const form = useForm({});
 form.transform((data) =>
     Object.fromEntries(fields.value.map((f) => [f.name, data[f.name]])),
 );
+
+async function eliminar(item) {
+    const ok = await confirmar({
+        titulo: `¿Eliminar este registro de ${props.seccion.singular}?`,
+        descripcion: 'El registro dejará de mostrarse en la ficha.',
+        confirmarTexto: 'Eliminar',
+        destructivo: true,
+    });
+
+    if (ok) {
+        router.delete(`${props.url}/${item.id}`, { preserveScroll: true });
+    }
+}
 
 function valorInicial(field, item) {
     if (field.type === 'file') return null;
@@ -91,11 +107,11 @@ function guardar() {
     }
 }
 
-function eliminar(item) {
+/* function eliminar(item) {
     if (window.confirm(`¿Eliminar este registro de ${props.seccion.singular}?`)) {
         router.delete(`${props.url}/${item.id}`, { preserveScroll: true });
     }
-}
+} */
 
 function opciones(field) {
     return (field.options ?? []).map((o) =>

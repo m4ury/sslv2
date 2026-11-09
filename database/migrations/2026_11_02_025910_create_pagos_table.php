@@ -19,7 +19,13 @@ return new class extends Migration
             $table->enum('medio_pago', ['efectivo', 'transferencia', 'debito'])->nullable();
             $table->string('numero_comprobante', 100)->nullable();
             $table->text('observacion')->nullable();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users');
+            $table->timestamp('anulado_at')->nullable();
+            $table->foreignId('anulado_por')->nullable()->constrained('users')->nullOnDelete();
+            $table->text('motivo_anulacion')->nullable();
+            $table->index(['medio_pago', 'numero_comprobante']);
+
+            $table->softDeletes();
             $table->timestamps();
         });
     }

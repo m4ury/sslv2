@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use Database\Factories\PrestacionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Prestacion extends Model
 {
-    /** @use HasFactory<\Database\Factories\PrestacionFactory> */
+    /** @use HasFactory<PrestacionFactory> */
     use HasFactory;
 
     protected $fillable = [
         'control_id',
+        'fecha',
         'nombre_prestacion',
         'descripcion',
         'parametro',
@@ -20,6 +23,7 @@ class Prestacion extends Model
     protected function casts(): array
     {
         return [
+            'fecha' => 'date:Y-m-d',
             'parametro' => 'float',
         ];
     }

@@ -2,7 +2,7 @@
 import AppContent from '@/components/AppContent.vue';
 import AppHeader from '@/components/AppHeader.vue';
 import AppShell from '@/components/AppShell.vue';
-import { Toaster } from '@/components/ui/sonner';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import type { BreadcrumbItem } from '@/types';
 
 type Props = {
@@ -19,7 +19,7 @@ withDefaults(defineProps<Props>(), {
         <AppHeader :breadcrumbs="breadcrumbs" />
         <AppContent variant="header">
             <slot />
+            <!-- <ConfirmDialog /> -->
         </AppContent>
-        <Toaster />
     </AppShell>
 </template>

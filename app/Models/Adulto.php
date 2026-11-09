@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TieneEstadoDeRol;
+use Database\Factories\AdultoFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Models\Concerns\TieneEstadoDeRol;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Adulto extends Model
 {
-    /** @use HasFactory<\Database\Factories\AdultoFactory> */
+    /** @use HasFactory<AdultoFactory> */
     use HasFactory, TieneEstadoDeRol;
 
     protected $fillable = [
@@ -22,7 +24,7 @@ class Adulto extends Model
         'observaciones',
     ];
 
-    //public const ESTADO_INICIAL = 'activo';
+    // public const ESTADO_INICIAL = 'activo';
 
     public function persona()
     {
@@ -39,9 +41,9 @@ class Adulto extends Model
         return $this->hasMany(Programado::class);
     }
 
-    public function prestaciones()
+    public function prestaciones(): HasManyThrough
     {
-        return $this->hasMany(Prestacion::class);
+        return $this->hasManyThrough(Prestacion::class, Control::class);
     }
 
     public function credenciales()
@@ -73,6 +75,11 @@ class Adulto extends Model
             'fecha_ingreso' => 'date:Y-m-d',
             'fecha_salida' => 'date:Y-m-d',
         ];
+    }
+
+    public function cuidadores()
+    {
+        return $this->hasMany(AdultoCuidador::class);
     }
 
     protected function nombreCompleto(): Attribute

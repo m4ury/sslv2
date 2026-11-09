@@ -1,6 +1,17 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Eye, Pencil, Plus, Search, Trash2, Users } from '@lucide/vue';
+import {
+    Eye,
+    HandHeart,
+    Handshake,
+    HeartHandshake,
+    Pencil,
+    Plus,
+    Search,
+    Trash2,
+    UserRound,
+    Users,
+} from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { create, destroy, edit, index, show } from '@/routes/personas';
 import Pagination from '@/components/Pagination.vue';
@@ -9,6 +20,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
     Table,
     TableBody,
     TableCell,
@@ -16,6 +33,10 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+
+import { useConfirm } from '@/composables/useConfirm';
+
+const { confirmar } = useConfirm();
 
 const props = defineProps({
     personas: {
@@ -44,7 +65,37 @@ watch(search, (value) => {
 
 onBeforeUnmount(() => clearTimeout(timeout));
 
-function deletePersona(persona) {
+const roleDefinitions = [
+    { key: 'socio', label: 'Socio', icon: Handshake },
+    { key: 'adulto', label: 'Adulto mayor', icon: UserRound },
+    { key: 'colaborador', label: 'Colaborador', icon: HandHeart },
+    { key: 'cuidador', label: 'Cuidador', icon: HeartHandshake },
+];
+
+async function deletePersona(persona) {
+    const ok = await confirmar({
+        titulo: `¿Eliminar a ${persona.full_name}?`,
+        descripcion: 'Esta acción no se puede deshacer.',
+        confirmarTexto: 'Eliminar',
+        destructivo: true,
+    });
+
+    if (ok) {
+        router.delete(destroy.url(persona.id), { preserveScroll: true });
+    }
+}
+
+function rolesFor(persona) {
+    return roleDefinitions.filter(({ key }) => persona[key]);
+}
+
+function roleCaption(persona, role) {
+    const estado = persona[role.key].estado;
+
+    return estado ? `${role.label} · ${estado}` : role.label;
+}
+
+/* function deletePersona(persona) {
     if (
         window.confirm(
             `¿Estás seguro de que deseas eliminar a ${persona.full_name}?`,
@@ -52,7 +103,7 @@ function deletePersona(persona) {
     ) {
         router.delete(destroy.url(persona.id), { preserveScroll: true });
     }
-}
+} */
 
 // Evita el desfase de zona horaria al parsear "YYYY-MM-DD"
 function formatDate(value) {
@@ -110,6 +161,7 @@ function formatDate(value) {
                                 <TableHead>Fecha de nacimiento</TableHead>
                                 <TableHead>Edad</TableHead>
                                 <TableHead>Sexo</TableHead>
+                                <TableHead>Roles</TableHead>
                                 <TableHead class="text-right">
                                     Acciones
                                 </TableHead>
@@ -137,6 +189,51 @@ function formatDate(value) {
                                     >
                                         {{ persona.sexo }}
                                     </Badge>
+                                </TableCell>
+                                <TableCell>
+                                    <TooltipProvider :delay-duration="200">
+                                        <div
+                                            v-if="rolesFor(persona).length > 0"
+                                            class="flex items-center gap-1"
+                                        >
+                                            <Tooltip
+                                                v-for="role in rolesFor(persona)"
+                                                :key="role.key"
+                                            >
+                                                <TooltipTrigger as-child>
+                                                    <button
+                                                        type="button"
+                                                        :aria-label="
+                                                            roleCaption(
+                                                                persona,
+                                                                role,
+                                                            )
+                                                        "
+                                                        class="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                                    >
+                                                        <component
+                                                            :is="role.icon"
+                                                            class="size-4"
+                                                        />
+                                                    </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    {{
+                                                        roleCaption(
+                                                            persona,
+                                                            role,
+                                                        )
+                                                    }}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </div>
+                                        <span
+                                            v-else
+                                            class="text-sm text-muted-foreground"
+                                        >
+                                            Sin roles
+                                        </span>
+                                    </TooltipProvider>
                                 </TableCell>
                                 <TableCell>
                                     <div class="flex justify-end gap-1">

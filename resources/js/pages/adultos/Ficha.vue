@@ -31,6 +31,8 @@ const props = defineProps({
     documentos: { type: Array, default: () => [] },
     catalogos: { type: Object, required: true },
     catalogoPatologias: { type: Array, default: () => [] },
+    cuidadores: { type: Array, default: () => [] },
+    catalogoCuidadores: { type: Array, default: () => [] },
 });
 
 const base = computed(() => `/adultos/${props.adulto.id}/ficha`);
@@ -48,7 +50,13 @@ const fullName = computed(
 );
 
 const secciones = computed(() =>
-    crearSecciones({ catalogos: props.catalogos, controles: props.controles, catalogoPatologias: props.catalogoPatologias, }),
+    crearSecciones(
+        {
+             catalogos: props.catalogos,
+             controles: props.controles,
+             catalogoPatologias: props.catalogoPatologias,
+             catalogoCuidadores: props.catalogoCuidadores,
+        }),
 );
 
 // Cada medición del control se aplana como med_<tipo> para el formulario genérico
@@ -59,6 +67,13 @@ const controlesPlanos = computed(() =>
             (c.mediciones ?? []).map((m) => [`med_${m.tipo}`, m.valor]),
         ),
     })),
+);
+const cuidadoresPlanos = computed(() =>
+    props.cuidadores.map((c) => ({ ...c, es_principal: c.es_principal ? 1 : 0 })),
+);
+
+const cuidadorPrincipal = computed(() =>
+    props.cuidadores.find((c) => c.es_principal && !c.fecha_fin) ?? null,
 );
 
 /* ---------- Resumen ---------- */
@@ -84,7 +99,7 @@ const atrasados = computed(
 
 const credencialesAlerta = computed(() =>
     props.credenciales.filter((c) =>
-        ['Vencida', 'Por vencer'].includes(estadoVigencia(c.fecha_vencimiento)),
+        ['Vencida', 'Por vencer'].includes(estadoVigencia(c.fecha_expiracion)),
     ),
 );
 
@@ -200,6 +215,9 @@ const ultimasMediciones = computed(() => {
                 <TabsTrigger value="documentos">
                     Documentos ({{ documentos.length }})
                 </TabsTrigger>
+                <TabsTrigger value="cuidadores">
+                    Cuidadores ({{ cuidadores.filter((c) => !c.fecha_fin).length }})
+                </TabsTrigger>
             </TabsList>
 
             <!-- Resumen -->
@@ -270,10 +288,20 @@ const ultimasMediciones = computed(() => {
                                 v-if="credencialesAlerta.length"
                                 class="flex justify-between gap-4"
                             >
-                                <span class="text-muted-foreground">Credenciales por revisar</span>
+                                <span class="text-muted-foreground">Credenciales por expirar</span>
                                 <Badge variant="destructive">
                                     {{ credencialesAlerta.length }}
                                 </Badge>
+                            </div>
+                            <div class="flex justify-between gap-4">
+                                <span class="text-muted-foreground">Cuidador principal</span>
+                                <span>
+                                    {{
+                                        cuidadorPrincipal
+                                            ? `${cuidadorPrincipal.cuidador?.persona?.full_name} · ${cuidadorPrincipal.cuidador?.telefono}`
+                                            : '—'
+                                    }}
+                                </span>
                             </div>
                         </CardContent>
                     </Card>
@@ -387,6 +415,18 @@ const ultimasMediciones = computed(() => {
                         </Button>
                     </template>
                 </FichaSeccion>
+            </TabsContent>
+            <TabsContent value="cuidadores" class="flex flex-col gap-3">
+                <FichaSeccion
+                    :seccion="secciones.cuidadores"
+                    :items="cuidadoresPlanos"
+                    :url="`${base}/cuidadores`"
+                />
+                <p class="text-sm text-muted-foreground">
+                    ¿No aparece el cuidador? Primero debe estar registrado: ábrelo en
+                    <Link href="/personas" class="underline underline-offset-4">Personas</Link>
+                    y usa "Registrar como cuidador".
+                </p>
             </TabsContent>
         </Tabs>
     </div>

@@ -9,7 +9,8 @@ import {
     Pencil,
     Trash2,
     UserRound,
-    RotateCcw
+    RotateCcw,
+    HeartHandshake,
 } from '@lucide/vue';
 import { computed, registerRuntimeCompiler } from 'vue';
 import { Badge } from '@/components/ui/badge';
@@ -26,13 +27,25 @@ import {
     edit as editColaborador,
     show as showColaborador,
 } from '@/routes/colaboradores';
+import {
+    create as createCuidador,
+    edit as editCuidador,
+} from '@/routes/cuidadores';
 import { destroy, edit, index } from '@/routes/personas';
+import { useConfirm } from '@/composables/useConfirm';
+
+const { confirmar } = useConfirm();
 
 const props = defineProps({
     persona: { type: Object, required: true },
     roles: {
         type: Object,
-        default: () => ({ socio: null, adulto: null, colaborador: null }),
+        default: () => ({
+            socio: null,
+            adulto: null,
+            colaborador: null,
+            cuidador: null,
+        }),
     },
 });
 
@@ -108,19 +121,45 @@ const transiciones = computed(() => [
             ? showColaborador.url(props.roles.colaborador.id)
             : null,
     },
+    {
+        key: 'cuidador',
+        label: 'Cuidador',
+        description:
+            'Registrar como cuidador de adultos mayores de la agrupación.',
+        icon: HeartHandshake,
+        createUrl: createCuidador.url({
+            query: { persona_id: props.persona.id },
+        }),
+        editUrl: props.roles.cuidador
+            ? editCuidador.url(props.roles.cuidador.id)
+            : null,
+    },
 ]);
 
 const rolesActivos = computed(() =>
     transiciones.value.filter((t) => t.editUrl),
 );
 
-function deletePersona() {
+/* function deletePersona() {
     if (
         window.confirm(
             `¿Estás seguro de que deseas eliminar a ${fullName.value}?`,
         )
     ) {
         router.delete(destroy.url(props.persona.id));
+    }
+} */
+
+async function deletePersona() {
+    const ok = await confirmar({
+        titulo: `¿Eliminar a ${fullName.value}?`,
+        descripcion: 'Esta acción no se puede deshacer.',
+        confirmarTexto: 'Eliminar',
+        destructivo: true,
+    });
+
+    if (ok) {
+        router.delete(destroy.url(props.persona.id), { preserveScroll: true });
     }
 }
 

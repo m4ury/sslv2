@@ -22,5 +22,10 @@ class Socio extends Model
         return $this->belongsTo(Persona::class);
     }
 
+    public function cuotas()
+    {
+        return $this->hasMany(Cuota::class);
+    }
+
     public const ESTADO_INICIAL = 'Activo';
 }

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\DocumentoFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Documento extends Model
 {
-    /** @use HasFactory<\Database\Factories\DocumentoFactory> */
+    /** @use HasFactory<DocumentoFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -21,11 +22,16 @@ class Documento extends Model
         'archivo_ruta',
         'archivo_original',
         'mime_type',
-        'tamano_bytes',
-        'fecha_carga'
-        ];
+        'tamanio_bytes',
+        'fecha_carga',
+    ];
 
     protected $hidden = ['archivo_ruta'];
+
+    public function tipoDocumento(): BelongsTo
+    {
+        return $this->belongsTo(Tipo_documento::class, 'tipo_documento_id');
+    }
 
     protected function casts(): array
     {

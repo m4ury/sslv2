@@ -24,7 +24,7 @@ class ColaboradorRequest extends FormRequest
      */
     public function rules(): array
     {
-        $colaborador = $this->route('colaboradore');
+        $colaborador = $this->route('colaborador');
 
         $rules = [
             'fecha_ingreso' => ['required', 'date'],

@@ -2,65 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePagoRequest;
-use App\Http\Requests\UpdatePagoRequest;
+use App\Models\Cuota;
 use App\Models\Pago;
+use App\Services\RegistroPagos;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PagoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function store(Request $request, Cuota $cuota, RegistroPagos $registro)
     {
-        //
+        $data = $request->validate([
+            'fecha_pago' => ['required', 'date', 'before_or_equal:today'],
+            'monto_pagado' => ['required', 'integer', 'min:1'],
+            'medio_pago' => ['required', Rule::in(config('cuotas.medios_pago'))],
+            'numero_comprobante' => [
+                Rule::requiredIf($request->input('medio_pago') !== 'Efectivo'),
+                'nullable',
+                'string',
+                'max:50',
+                // El mismo comprobante no se registra dos veces con el mismo medio
+                Rule::unique('pagos', 'numero_comprobante')
+                    ->where('medio_pago', $request->input('medio_pago'))
+                    ->whereNull('anulado_at'),
+            ],
+        ]);
+
+        $registro->registrar($cuota, $data, $request->user()->id);
+
+        return back()->with('success', 'Pago registrado correctamente.');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function anular(Request $request, Pago $pago, RegistroPagos $registro)
     {
-        //
-    }
+        $data = $request->validate([
+            'motivo' => ['required', 'string', 'min:5', 'max:500'],
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorePagoRequest $request)
-    {
-        //
-    }
+        $registro->anular($pago, $data['motivo'], $request->user()->id);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Pago $pago)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Pago $pago)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePagoRequest $request, Pago $pago)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Pago $pago)
-    {
-        //
+        return back()->with('success', 'Pago anulado. La cuota fue recalculada.');
     }
 }

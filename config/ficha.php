@@ -20,11 +20,11 @@ return [
         'Control kinésico',
         'Control nutricional',
         'Control psicológico',
+        'Control terapeuta ocupacional',
         'Otro',
     ],
     'estados_patologia' => ['Activa', 'Controlada', 'Resuelta'],
     'estados_programado' => ['Pendiente', 'Realizado', 'Cancelado', 'No asistió'],
-    'tipos_credencial' => ['Credencial de discapacidad', 'Carnet de control', 'Seguro de salud', 'Otra'],
+    'tipo_discapacidad' => ['fisica', 'sensorial', 'intelectual', 'otra'],
     'tipos_documento' => ['Examen', 'Epicrisis', 'Receta', 'Informe', 'Consentimiento', 'Otro'],
 ];
-

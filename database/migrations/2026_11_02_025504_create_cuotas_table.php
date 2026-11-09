@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('cuotas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('socio_id')->constrained('socios')->onDelete('cascade');
-            $table->foreignId('config_cuota_id')->constrained('config_cuotas')->onDelete('cascade');
+            $table->foreignId('socio_id')->constrained('socios');
+            $table->foreignId('config_cuota_id')->constrained('config_cuotas');
             $table->date('periodo')->nullable();
             $table->float('monto_cuota', 10, 2)->nullable();
             $table->date('fecha_vencimiento')->nullable();
-            $table->enum('estado', ['pendiente', 'pagado', 'vencido'])->default('pendiente');
+            $table->enum('estado', ['Pendiente', 'Pagada', 'Vencida'])->default('Pendiente');
+            $table->unique(['socio_id', 'config_cuota_id', 'periodo']);
             $table->timestamps();
         });
     }

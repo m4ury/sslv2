@@ -17,6 +17,8 @@ return new class extends Migration
             $table->float('monto', 10, 2)->nullable();
             $table->date('fecha_inicio')->nullable();
             $table->date('fecha_termino')->nullable();
+            $table->unsignedTinyInteger('dia_vencimiento')->default(10);
+            $table->boolean('activa')->default(true);
             $table->timestamps();
         });
     }

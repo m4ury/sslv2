@@ -59,7 +59,7 @@ const VARIANTES = {
 
 const variante = (valor) => VARIANTES[valor] ?? 'secondary';
 
-export function crearSecciones({ catalogos, controles, catalogoPatologias = [] }) {
+export function crearSecciones({ catalogos, controles, catalogoPatologias = [], catalogoCuidadores = [], }) {
     const etiquetaControl = (c) => `${formatDate(c.fecha)} · ${c.tipo}`;
 
     const camposMediciones = Object.entries(catalogos.mediciones).map(
@@ -149,9 +149,9 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [] }
                 { name: 'nombre', label: 'Prestación', required: true },
                 {
                     name: 'control_id',
-                    label: 'Control asociado (opcional)',
+                    label: 'Control asociado',
                     type: 'select',
-                    placeholder: 'Sin control asociado',
+                    required: true,
                     span: 2,
                     options: controles.map((c) => ({ value: c.id, label: etiquetaControl(c) })),
                 },
@@ -184,24 +184,26 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [] }
             descripcion: 'Credenciales y su vigencia.',
             vacio: 'Sin credenciales registradas.',
             columns: [
-                { key: 'tipo', label: 'Tipo' },
+                { key: 'tipo_discapacidad', label: 'Tipo' },
                 { key: 'numero', label: 'N°' },
-                { key: 'emisor', label: 'Emisor' },
-                { key: 'fecha_vencimiento', label: 'Vence', type: 'date' },
+                { key: 'organismo_emisor', label: 'Emisor' },
+                { key: 'fecha_expiracion', label: 'Vence', type: 'date' },
+                { key: 'porcentaje_discapacidad', label: '% Discap.', type: 'number'},
                 {
                     key: 'vigencia',
                     label: 'Vigencia',
                     badge: true,
-                    format: (i) => estadoVigencia(i.fecha_vencimiento) ?? 'Sin vencimiento',
-                    variant: (i) => variante(estadoVigencia(i.fecha_vencimiento)),
+                    format: (i) => estadoVigencia(i.fecha_expiracion) ?? 'Sin vencimiento',
+                    variant: (i) => variante(estadoVigencia(i.fecha_expiracion)),
                 },
             ],
             fields: [
-                { name: 'tipo', label: 'Tipo', type: 'select', required: true, options: catalogos.tipos_credencial },
+                { name: 'tipo_discapacidad', label: 'Tipo', type: 'select', required: true, options: catalogos.tipo_discapacidad },
+                { name: 'porcentaje_discapacidad', label: '% Discap.', type: 'number', step: 'any' },
                 { name: 'numero', label: 'Número' },
-                { name: 'emisor', label: 'Emisor' },
+                { name: 'organismo_emisor', label: 'Emisor' },
                 { name: 'fecha_emision', label: 'Fecha de emisión', type: 'date' },
-                { name: 'fecha_vencimiento', label: 'Fecha de vencimiento', type: 'date' },
+                { name: 'fecha_expiracion', label: 'Fecha de vencimiento', type: 'date' },
                 { name: 'observaciones', label: 'Observaciones', type: 'textarea', span: 2 },
             ],
         },
@@ -224,5 +226,71 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [] }
                 { name: 'fecha_documento', label: 'Fecha del documento', type: 'date' },
             ],
         },
+
+        cuidadores: {
+            titulo: 'Cuidadores',
+            singular: 'cuidador',
+            descripcion: 'Personas que cuidan a este adulto y desde cuándo.',
+            vacio: 'Sin cuidadores asignados.',
+            columns: [
+                { key: 'cuidador', label: 'Cuidador', format: (i) => i.cuidador?.persona?.full_name ?? '—' },
+                { key: 'telefono', label: 'Teléfono', format: (i) => i.cuidador?.telefono ?? '—' },
+                { key: 'vinculo', label: 'Vínculo' },
+                {
+                    key: 'es_principal',
+                    label: 'Rol',
+                    badge: true,
+                    format: (i) => (i.es_principal ? 'Principal' : 'Secundario'),
+                    variant: (i) => (i.es_principal ? 'default' : 'outline'),
+                },
+                { key: 'fecha_inicio', label: 'Desde', type: 'date' },
+                { key: 'fecha_fin', label: 'Hasta', type: 'date' },
+            ],
+            fields: [
+                {
+                    name: 'cuidador_id',
+                    label: 'Cuidador',
+                    type: 'select',
+                    required: true,
+                    span: 2,
+                    options: catalogoCuidadores.map((c) => ({
+                        value: c.id,
+                        label: `${c.nombre} · ${c.rut}${c.estado !== 'Activo' ? ' (inactivo)' : ''}`,
+                    })),
+                },
+                { name: 'vinculo', label: 'Vínculo', placeholder: 'Hija, vecino, cuidador contratado...' },
+                {
+                    name: 'es_principal',
+                    label: 'Cuidador principal',
+                    type: 'select',
+                    required: true,
+                    options: [
+                        { value: 1, label: 'Sí' },
+                        { value: 0, label: 'No' },
+                    ],
+                },
+                { name: 'fecha_inicio', label: 'Fecha de inicio', type: 'date', required: true },
+                { name: 'fecha_fin', label: 'Fecha de término', type: 'date', editOnly: true },
+                { name: 'observaciones', label: 'Observaciones', type: 'textarea', span: 2 },
+            ],
+        },
+
     };
+}
+export function formatCLP(value) {
+    return new Intl.NumberFormat('es-CL', {
+        style: 'currency',
+        currency: 'CLP',
+        maximumFractionDigits: 0,
+    }).format(value ?? 0);
+}
+
+// "2026-03" → "Marzo 2026"
+export function formatPeriodo(periodo) {
+    if (!periodo) return '—';
+    const [y, m] = String(periodo).split('-');
+    const mes = new Date(Number(y), Number(m) - 1, 1).toLocaleDateString('es-CL', {
+        month: 'long',
+    });
+    return `${mes.charAt(0).toUpperCase()}${mes.slice(1)} ${y}`;
 }

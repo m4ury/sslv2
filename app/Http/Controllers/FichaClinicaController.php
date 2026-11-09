@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use App\Models\Cuidador;
+use App\Models\Documento;
+use App\Models\Prestacion;
+use App\Models\Programado;
+use App\Models\Tipo_documento;
 
 class FichaClinicaController extends Controller
 {
@@ -36,11 +41,55 @@ class FichaClinicaController extends Controller
                     'mediciones' => $control->mediciones,
                     'autor' => $control->user,
                 ]),
-            //'prestaciones' => $adulto->prestaciones()->orderByDesc('created_at')->get(),
-            'programados' => $adulto->programados()->orderBy('fecha_programada')->get(),
+            'prestaciones' => $adulto->prestaciones()
+                ->orderByDesc('created_at')
+                ->get()
+                ->map(fn (Prestacion $prestacion) => [
+                    'id' => $prestacion->id,
+                    'fecha' => $prestacion->fecha?->toDateString(),
+                    'nombre' => $prestacion->nombre_prestacion,
+                    'control_id' => $prestacion->control_id,
+                    'detalle' => $prestacion->descripcion,
+                ]),
+            'programados' => $adulto->programados()
+                ->orderBy('fecha_programada')
+                ->get()
+                ->map(fn (Programado $programado) => [
+                    'id' => $programado->id,
+                    'fecha_programada' => $programado->fecha_programada,
+                    'tipo' => $programado->tipo_control,
+                    'estado' => $programado->estado,
+                    'observaciones' => $programado->observacion,
+                ]),
             'credenciales' => $adulto->credenciales()->orderBy('fecha_expiracion')->get(),
-            'documentos' => $adulto->documentos()->latest()->get(),
+            'documentos' => $adulto->documentos()
+                ->with('tipoDocumento:id,nombre')
+                ->latest()
+                ->get()
+                ->map(fn (Documento $documento) => [
+                    'id' => $documento->id,
+                    'nombre' => $documento->nombre,
+                    'tipo' => $documento->tipoDocumento->nombre,
+                    'fecha_documento' => $documento->fecha_documento?->toDateString(),
+                    'tamano' => $documento->tamanio_bytes,
+                ]),
             'catalogos' => config('ficha'),
+            'cuidadores' => $adulto->cuidadores()
+                ->with('cuidador.persona')
+                ->orderByDesc('es_principal')
+                ->orderByDesc('fecha_inicio')
+                ->get(),
+            'catalogoCuidadores' => Cuidador::with('persona')
+                ->where('persona_id', '!=', $adulto->persona_id) // nadie es cuidador de sí mismo
+                ->get()
+                ->map(fn ($c) => [
+                    'id' => $c->id,
+                    'nombre' => $c->persona->full_name,
+                    'rut' => $c->persona->rut,
+                    'estado' => $c->estado,
+                ])
+                ->sortBy('nombre')
+                ->values(),
         ]);
     }
 
@@ -52,7 +101,20 @@ class FichaClinicaController extends Controller
             match ($seccion) {
                 'controles' => $this->guardarControl($adulto, $data, $request->user()->id),
                 'documentos' => $this->guardarDocumento($request, $adulto, $data),
-                'programados' => $adulto->programados()->create([...$data, 'estado' => 'Pendiente']),
+                'programados' => $adulto->programados()->create([
+                    'fecha_programada' => $data['fecha_programada'],
+                    'tipo_control' => $data['tipo'],
+                    'estado' => 'Pendiente',
+                    'observacion' => $data['observaciones'] ?? null,
+                ]),
+                'prestaciones' => $adulto->controles()
+                    ->findOrFail($data['control_id'])
+                    ->prestaciones()
+                    ->create([
+                        'fecha' => $data['fecha'],
+                        'nombre_prestacion' => $data['nombre'],
+                        'descripcion' => $data['detalle'] ?? null,
+                    ]),
                 default => $adulto->{$seccion}()->create($data),
             };
         });
@@ -69,6 +131,30 @@ class FichaClinicaController extends Controller
         DB::transaction(function () use ($request, $adulto, $seccion, $registro, $data) {
             if ($seccion === 'controles') {
                 $this->guardarControl($adulto, $data, $request->user()->id, $registro);
+            } elseif ($seccion === 'programados') {
+                $registro->update([
+                    'fecha_programada' => $data['fecha_programada'],
+                    'tipo_control' => $data['tipo'],
+                    'estado' => $data['estado'],
+                    'observacion' => $data['observaciones'] ?? null,
+                ]);
+            } elseif ($seccion === 'prestaciones') {
+                $registro->update([
+                    'control_id' => $data['control_id'],
+                    'fecha' => $data['fecha'],
+                    'nombre_prestacion' => $data['nombre'],
+                    'descripcion' => $data['detalle'] ?? null,
+                ]);
+            } elseif ($seccion === 'documentos') {
+                $tipoDocumento = Tipo_documento::query()->firstOrCreate([
+                    'nombre' => $data['tipo'],
+                ]);
+
+                $registro->update([
+                    'nombre' => $data['nombre'],
+                    'tipo_documento_id' => $tipoDocumento->id,
+                    'fecha_documento' => $data['fecha_documento'] ?? null,
+                ]);
             } else {
                 $registro->update($data);
             }
@@ -90,7 +176,7 @@ class FichaClinicaController extends Controller
         $doc = $adulto->documentos()->findOrFail($documento);
 
         // Disco privado: el archivo no es accesible por URL directa
-        return Storage::disk('local')->download($doc->ruta, $doc->nombre_original);
+        return Storage::disk('local')->download($doc->archivo_ruta, $doc->archivo_original);
     }
 
     private function guardarControl(Adulto $adulto, array $data, int $userId, ?Control $control = null): void
@@ -125,15 +211,19 @@ class FichaClinicaController extends Controller
     private function guardarDocumento(Request $request, Adulto $adulto, array $data): void
     {
         $archivo = $request->file('archivo');
+        $tipoDocumento = Tipo_documento::query()->firstOrCreate([
+            'nombre' => $data['tipo'],
+        ]);
 
         $adulto->documentos()->create([
+            'user_id' => $request->user()->id,
             'nombre' => $data['nombre'],
-            'tipo_documento_id' => $data['tipo_documento_id'],
+            'tipo_documento_id' => $tipoDocumento->id,
             'fecha_documento' => $data['fecha_documento'] ?? null,
             'archivo_ruta' => $archivo->store("fichas/{$adulto->id}", 'local'),
             'archivo_original' => $archivo->getClientOriginalName(),
             'mime_type' => $archivo->getMimeType(),
-            'tamano_bytes' => $archivo->getSize(),
+            'tamanio_bytes' => $archivo->getSize(),
         ]);
     }
 
@@ -141,6 +231,11 @@ class FichaClinicaController extends Controller
     {
         $c = config('ficha');
         $vigente = in_array($request->input('estado'), ['Activa', 'Controlada'], true);
+        $existeCuidador = Rule::exists('cuidadores', 'id');
+        if (!$editando) {
+            // Solo se pueden asignar cuidadores activos; al editar se admite cualquiera
+            $existeCuidador->where('estado', 'Activo');
+        }
 
         return match ($seccion) {
             'patologias' => [
@@ -159,7 +254,7 @@ class FichaClinicaController extends Controller
             'fecha_diagnostico' => ['nullable', 'date', 'before_or_equal:today'],
             'estado' => ['required', Rule::in($c['estados_patologia'])],
             'observaciones' => ['nullable', 'string'],
-],
+            ],
 
             'controles' => [
                 'fecha' => ['required', 'date', 'before_or_equal:today'],
@@ -174,8 +269,8 @@ class FichaClinicaController extends Controller
                 'fecha' => ['required', 'date', 'before_or_equal:today'],
                 'nombre' => ['required', 'string', 'max:255'],
                 'control_id' => [
-                    'nullable',
-                    Rule::exists('controles', 'id')
+                    'required',
+                    Rule::exists('controls', 'id')
                         ->where('adulto_id', $adulto->id)
                         ->whereNull('deleted_at'),
                 ],
@@ -190,11 +285,13 @@ class FichaClinicaController extends Controller
             ],
 
             'credenciales' => [
-                'tipo' => ['required', Rule::in($c['tipos_credencial'])],
+                'tipo_discapacidad' => ['required', Rule::in($c['tipo_discapacidad'])],
+                'grado_discapacidad' => ['nullable'],
+                'porcentaje_discapacidad' => ['nullable', 'numeric', 'between:0,100'],
                 'numero' => ['nullable', 'string', 'max:255'],
-                'emisor' => ['nullable', 'string', 'max:255'],
+                'organismo_emisor' => ['nullable', 'string', 'max:255'],
                 'fecha_emision' => ['nullable', 'date'],
-                'fecha_vencimiento' => [
+                'fecha_expiracion' => [
                     'nullable',
                     'date',
                     ...($request->filled('fecha_emision') ? ['after_or_equal:fecha_emision'] : []),
@@ -209,6 +306,31 @@ class FichaClinicaController extends Controller
                 ...($editando ? [] : [
                     'archivo' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx', 'max:10240'],
                 ]),
+            ],
+
+            'cuidadores' => [
+                'cuidador_id' => [
+                    'required',
+                    $existeCuidador,
+                    function ($attribute, $value, $fail) use ($adulto) {
+                        if (Cuidador::whereKey($value)->where('persona_id', $adulto->persona_id)->exists()) {
+                            $fail('Una persona no puede ser cuidadora de sí misma.');
+                        }
+                    },
+                    // Evita dos asignaciones vigentes del mismo cuidador al mismo adulto
+                    ...($request->filled('fecha_fin') ? [] : [
+                        Rule::unique('adulto_cuidador', 'cuidador_id')
+                            ->where('adulto_id', $adulto->id)
+                            ->whereNull('deleted_at')
+                            ->whereNull('fecha_fin')
+                            ->ignore($request->route('id')),
+                    ]),
+                ],
+                'vinculo' => ['nullable', 'string', 'max:255'],
+                'es_principal' => ['required', 'boolean'],
+                'fecha_inicio' => ['required', 'date'],
+                'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
+                'observaciones' => ['nullable', 'string'],
             ],
         };
     }

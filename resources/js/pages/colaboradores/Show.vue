@@ -175,7 +175,7 @@ function formatDate(value) {
                                 {{ dato.label }}
                             </dt>
                             <dd
-                                class="text-sm break-words"
+                                class="text-sm wrap-break-word"
                                 :class="{
                                     'font-mono': dato.mono,
                                     capitalize: dato.capitalize,
