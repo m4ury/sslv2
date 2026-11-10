@@ -33,7 +33,7 @@ const todos = [
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Tablero',
         href: dashboard(),
         icon: LayoutGrid,
     },

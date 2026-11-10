@@ -32,7 +32,6 @@ Route::resource('personas', PersonaController::class)
 Route::middleware('can:roles.gestionar')->group(function () {
     // Mueve aquí tus Route::resource actuales de estos roles, con sus opciones
     // (y las rutas de baja/reactivar, si las implementaste).
-    /* Route::resource('socios', SocioController::class); */
     Route::resource('socios', SocioController::class)->except(['index']);
     Route::patch('socios/{socio}/baja', [SocioController::class, 'baja'])->name('socios.baja');
     Route::patch('socios/{socio}/reactivar', [SocioController::class, 'reactivar'])->name('socios.reactivar');
