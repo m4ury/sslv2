@@ -33,9 +33,9 @@ defineProps({
     <div class="mx-auto w-full max-w-3xl px-4 pb-6 md:px-6">
         <Card>
             <CardHeader>
-                <CardTitle>Adultos a su cargo</CardTitle>
+                <CardTitle>Pacientes a su cargo</CardTitle>
                 <CardDescription>
-                    Las asignaciones se gestionan desde la ficha de cada adulto,
+                    Las asignaciones se gestionan desde la ficha de cada socio,
                     en la pestaña Cuidadores.
                 </CardDescription>
             </CardHeader>
@@ -47,10 +47,10 @@ defineProps({
                 >
                     <div class="flex flex-col gap-1">
                         <Link
-                            :href="`/adultos/${a.adulto_id}/ficha`"
+                            :href="`/socios/${a.socio_id}/ficha`"
                             class="text-sm font-medium underline-offset-4 hover:underline"
                         >
-                            {{ a.adulto?.persona?.full_name }}
+                            {{ a.socio?.persona?.full_name }}
                         </Link>
                         <span class="text-xs text-muted-foreground">
                             {{ a.vinculo || 'Sin vínculo indicado' }} · desde
@@ -72,7 +72,7 @@ defineProps({
                     v-if="asignaciones.length === 0"
                     class="text-sm text-muted-foreground"
                 >
-                    Aún no tiene adultos asignados.
+                    Aún no tiene pacientes asignados.
                 </p>
             </CardContent>
         </Card>

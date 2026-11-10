@@ -1,6 +1,6 @@
 export const socioSections = [
     {
-        title: 'Pertenencia como socio',
+        title: 'Pertenencia a la agrupación',
         fields: [
             {
                 name: 'fecha_ingreso',
@@ -21,7 +21,19 @@ export const socioSections = [
                 type: 'select',
                 required: true,
                 editOnly: true,
-                options: ['Activo', 'Inactivo'],
+                options: ['activo', 'inactivo'],
+            },
+        ],
+    },
+    {
+        title: 'Contacto de emergencia',
+        fields: [
+            { name: 'contacto_emergencia_nombre', label: 'Nombre del contacto' },
+            {
+                name: 'contacto_emergencia_telefono',
+                label: 'Teléfono',
+                type: 'tel',
+                placeholder: '+56 9 1234 5678',
             },
         ],
     },

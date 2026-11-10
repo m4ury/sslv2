@@ -32,6 +32,7 @@ class CuotaController extends Controller
                         ->orWhere('apellido_materno', 'like', "%{$search}%");
                 });
             })
+            ->when($request->filled('socio'), fn ($q) => $q->where('socio_id', $request->integer('socio')))
             ->when($request->filled('periodo'), fn ($q) => $q->where('periodo', $request->query('periodo')))
             ->when($request->filled('config'), fn ($q) => $q->where('config_cuota_id', $request->query('config')))
             ->when($request->filled('estado'), function ($q) use ($request) {
@@ -52,7 +53,7 @@ class CuotaController extends Controller
 
         return Inertia::render('cuotas/Index', [
             'cuotas' => $cuotas,
-            'filters' => $request->only('search', 'estado', 'periodo', 'config'),
+            'filters' => $request->only('search', 'estado', 'periodo', 'config', 'socio'),
             'periodos' => Cuota::select('periodo')->distinct()->orderByDesc('periodo')->pluck('periodo'),
             'configuraciones' => ConfigCuota::orderBy('nombre_cuota')->get(['id', 'nombre_cuota']),
             'medios' => config('cuotas.medios_pago'),

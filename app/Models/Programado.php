@@ -15,7 +15,7 @@ class Programado extends Model
     use HasFactory;
 
     protected $fillable = [
-        'adulto_id',
+        'socio_id',
         'fecha_programada',
         'tipo_control',
         'estado',
@@ -29,9 +29,9 @@ class Programado extends Model
         ];
     }
 
-    public function adulto(): BelongsTo
+    public function socio(): BelongsTo
     {
-        return $this->belongsTo(Adulto::class);
+        return $this->belongsTo(Socio::class);
     }
 
     /** Control realizado a partir de esta hora programada */

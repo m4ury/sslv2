@@ -45,11 +45,6 @@ class Persona extends Model
         return $this->hasOne(Socio::class);
     }
 
-    public function adulto()
-    {
-        return $this->hasOne(Adulto::class);
-    }
-
     public function colaborador()
     {
         return $this->hasOne(Colaborador::class);

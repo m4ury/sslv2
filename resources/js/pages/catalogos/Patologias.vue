@@ -13,7 +13,7 @@ const seccion = {
     titulo: 'Catálogo de patologías',
     singular: 'patología',
     descripcion:
-        'Lista compartida. Al renombrar una patología, el cambio se refleja en todos los adultos que la tienen.',
+        'Lista compartida. Al renombrar una patología, el cambio se refleja en todos los pacientes que la tienen.',
     vacio: 'El catálogo está vacío.',
     columns: [
         { key: 'nombre', label: 'Patología' },

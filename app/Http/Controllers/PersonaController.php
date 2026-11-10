@@ -20,7 +20,6 @@ class PersonaController extends Controller
         $personas = Persona::query()
             ->with([
                 'socio:id,persona_id,estado',
-                'adulto:id,persona_id,estado',
                 'colaborador:id,persona_id,estado',
                 'cuidador:id,persona_id,estado',
             ])
@@ -66,13 +65,12 @@ class PersonaController extends Controller
      */
     public function show(Persona $persona)
     {
-        $persona->load(['socio', 'adulto', 'colaborador', 'cuidador']);
+        $persona->load(['socio', 'colaborador', 'cuidador']);
 
         return Inertia::render('personas/Show', [
             'persona' => $persona,
             'roles' => [
                 'socio' => $persona->socio?->only('id', 'estado'),
-                'adulto' => $persona->adulto?->only('id', 'estado'),
                 'colaborador' => $persona->colaborador?->only('id', 'estado'),
                 'cuidador' => $persona->cuidador?->only('id', 'estado'),
             ],

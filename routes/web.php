@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AdultoController;
 use App\Http\Controllers\ColaboradorController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\SocioController;
@@ -29,14 +28,14 @@ Route::resource('personas', PersonaController::class)
 Route::resource('personas', PersonaController::class)
     ->only(['index', 'show'])->middleware('can:personas.ver');
 
-// ---------- Roles: socios, adultos, colaboradores, cuidadores ----------
+// ---------- Roles: socios, colaboradores, cuidadores ----------
 Route::middleware('can:roles.gestionar')->group(function () {
     // Mueve aquí tus Route::resource actuales de estos roles, con sus opciones
     // (y las rutas de baja/reactivar, si las implementaste).
-    Route::resource('socios', SocioController::class);
-    Route::resource('adultos', AdultoController::class)->except(['index']);
-    Route::patch('adultos/{adulto}/baja', [AdultoController::class, 'baja'])->name('adultos.baja');
-    Route::patch('adultos/{adulto}/reactivar', [AdultoController::class, 'reactivar'])->name('adultos.reactivar');
+    /* Route::resource('socios', SocioController::class); */
+    Route::resource('socios', SocioController::class)->except(['index']);
+    Route::patch('socios/{socio}/baja', [SocioController::class, 'baja'])->name('socios.baja');
+    Route::patch('socios/{socio}/reactivar', [SocioController::class, 'reactivar'])->name('socios.reactivar');
     Route::resource('colaboradores', ColaboradorController::class)
         ->parameters(['colaboradores' => 'colaborador']);
     Route::resource('cuidadores', CuidadorController::class)
@@ -45,7 +44,7 @@ Route::middleware('can:roles.gestionar')->group(function () {
 });
 
 // ---------- Ficha clínica ----------
-Route::prefix('adultos/{adulto}/ficha')
+Route::prefix('socios/{socio}/ficha')
     ->name('ficha.')
     ->where([
         'seccion' => 'patologias|controles|prestaciones|programados|credenciales|documentos|cuidadores',

@@ -13,7 +13,7 @@ class Documento extends Model
     use HasFactory;
 
     protected $fillable = [
-        'adulto_id',
+        'socio_id',
         'user_id',
         'tipo_documento_id',
         'nombre',

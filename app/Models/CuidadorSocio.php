@@ -5,14 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AdultoCuidador extends Model
-{
-    use SoftDeletes;
 
-    protected $table = 'adulto_cuidador';
+class CuidadorSocio extends Model
+{
+    protected $table = 'cuidador_socio';
 
     protected $fillable = [
-        'adulto_id', 'cuidador_id', 'vinculo', 'es_principal',
+        'socio_id', 'cuidador_id', 'vinculo', 'es_principal',
         'fecha_inicio', 'fecha_fin', 'observaciones',
     ];
 
@@ -25,12 +24,12 @@ class AdultoCuidador extends Model
         ];
     }
 
-    // Un adulto tiene un solo cuidador principal vigente
+    // Un socio tiene un solo cuidador principal vigente
     protected static function booted(): void
     {
         static::saved(function (self $registro) {
             if ($registro->es_principal && $registro->fecha_fin === null) {
-                static::where('adulto_id', $registro->adulto_id)
+                static::where('socio_id', $registro->socio_id)
                     ->where('id', '!=', $registro->id)
                     ->whereNull('fecha_fin')
                     ->update(['es_principal' => false]);
@@ -38,9 +37,9 @@ class AdultoCuidador extends Model
         });
     }
 
-    public function adulto()
+    public function socio()
     {
-        return $this->belongsTo(Adulto::class);
+        return $this->belongsTo(Socio::class);
     }
 
     public function cuidador()

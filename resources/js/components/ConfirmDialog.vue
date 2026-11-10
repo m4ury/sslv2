@@ -1,23 +1,22 @@
 <script setup>
 import {
     AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { useConfirmState } from '@/composables/useConfirm';
 
 const state = useConfirmState();
 
 function responder(valor) {
-    state.resolver?.(valor);
+    const resolver = state.resolver;
     state.resolver = null;
     state.open = false;
+    resolver?.(valor);
 }
 </script>
 
@@ -31,13 +30,16 @@ function responder(valor) {
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel @click="responder(false)">Cancelar</AlertDialogCancel>
-                <AlertDialogAction
+                <Button type="button" variant="outline" @click="responder(false)">
+                    Cancelar
+                </Button>
+                <Button
+                    type="button"
                     :class="state.destructivo ? buttonVariants({ variant: 'destructive' }) : ''"
                     @click="responder(true)"
                 >
                     {{ state.confirmarTexto }}
-                </AlertDialogAction>
+                </Button>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>

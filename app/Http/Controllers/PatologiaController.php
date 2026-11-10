@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePatologiaRequest;
 use App\Http\Requests\UpdatePatologiaRequest;
-use App\Models\Adulto;
+use App\Models\Socio;
 use App\Models\Patologia;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -14,13 +14,13 @@ class PatologiaController extends Controller
 {
     public function index(Request $request)
     {
-        $adulto = Adulto::with('persona')->find($request->integer('adulto'));
+        $socio = Socio::with('persona')->find($request->integer('socio'));
 
         return Inertia::render('catalogos/Patologias', [
             'patologias' => Patologia::withCount('registros')->orderBy('nombre')->get(),
-            'volver' => $adulto ? [
-                'url' => "/adultos/{$adulto->id}/ficha",
-                'nombre' => $adulto->persona?->full_name,
+            'volver' => $socio ? [
+                'url' => "/socios/{$socio->id}/ficha",
+                'nombre' => $socio->persona?->full_name,
             ] : null,
         ]);
     }
@@ -43,7 +43,7 @@ class PatologiaController extends Controller
     {
         // withTrashed: también cuenta registros eliminados, que siguen ligados por FK
         if ($patologia->registros()->withTrashed()->exists()) {
-            return back()->with('error', 'No se puede eliminar: está asociada a registros de adultos.');
+            return back()->with('error', 'No se puede eliminar: está asociada a registros de socios.');
         }
 
         $patologia->delete();

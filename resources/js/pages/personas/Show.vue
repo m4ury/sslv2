@@ -42,7 +42,6 @@ const props = defineProps({
         type: Object,
         default: () => ({
             socio: null,
-            adulto: null,
             colaborador: null,
             cuidador: null,
         }),
@@ -85,7 +84,7 @@ const datos = computed(() => [
 // Cada rol: al transicionar se abre su formulario con ?persona_id=
 // Si ya existe, se enlaza a su ficha. Ajusta las rutas a las tuyas.
 const transiciones = computed(() => [
-    {
+    /* {
         key: 'socio',
         label: 'Socio',
         description: 'Registrar a esta persona como socio de la agrupación.',
@@ -94,17 +93,17 @@ const transiciones = computed(() => [
         editUrl: props.roles.socio ? `/socios/${props.roles.socio.id}/edit` : null,
         showUrl: props.roles.socio ? `/socios/${props.roles.socio.id}` : null,
 
-    },
+    }, */
     {
-        key: 'adulto',
-        label: 'Adulto mayor',
-        description: 'Incorporar como adulto mayor perteneciente a la agrupación.',
+        key: 'socio',
+        label: 'Socio',
+        description: 'Incorporar como socio perteneciente a la agrupación.',
         icon: UserRound,
-        createUrl: `/adultos/create?persona_id=${props.persona.id}`,
-        editUrl: props.roles.adulto
-            ? `/adultos/${props.roles.adulto.id}/ficha`
+        createUrl: `/socios/create?persona_id=${props.persona.id}`,
+        editUrl: props.roles.socio
+            ? `/socios/${props.roles.socio.id}/ficha`
             : null,
-        showUrl: props.roles.adulto ? `/adultos/${props.roles.adulto.id}` : null,
+        showUrl: props.roles.socio ? `/socios/${props.roles.socio.id}` : null,
     },
     {
         key: 'colaboradores',

@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import  personas  from '@/routes/personas';
-import  adultos  from '@/routes/adultos';
+/* import  socios  from '@/routes/socios'; */
 import type { NavItem } from '@/types';
 import { usePermisos } from '@/composables/usePermisos';
 
@@ -51,19 +51,19 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Aportes',
         href: '/aportes',
-        icon: HandCoins 
+        icon: HandCoins
     },
 
     {
         title: 'Usuarios',
         href: '/admin/usuarios',
-        icon: Users 
+        icon: Users
     },
 
     {
         title: 'Profesiones',
         href: '/admin/profesiones',
-        icon: Stethoscope 
+        icon: Stethoscope
     },
 ];
 

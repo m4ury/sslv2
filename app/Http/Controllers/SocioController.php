@@ -106,4 +106,28 @@ class SocioController extends Controller
     {
         //
     }
+
+    public function baja(Socio $socio)
+    {
+        if (! $socio->estaActivo()) {
+            return back()->with('error', 'El socio no está activo.');
+        }
+
+        $socio->darDeBaja();
+
+        return redirect()->route('personas.show', $socio->persona_id)
+            ->with('success', 'Socio dado de baja. Los datos de la persona se mantienen.');
+    }
+
+    public function reactivar(Socio $socio)
+    {
+        if (! $socio->estaInactivo()) {
+            return back()->with('error', 'Solo se puede reingresar a un socio inactivo.');
+        }
+
+        $socio->reactivar();
+
+        return redirect()->route('personas.show', $socio->persona_id)
+            ->with('success', 'Socio reingresado correctamente.');
+    }
 }

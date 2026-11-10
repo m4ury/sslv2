@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\ConfigCuota;
 use App\Services\GeneradorCuotas;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
-
 
 class ConfigCuotaController extends Controller
 {
@@ -44,13 +43,15 @@ class ConfigCuotaController extends Controller
 
     public function generar(ConfigCuota $configuracion, GeneradorCuotas $generador)
     {
-        if (!$configuracion->activa) {
+        if (! $configuracion->activa) {
             return back()->with('error', 'La configuración está inactiva.');
         }
 
         $r = $generador->generar($configuracion);
 
-        return back()->with('success', "Cuotas generadas: {$r['creadas']} nuevas, {$r['existentes']} ya existían.");
+        return redirect()
+            ->route('cuotas.configuraciones.index')
+            ->with('success', "Cuotas generadas: {$r['creadas']} nuevas, {$r['existentes']} ya existían.");
     }
 
     private function validar(Request $request, bool $editando = false): array

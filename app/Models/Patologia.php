@@ -14,13 +14,13 @@ class Patologia extends Model
 
     public function registros()
     {
-        return $this->hasMany(AdultoPatologia::class);
+        return $this->hasMany(PatologiaSocio::class);
     }
 
-    // Adultos que tienen esta patología (útil para reportes)
-    public function adultos()
+    // Socios que tienen esta patología (útil para reportes)
+    public function socios()
     {
-        return $this->belongsToMany(Adulto::class, 'adulto_patologia')
+        return $this->belongsToMany(Socio::class, 'patologia_socio')
             ->wherePivotNull('deleted_at')
             ->withPivot('estado', 'fecha_diagnostico');
     }

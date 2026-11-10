@@ -3,9 +3,11 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { ArrowLeft, CalendarPlus } from '@lucide/vue';
 import { computed } from 'vue';
 import FichaSeccion from '@/components/ficha/FichaSeccion.vue';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { formatCLP, formatDate } from '@/config/ficha';
+import { generar as generarCuotas } from '@/routes/cuotas/configuraciones';
 import { useConfirm } from '@/composables/useConfirm';
+
 
 const { confirmar } = useConfirm();
 
@@ -63,26 +65,16 @@ const seccion = {
 
 async function generar(item) {
     const ok = await confirmar({
-        titulo: `¿Generar las cuotas de "${item.nombre}"?`,
+        titulo: `¿Generar las cuotas de "${item.nombre_cuota}"?`,
         descripcion:
             'Se crearán las cuotas de los socios activos hasta el mes actual. Las que ya existen no se duplican.',
         confirmarTexto: 'Generar cuotas',
     });
 
     if (ok) {
-        router.post(`${URL_BASE}/${item.id}/generar`, {}, { preserveScroll: true });
+        router.post(generarCuotas.url(item.id), {}, { preserveScroll: true });
     }
 }
-
-/* function generar(item) {
-    if (
-        window.confirm(
-            `¿Generar las cuotas de "${item.nombre}" para los socios activos, hasta el mes actual? Las que ya existen no se duplican.`,
-        )
-    ) {
-        router.post(`${URL_BASE}/${item.id}/generar`, {}, { preserveScroll: true });
-    }
-} */
 </script>
 
 <template>
@@ -100,15 +92,16 @@ async function generar(item) {
 
         <FichaSeccion :seccion="seccion" :items="items" :url="URL_BASE">
             <template #acciones="{ item }">
-                <Button
+                <button
                     v-if="item.activa"
-                    variant="ghost"
-                    size="icon"
+                    type="button"
+                    :class="buttonVariants({ variant: 'ghost', size: 'icon' })"
                     title="Generar cuotas"
-                    @click="generar(item)"
+                    :aria-label="`Generar cuotas de ${item.nombre_cuota}`"
+                    @click.stop="generar(item)"
                 >
                     <CalendarPlus class="size-4" />
-                </Button>
+                </button>
             </template>
         </FichaSeccion>
     </div>

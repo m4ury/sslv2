@@ -1,7 +1,7 @@
 <script setup>
 import RolForm from '@/components/roles/RolForm.vue';
 import { socioSections } from '@/config/roles/socio';
-import { store, update } from '@/routes/socios';
+import {baja, reactivar, store, update} from '@/routes/socios';
 import CuotasSocio from '@/components/cuotas/CuotasSocio.vue';
 
 const props = defineProps({
@@ -20,6 +20,8 @@ const props = defineProps({
         :sections="socioSections"
         :store-url="store.url()"
         :update-url="update.url(socio.id)"
+        :baja-url="baja.url(socio.id)"
+        :reactivar-url="reactivar.url(socio.id)"
     />
     <div class="mx-auto w-full max-w-3xl px-4 pb-6 md:px-6">
         <CuotasSocio :cuotas="cuotas" :medios="medios" />

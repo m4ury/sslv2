@@ -15,7 +15,7 @@ class Control extends Model
     use HasFactory, softDeletes;
 
     protected $fillable = [
-        'adulto_id',
+        'socio_id',
         'programado_id',
         'user_id',
         'fecha_control',
@@ -32,9 +32,9 @@ class Control extends Model
         ];
     }
 
-    public function adulto(): BelongsTo
+    public function socio(): BelongsTo
     {
-        return $this->belongsTo(Adulto::class);
+        return $this->belongsTo(Socio::class);
     }
 
     public function programado(): BelongsTo

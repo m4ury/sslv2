@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
-import { History, Search, Settings, Wallet } from '@lucide/vue';
+import { Eye, History, List, Search, Settings, Wallet } from '@lucide/vue';
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import Pagination from '@/components/Pagination.vue';
 import PagosDialog from '@/components/cuotas/PagosDialog.vue';
@@ -18,6 +18,8 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { formatCLP, formatDate, formatPeriodo } from '@/config/ficha';
+import { index as cuotasIndex } from '@/routes/cuotas';
+import { show as showPersona } from '@/routes/personas';
 
 const props = defineProps({
     cuotas: { type: Object, required: true },
@@ -44,6 +46,7 @@ const filtros = reactive({
     estado: props.filters.estado ?? '',
     periodo: props.filters.periodo ?? '',
     config: props.filters.config ?? '',
+    socio: props.filters.socio ?? '',
 });
 
 let timeout;
@@ -189,6 +192,40 @@ const selectClass =
                                 </TableCell>
                                 <TableCell>
                                     <div class="flex justify-end gap-1">
+                                        <Button
+                                            as-child
+                                            variant="ghost"
+                                            size="icon"
+                                            title="Ver socio"
+                                        >
+                                            <Link
+                                                :href="
+                                                    showPersona.url(
+                                                        c.socio.persona_id,
+                                                    )
+                                                "
+                                            >
+                                                <Eye class="size-4" />
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            as-child
+                                            variant="ghost"
+                                            size="icon"
+                                            title="Ver cuotas del socio"
+                                        >
+                                            <Link
+                                                :href="
+                                                    cuotasIndex.url({
+                                                        query: {
+                                                            socio: c.socio_id,
+                                                        },
+                                                    })
+                                                "
+                                            >
+                                                <List class="size-4" />
+                                            </Link>
+                                        </Button>
                                         <Button
                                             v-if="c.saldo > 0"
                                             size="sm"

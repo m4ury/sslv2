@@ -12,7 +12,7 @@ class Credencial extends Model
     use HasFactory;
 
     protected $fillable = [
-        'adulto_id',
+        'socio_id',
         'fecha_emision',
         'fecha_expiracion',
         'numero',
@@ -32,8 +32,8 @@ class Credencial extends Model
         ];
     }
 
-    public function adulto()
+    public function socio()
     {
-        return $this->belongsTo(Adulto::class);
+        return $this->belongsTo(Socio::class);
     }
 }

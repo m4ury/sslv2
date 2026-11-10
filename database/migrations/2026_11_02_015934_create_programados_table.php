@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('programados', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('adulto_id')->constrained('adultos')->onDelete('cascade');
+            $table->foreignId('socio_id')->constrained('socios')->onDelete('cascade');
             $table->date('fecha_programada')->nullable();
             $table->enum('estado', ['asiste', 'no_asiste', 'reagendado'])->nullable();
             $table->string('observacion', 255)->nullable();

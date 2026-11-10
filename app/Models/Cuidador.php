@@ -34,13 +34,13 @@ class Cuidador extends Model
     // Asignaciones con sus datos (las usa la pantalla del cuidador)
     public function asignaciones()
     {
-        return $this->hasMany(AdultoCuidador::class);
+        return $this->hasMany(CuidadorSocio::class);
     }
 
-    // Acceso n:m directo a los adultos
-    public function adultos()
+    // Acceso n:m directo a los socios
+    public function socios()
     {
-        return $this->belongsToMany(Adulto::class, 'adulto_cuidador')
+        return $this->belongsToMany(socio::class, 'cuidador_socio')
             ->wherePivotNull('deleted_at')
             ->withPivot('vinculo', 'es_principal', 'fecha_inicio', 'fecha_fin');
     }

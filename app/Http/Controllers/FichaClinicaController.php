@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Adulto;
+use App\Models\Socio;
 use App\Models\Control;
 use App\Models\Patologia;
 use Illuminate\Http\Request;
@@ -19,18 +19,17 @@ use Illuminate\Support\Facades\Gate;
 
 class FichaClinicaController extends Controller
 {
-    public function show(Adulto $adulto)
+    public function show(Socio $socio)
     {
-        return Inertia::render('adultos/Ficha', [
-            'adulto' => $adulto->only('id', 'estado', 'fecha_ingreso'),
-            'persona' => $adulto->persona,
-            //'patologias' => $adulto->patologias()->orderByDesc('fecha_diagnostico')->get(),
-            'patologias' => $adulto->patologias()
+        return Inertia::render('socios/Ficha', [
+            'socio' => $socio->only('id', 'estado', 'fecha_ingreso'),
+            'persona' => $socio->persona,
+            'patologias' => $socio->patologias()
                 ->with('patologia:id,nombre')
                 ->orderByDesc('fecha_diagnostico')
                 ->get(),
             'catalogoPatologias' => Patologia::orderBy('nombre')->get(['id', 'nombre']),
-            'controles' => $adulto->controles()
+            'controles' => $socio->controles()
                 ->with(['mediciones', 'user:id,name'])
                 ->orderByDesc('created_at')->orderByDesc('id')
                 ->get()
@@ -42,7 +41,7 @@ class FichaClinicaController extends Controller
                     'mediciones' => $control->mediciones,
                     'autor' => $control->user,
                 ]),
-            'prestaciones' => $adulto->prestaciones()
+            'prestaciones' => $socio->prestaciones()
                 ->orderByDesc('created_at')
                 ->get()
                 ->map(fn (Prestacion $prestacion) => [
@@ -52,7 +51,7 @@ class FichaClinicaController extends Controller
                     'control_id' => $prestacion->control_id,
                     'detalle' => $prestacion->descripcion,
                 ]),
-            'programados' => $adulto->programados()
+            'programados' => $socio->programados()
                 ->orderBy('fecha_programada')
                 ->get()
                 ->map(fn (Programado $programado) => [
@@ -62,8 +61,8 @@ class FichaClinicaController extends Controller
                     'estado' => $programado->estado,
                     'observaciones' => $programado->observacion,
                 ]),
-            'credenciales' => $adulto->credenciales()->orderBy('fecha_expiracion')->get(),
-            'documentos' => $adulto->documentos()
+            'credenciales' => $socio->credenciales()->orderBy('fecha_expiracion')->get(),
+            'documentos' => $socio->documentos()
                 ->with('tipoDocumento:id,nombre')
                 ->latest()
                 ->get()
@@ -75,13 +74,13 @@ class FichaClinicaController extends Controller
                     'tamano' => $documento->tamanio_bytes,
                 ]),
             'catalogos' => config('ficha'),
-            'cuidadores' => $adulto->cuidadores()
+            'cuidadores' => $socio->cuidadores()
                 ->with('cuidador.persona')
                 ->orderByDesc('es_principal')
                 ->orderByDesc('fecha_inicio')
                 ->get(),
             'catalogoCuidadores' => Cuidador::with('persona')
-                ->where('persona_id', '!=', $adulto->persona_id) // nadie es cuidador de sí mismo
+                ->where('persona_id', '!=', $socio->persona_id) // nadie es cuidador de sí mismo
                 ->get()
                 ->map(fn ($c) => [
                     'id' => $c->id,
@@ -94,23 +93,23 @@ class FichaClinicaController extends Controller
         ]);
     }
 
-    public function store(Request $request, Adulto $adulto, string $seccion)
+    public function store(Request $request, Socio $socio, string $seccion)
     {
         Gate::authorize($this->permisoDe($seccion));
 
-        $data = $request->validate($this->reglas($seccion, $adulto, $request, false));
+        $data = $request->validate($this->reglas($seccion, $socio, $request, false));
 
-        DB::transaction(function () use ($request, $adulto, $seccion, $data) {
+        DB::transaction(function () use ($request, $socio, $seccion, $data) {
             match ($seccion) {
-                'controles' => $this->guardarControl($adulto, $data, $request->user()->id),
-                'documentos' => $this->guardarDocumento($request, $adulto, $data),
-                'programados' => $adulto->programados()->create([
+                'controles' => $this->guardarControl($socio, $data, $request->user()->id),
+                'documentos' => $this->guardarDocumento($request, $socio, $data),
+                'programados' => $socio->programados()->create([
                     'fecha_programada' => $data['fecha_programada'],
                     'tipo_control' => $data['tipo'],
                     'estado' => 'Pendiente',
                     'observacion' => $data['observaciones'] ?? null,
                 ]),
-                'prestaciones' => $adulto->controles()
+                'prestaciones' => $socio->controles()
                     ->findOrFail($data['control_id'])
                     ->prestaciones()
                     ->create([
@@ -118,23 +117,23 @@ class FichaClinicaController extends Controller
                         'nombre_prestacion' => $data['nombre'],
                         'descripcion' => $data['detalle'] ?? null,
                     ]),
-                default => $adulto->{$seccion}()->create($data),
+                default => $socio->{$seccion}()->create($data),
             };
         });
 
         return back()->with('success', 'Registro guardado correctamente.');
     }
 
-    public function update(Request $request, Adulto $adulto, string $seccion, int $id)
+    public function update(Request $request, Socio $socio, string $seccion, int $id)
     {
         Gate::authorize($this->permisoDe($seccion));
-        // Se busca a través de la relación: solo registros de este adulto
-        $registro = $adulto->{$seccion}()->findOrFail($id);
-        $data = $request->validate($this->reglas($seccion, $adulto, $request, true));
+        // Se busca a través de la relación: solo registros de este socio
+        $registro = $socio->{$seccion}()->findOrFail($id);
+        $data = $request->validate($this->reglas($seccion, $socio, $request, true));
 
-        DB::transaction(function () use ($request, $adulto, $seccion, $registro, $data) {
+        DB::transaction(function () use ($request, $socio, $seccion, $registro, $data) {
             if ($seccion === 'controles') {
-                $this->guardarControl($adulto, $data, $request->user()->id, $registro);
+                $this->guardarControl($socio, $data, $request->user()->id, $registro);
             } elseif ($seccion === 'programados') {
                 $registro->update([
                     'fecha_programada' => $data['fecha_programada'],
@@ -167,25 +166,25 @@ class FichaClinicaController extends Controller
         return back()->with('success', 'Registro actualizado correctamente.');
     }
 
-    public function destroy(Adulto $adulto, string $seccion, int $id)
+    public function destroy(Socio $socio, string $seccion, int $id)
     {
         Gate::authorize($this->permisoDe($seccion));
-        
+
         // Soft delete: el registro deja de mostrarse pero se conserva en la base
-        $adulto->{$seccion}()->findOrFail($id)->delete();
+        $socio->{$seccion}()->findOrFail($id)->delete();
 
         return back()->with('success', 'Registro eliminado.');
     }
 
-    public function descargar(Adulto $adulto, int $documento)
+    public function descargar(Socio $socio, int $documento)
     {
-        $doc = $adulto->documentos()->findOrFail($documento);
+        $doc = $socio->documentos()->findOrFail($documento);
 
         // Disco privado: el archivo no es accesible por URL directa
         return Storage::disk('local')->download($doc->archivo_ruta, $doc->archivo_original);
     }
 
-    private function guardarControl(Adulto $adulto, array $data, int $userId, ?Control $control = null): void
+    private function guardarControl(Socio $socio, array $data, int $userId, ?Control $control = null): void
     {
         $atributos = [
             'fecha_control' => $data['fecha'],
@@ -196,7 +195,7 @@ class FichaClinicaController extends Controller
         if ($control) {
             $control->update($atributos);
         } else {
-            $control = $adulto->controles()->create([...$atributos, 'user_id' => $userId]);
+            $control = $socio->controles()->create([...$atributos, 'user_id' => $userId]);
         }
 
         $control->mediciones()->delete();
@@ -214,26 +213,26 @@ class FichaClinicaController extends Controller
         }
     }
 
-    private function guardarDocumento(Request $request, Adulto $adulto, array $data): void
+    private function guardarDocumento(Request $request, Socio $socio, array $data): void
     {
         $archivo = $request->file('archivo');
         $tipoDocumento = Tipo_documento::query()->firstOrCreate([
             'nombre' => $data['tipo'],
         ]);
 
-        $adulto->documentos()->create([
+        $socio->documentos()->create([
             'user_id' => $request->user()->id,
             'nombre' => $data['nombre'],
             'tipo_documento_id' => $tipoDocumento->id,
             'fecha_documento' => $data['fecha_documento'] ?? null,
-            'archivo_ruta' => $archivo->store("fichas/{$adulto->id}", 'local'),
+            'archivo_ruta' => $archivo->store("fichas/{$socio->id}", 'local'),
             'archivo_original' => $archivo->getClientOriginalName(),
             'mime_type' => $archivo->getMimeType(),
             'tamanio_bytes' => $archivo->getSize(),
         ]);
     }
 
-    private function reglas(string $seccion, Adulto $adulto, Request $request, bool $editando): array
+    private function reglas(string $seccion, Socio $socio, Request $request, bool $editando): array
     {
         $c = config('ficha');
         $vigente = in_array($request->input('estado'), ['Activa', 'Controlada'], true);
@@ -248,10 +247,10 @@ class FichaClinicaController extends Controller
             'patologia_id' => [
                 'required',
                 Rule::exists('patologias', 'id'),
-                // Evita dos registros vigentes de la misma patología en el mismo adulto
+                // Evita dos registros vigentes de la misma patología en el mismo socio
                 ...($vigente ? [
-                    Rule::unique('adulto_patologia', 'patologia_id')
-                        ->where('adulto_id', $adulto->id)
+                    Rule::unique('patologia_socio', 'patologia_id')
+                        ->where('socio_id', $socio->id)
                         ->whereNull('deleted_at')
                         ->whereIn('estado', ['Activa', 'Controlada'])
                         ->ignore($request->route('id')),
@@ -277,7 +276,7 @@ class FichaClinicaController extends Controller
                 'control_id' => [
                     'required',
                     Rule::exists('controls', 'id')
-                        ->where('adulto_id', $adulto->id)
+                        ->where('socio_id', $socio->id)
                         ->whereNull('deleted_at'),
                 ],
                 'detalle' => ['nullable', 'string'],
@@ -318,15 +317,15 @@ class FichaClinicaController extends Controller
                 'cuidador_id' => [
                     'required',
                     $existeCuidador,
-                    function ($attribute, $value, $fail) use ($adulto) {
-                        if (Cuidador::whereKey($value)->where('persona_id', $adulto->persona_id)->exists()) {
+                    function ($attribute, $value, $fail) use ($socio) {
+                        if (Cuidador::whereKey($value)->where('persona_id', $socio->persona_id)->exists()) {
                             $fail('Una persona no puede ser cuidadora de sí misma.');
                         }
                     },
-                    // Evita dos asignaciones vigentes del mismo cuidador al mismo adulto
+                    // Evita dos asignaciones vigentes del mismo cuidador al mismo socio
                     ...($request->filled('fecha_fin') ? [] : [
-                        Rule::unique('adulto_cuidador', 'cuidador_id')
-                            ->where('adulto_id', $adulto->id)
+                        Rule::unique('cuidador_socio', 'cuidador_id')
+                            ->where('socio_id', $socio->id)
                             ->whereNull('deleted_at')
                             ->whereNull('fecha_fin')
                             ->ignore($request->route('id')),

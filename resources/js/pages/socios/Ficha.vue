@@ -25,7 +25,7 @@ import { usePermisos } from '@/composables/usePermisos';
 const { puede } = usePermisos();
 
 const props = defineProps({
-    adulto: { type: Object, required: true },
+    socio: { type: Object, required: true },
     persona: { type: Object, required: true },
     patologias: { type: Array, default: () => [] },
     controles: { type: Array, default: () => [] },
@@ -39,7 +39,7 @@ const props = defineProps({
     catalogoCuidadores: { type: Array, default: () => [] },
 });
 
-const base = computed(() => `/adultos/${props.adulto.id}/ficha`);
+const base = computed(() => `/socios/${props.socio.id}/ficha`);
 
 const fullName = computed(
     () =>
@@ -176,8 +176,8 @@ const ultimasMediciones = computed(() => {
                     <span v-if="persona.edad != null" class="text-muted-foreground">
                         · {{ persona.edad }} años
                     </span>
-                    <Badge :variant="adulto.estado === 'Activo' ? 'default' : 'secondary'">
-                        {{ adulto.estado }}
+                    <Badge :variant="socio.estado === 'Activo' ? 'default' : 'secondary'">
+                        {{ socio.estado }}
                     </Badge>
                 </div>
             </div>
@@ -190,9 +190,9 @@ const ultimasMediciones = computed(() => {
                     </Link>
                 </Button>
                 <Button as-child variant="outline">
-                    <Link :href="`/adultos/${adulto.id}/edit`">
+                    <Link :href="`/socios/${socio.id}/edit`">
                         <Pencil class="size-4" />
-                        Editar datos del adulto
+                        Editar datos del socio
                     </Link>
                 </Button>
             </div>
@@ -353,7 +353,7 @@ const ultimasMediciones = computed(() => {
                 <p class="text-sm text-muted-foreground">
                     ¿No encuentras la patología?
                     <Link
-                        :href="`/catalogos/patologias?adulto=${adulto.id}`"
+                        :href="`/catalogos/patologias?socio=${socio.id}`"
                         class="underline underline-offset-4"
                     >
                         Agrégala al catálogo

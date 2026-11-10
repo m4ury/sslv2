@@ -51,11 +51,11 @@ import { register } from '@/routes';
                     <h1 class="mb-1 font-medium">Sueños Sin Límites</h1>
                     <p class="mb-6 text-sm text-[#1b1b18] dark:text-[#EDEDEC]">
                         Bienvenido a Sueños Sin Límites, una plataforma que
-                        permite gestionar personas, adultos y socios de manera
+                        permite gestionar personas, socios de manera
                         eficiente.
                     </p>
                     <p class="mb-6 text-sm text-[#1b1b18] dark:text-[#EDEDEC]">
-                        Para comenzar, puedes crear una nueva persona haciendo clic en el botón "Crear Persona" en la parte superior de la página. Una vez que hayas creado una persona, podrás ver sus detalles y realizar acciones adicionales, como pasarla a adulto, socio o adulto colaborador.
+                        Para comenzar, puedes crear una nueva persona haciendo clic en el botón "Crear Persona" en la parte superior de la página. Una vez que hayas creado una persona, podrás ver sus detalles y realizar acciones adicionales, como pasarla a socio o colaborador.
                     </p>
                     <p class="mb-6 text-sm text-[#1b1b18] dark:text-[#EDEDEC]">
                         Explora las funcionalidades de la plataforma y gestiona tus registros de manera efectiva. ¡Disfruta de la experiencia!

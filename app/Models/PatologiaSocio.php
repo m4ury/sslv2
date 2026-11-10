@@ -5,22 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AdultoPatologia extends Model
+
+class PatologiaSocio extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'adulto_patologia';
+    protected $table = 'patologia_socio';
 
-    protected $fillable = ['adulto_id', 'patologia_id', 'fecha_diagnostico', 'observaciones', 'estado'];
+    protected $fillable = ['socio_id', 'patologia_id', 'fecha_diagnostico', 'observaciones', 'estado'];
 
     protected function casts(): array
     {
         return ['fecha_diagnostico' => 'date:Y-m-d'];
     }
 
-    public function adulto()
+    public function socio()
     {
-        return $this->belongsTo(Adulto::class);
+        return $this->belongsTo(Socio::class);
     }
 
     public function patologia()

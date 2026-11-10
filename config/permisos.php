@@ -5,13 +5,13 @@ return [
         'Personas y roles' => [
             'personas.ver' => 'Ver personas',
             'personas.gestionar' => 'Crear, editar y eliminar personas',
-            'roles.gestionar' => 'Registrar y editar socios, adultos, colaboradores y cuidadores',
+            'roles.gestionar' => 'Registrar y editar socios, colaboradores y cuidadores',
         ],
         'Ficha clínica' => [
-            'ficha.ver' => 'Ver la ficha clínica del adulto',
+            'ficha.ver' => 'Ver la ficha clínica del socio',
             'ficha.registrar' => 'Registrar y editar controles, prestaciones, patologías, controles programados, credenciales y documentos',
             'patologias.catalogo' => 'Agregar y editar patologías del catálogo',
-            'cuidadores.asignar' => 'Asignar cuidadores a un adulto',
+            'cuidadores.asignar' => 'Asignar cuidadores a un paciente',
         ],
         'Tesorería' => [
             'cuotas.ver' => 'Ver cuotas',

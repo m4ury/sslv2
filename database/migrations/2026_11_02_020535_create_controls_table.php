@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('controls', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('adulto_id')->constrained('adultos')->nullable();
+            $table->foreignId('socio_id')->constrained('socios')->nullable();
             $table->foreignId('programado_id')->constrained('programados')->nullable();
             $table->foreignId('user_id')->constrained('users')->nullable();
             $table->date('fecha_control')->nullable();

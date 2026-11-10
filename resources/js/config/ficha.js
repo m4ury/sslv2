@@ -78,11 +78,10 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [], 
         patologias: {
             titulo: 'Patologías',
             singular: 'patología',
-            descripcion: 'Diagnósticos del adulto, tomados del catálogo de patologías.',
+            descripcion: 'Diagnósticos, tomados del catálogo de patologías.',
             vacio: 'Sin patologías registradas.',
             columns: [
                 { key: 'patologia', label: 'Patología', format: (i) => i.patologia?.nombre ?? '—' },
-                /* { key: 'codigo', label: 'CIE-10', format: (i) => i.patologia?.codigo_cie10 ?? '—' }, */
                 { key: 'fecha_diagnostico', label: 'Diagnóstico', type: 'date' },
                 { key: 'estado', label: 'Estado', badge: true, variant: (i) => variante(i.estado) },
                 { key: 'observaciones', label: 'Observaciones', class: 'max-w-xs truncate' },
@@ -96,7 +95,6 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [], 
                     span: 2,
                     options: catalogoPatologias.map((p) => ({
                         value: p.id,
-                        /* label: p.codigo_cie10 ? `${p.nombre} (${p.codigo_cie10})` : p.nombre, */
                         label:`${p.nombre}`
                     })),
                 },
@@ -230,7 +228,7 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [], 
         cuidadores: {
             titulo: 'Cuidadores',
             singular: 'cuidador',
-            descripcion: 'Personas que cuidan a este adulto y desde cuándo.',
+            descripcion: 'Personas que cuidan a este paciente y desde cuándo.',
             vacio: 'Sin cuidadores asignados.',
             columns: [
                 { key: 'cuidador', label: 'Cuidador', format: (i) => i.cuidador?.persona?.full_name ?? '—' },

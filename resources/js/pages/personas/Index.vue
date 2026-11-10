@@ -67,7 +67,6 @@ onBeforeUnmount(() => clearTimeout(timeout));
 
 const roleDefinitions = [
     { key: 'socio', label: 'Socio', icon: Handshake },
-    { key: 'adulto', label: 'Adulto mayor', icon: UserRound },
     { key: 'colaborador', label: 'Colaborador', icon: HandHeart },
     { key: 'cuidador', label: 'Cuidador', icon: HeartHandshake },
 ];
@@ -94,16 +93,6 @@ function roleCaption(persona, role) {
 
     return estado ? `${role.label} · ${estado}` : role.label;
 }
-
-/* function deletePersona(persona) {
-    if (
-        window.confirm(
-            `¿Estás seguro de que deseas eliminar a ${persona.full_name}?`,
-        )
-    ) {
-        router.delete(destroy.url(persona.id), { preserveScroll: true });
-    }
-} */
 
 // Evita el desfase de zona horaria al parsear "YYYY-MM-DD"
 function formatDate(value) {

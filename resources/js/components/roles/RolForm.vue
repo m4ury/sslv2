@@ -4,7 +4,7 @@ import { ArrowLeft, Loader2, Save } from '@lucide/vue';
 import { computed } from 'vue';
 import InputError from '@/components/InputError.vue';
 import PersonaResumen from '@/components/personas/PersonaResumen.vue';
-import RolEstadoCard from '@/components/roles/RolEstadoCard.vue';
+/* import RolEstadoCard from '@/components/roles/RolEstadoCard.vue'; */
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -24,7 +24,7 @@ const props = defineProps({
     persona: { type: Object, required: true },
     // Registro existente del rol; si viene, es modo edición
     registro: { type: Object, default: null },
-    // Nombre del rol: "Adulto", "Socio", "Colaborador"
+    // Nombre del rol: "Socio", "Colaborador"
     rolLabel: { type: String, required: true },
     // Secciones y campos propios del rol (ver config/roles/*.js)
     sections: { type: Array, required: true },
@@ -140,14 +140,14 @@ function minFor(field) {
 
         <PersonaResumen :persona="persona" />
 
-        <RolEstadoCard
+        <!-- <RolEstadoCard
             v-if="isEdit && bajaUrl && reactivarUrl"
             :registro="registro"
             :rol-label="rolLabel"
             :nombre="fullName"
             :baja-url="bajaUrl"
             :reactivar-url="reactivarUrl"
-        />
+        /> -->
 
         <form @submit.prevent="submitForm">
             <Card>

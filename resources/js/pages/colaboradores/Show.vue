@@ -26,7 +26,7 @@ const props = defineProps({
     persona: { type: Object, required: true },
     roles: {
         type: Object,
-        default: () => ({ socio: null, adulto: null, colaborador: null }),
+        default: () => ({ socio: null, colaborador: null }),
     },
 });
 
@@ -71,24 +71,15 @@ const transiciones = computed(() => [
         createUrl: `/socios/create?persona_id=${props.persona.id}`,
         showUrl: props.roles.socio ? `/socios/${props.roles.socio.id}` : null,
     },
-    {
-        key: 'adulto',
-        label: 'Adulto mayor',
-        description: 'Incorporar como adulto mayor perteneciente a la agrupación.',
-        icon: UserRound,
-        createUrl: `/adultos/create?persona_id=${props.persona.id}`,
-        showUrl: props.roles.adulto
-            ? `/adultos/${props.roles.adulto.id}`
-            : null,
-    },
+
     {
         key: 'colaborador',
         label: 'Colaborador',
         description: 'Registrar como colaborador de la agrupación.',
         icon: HandHeart,
-        createUrl: `/adultos/colaborador?persona_id=${props.persona.id}`,
+        createUrl: `/socios/colaborador?persona_id=${props.persona.id}`,
         showUrl: props.roles.colaborador
-            ? `/adultos/colaborador/${props.roles.colaborador.id}`
+            ? `/socios/colaborador/${props.roles.colaborador.id}`
             : null,
     },
 ]);

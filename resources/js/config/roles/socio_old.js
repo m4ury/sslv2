@@ -1,6 +1,6 @@
-export const adultoSections = [
+export const socioSections = [
     {
-        title: 'Pertenencia a la agrupación',
+        title: 'Pertenencia como socio',
         fields: [
             {
                 name: 'fecha_ingreso',
@@ -21,19 +21,7 @@ export const adultoSections = [
                 type: 'select',
                 required: true,
                 editOnly: true,
-                options: ['activo', 'inactivo'],
-            },
-        ],
-    },
-    {
-        title: 'Contacto de emergencia',
-        fields: [
-            { name: 'contacto_emergencia_nombre', label: 'Nombre del contacto' },
-            {
-                name: 'contacto_emergencia_telefono',
-                label: 'Teléfono',
-                type: 'tel',
-                placeholder: '+56 9 1234 5678',
+                options: ['Activo', 'Inactivo'],
             },
         ],
     },

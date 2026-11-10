@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('credencials', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('adulto_id')->constrained('adultos')->onDelete('cascade');
+            $table->foreignId('socio_id')->constrained('socios')->onDelete('cascade');
             $table->string('numero', 255)->unique();
             $table->date('fecha_emision')->nullable();
             $table->date('fecha_expiracion')->nullable();

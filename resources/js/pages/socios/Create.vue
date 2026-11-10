@@ -1,6 +1,6 @@
 <script setup>
 import RolForm from '@/components/roles/RolForm.vue';
-import { socioSections } from '@/config/roles/socio';
+import { socioSections } from '@/config/roles/socio_old';
 import { store } from '@/routes/socios';
 
 defineProps({

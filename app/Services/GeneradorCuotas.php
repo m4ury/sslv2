@@ -29,7 +29,7 @@ class GeneradorCuotas
         $creadas = 0;
         $existentes = 0;
 
-        Socio::where('estado', 'Activo')->each(
+        Socio::where('estado', Socio::ESTADO_ACTIVO)->each(
             function (Socio $socio) use ($config, $inicio, $limite, &$creadas, &$existentes) {
                 $desde = $inicio->copy();
 

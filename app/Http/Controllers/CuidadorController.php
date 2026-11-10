@@ -66,7 +66,7 @@ class CuidadorController extends Controller
             'cuidador' => $cuidador,
             'persona' => $cuidador->persona,
             'asignaciones' => $cuidador->asignaciones()
-                ->with('adulto.persona')
+                ->with('socio.persona')
                 ->orderByRaw('fecha_fin is not null') // vigentes primero
                 ->orderByDesc('fecha_inicio')
                 ->get(),

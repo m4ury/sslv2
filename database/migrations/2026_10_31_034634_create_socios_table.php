@@ -16,7 +16,10 @@ return new class extends Migration
             $table->foreignId('persona_id')->constrained('personas')->onDelete('cascade');
             $table->date('fecha_ingreso')->nullable();
             $table->date('fecha_salida')->nullable();
-            $table->string('estado', 10)->default('activo');
+            /* $table->string('estado', 10)->default('activo'); */
+            $table->enum('estado', ['activo', 'inactivo'])->default('activo');
+            $table->string('contacto_emergencia_nombre', 255)->nullable();
+            $table->string('contacto_emergencia_telefono', 20)->nullable();
             $table->string('observaciones', 255)->nullable();
             $table->timestamps();
         });
