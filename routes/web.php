@@ -13,6 +13,8 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\AporteController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProfesionController;
+use App\Http\Controllers\CajaController;
+use App\Http\Controllers\EgresoController;
 
 
 
@@ -62,54 +64,76 @@ Route::prefix('socios/{socio}/ficha')
         Route::delete('{seccion}/{id}', [FichaClinicaController::class, 'destroy'])->name('destroy');
     });
 
-        // ---------- Catálogo de patologías ----------
-        Route::prefix('catalogos')->name('catalogos.')->middleware('can:patologias.catalogo')->group(function () {
-            Route::get('patologias', [PatologiaController::class, 'index'])->name('patologias.index');
-            Route::post('patologias', [PatologiaController::class, 'store'])->name('patologias.store');
-            Route::put('patologias/{patologia}', [PatologiaController::class, 'update'])->name('patologias.update');
-            Route::delete('patologias/{patologia}', [PatologiaController::class, 'destroy'])->name('patologias.destroy');
+    // ---------- Catálogo de patologías ----------
+    Route::prefix('catalogos')->name('catalogos.')->middleware('can:patologias.catalogo')->group(function () {
+        Route::get('patologias', [PatologiaController::class, 'index'])->name('patologias.index');
+        Route::post('patologias', [PatologiaController::class, 'store'])->name('patologias.store');
+        Route::put('patologias/{patologia}', [PatologiaController::class, 'update'])->name('patologias.update');
+        Route::delete('patologias/{patologia}', [PatologiaController::class, 'destroy'])->name('patologias.destroy');
+    });
+
+    // ---------- Cuotas ----------
+    Route::prefix('cuotas')->name('cuotas.')->group(function () {
+        Route::get('/', [CuotaController::class, 'index'])->middleware('can:cuotas.ver')->name('index');
+        Route::post('{cuota}/pagos', [PagoController::class, 'store'])
+            ->middleware('can:cuotas.pagar')->whereNumber('cuota')->name('pagos.store');
+
+        Route::middleware('can:cuotas.configurar')->group(function () {
+            Route::get('configuraciones', [ConfigCuotaController::class, 'index'])->name('configuraciones.index');
+            Route::post('configuraciones', [ConfigCuotaController::class, 'store'])->name('configuraciones.store');
+            Route::put('configuraciones/{configuracion}', [ConfigCuotaController::class, 'update'])->name('configuraciones.update');
+            Route::delete('configuraciones/{configuracion}', [ConfigCuotaController::class, 'destroy'])->name('configuraciones.destroy');
+            Route::post('configuraciones/{configuracion}/generar', [ConfigCuotaController::class, 'generar'])->name('configuraciones.generar');
+        });
+    });
+    Route::post('pagos/{pago}/anular', [PagoController::class, 'anular'])
+        ->middleware('can:cuotas.pagar')->whereNumber('pago')->name('pagos.anular');
+
+    // ---------- Aportes ----------
+    Route::get('aportes', [AporteController::class, 'index'])->middleware('can:aportes.ver')->name('aportes.index');
+    Route::post('colaboradores/{colaborador}/aportes', [AporteController::class, 'store'])
+        ->middleware('can:aportes.registrar')->whereNumber('colaborador')->name('aportes.store');
+    Route::post('aportes/{aporte}/anular', [AporteController::class, 'anular'])
+        ->middleware('can:aportes.registrar')->whereNumber('aporte')->name('aportes.anular');
+
+    // ---------- Administración ----------
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::middleware('can:usuarios.gestionar')->group(function () {
+            Route::get('usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
+            Route::post('usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
+            Route::put('usuarios/{usuario}', [UsuarioController::class, 'update'])->name('usuarios.update');
         });
 
-        // ---------- Cuotas ----------
-        Route::prefix('cuotas')->name('cuotas.')->group(function () {
-            Route::get('/', [CuotaController::class, 'index'])->middleware('can:cuotas.ver')->name('index');
-            Route::post('{cuota}/pagos', [PagoController::class, 'store'])
-                ->middleware('can:cuotas.pagar')->whereNumber('cuota')->name('pagos.store');
-
-            Route::middleware('can:cuotas.configurar')->group(function () {
-                Route::get('configuraciones', [ConfigCuotaController::class, 'index'])->name('configuraciones.index');
-                Route::post('configuraciones', [ConfigCuotaController::class, 'store'])->name('configuraciones.store');
-                Route::put('configuraciones/{configuracion}', [ConfigCuotaController::class, 'update'])->name('configuraciones.update');
-                Route::delete('configuraciones/{configuracion}', [ConfigCuotaController::class, 'destroy'])->name('configuraciones.destroy');
-                Route::post('configuraciones/{configuracion}/generar', [ConfigCuotaController::class, 'generar'])->name('configuraciones.generar');
-            });
+        Route::middleware('can:profesiones.gestionar')->group(function () {
+            Route::get('profesiones', [ProfesionController::class, 'index'])->name('profesiones.index');
+            Route::post('profesiones', [ProfesionController::class, 'store'])->name('profesiones.store');
+            Route::put('profesiones/{profesion}', [ProfesionController::class, 'update'])->name('profesiones.update');
+            Route::delete('profesiones/{profesion}', [ProfesionController::class, 'destroy'])->name('profesiones.destroy');
         });
-        Route::post('pagos/{pago}/anular', [PagoController::class, 'anular'])
-            ->middleware('can:cuotas.pagar')->whereNumber('pago')->name('pagos.anular');
+    });
 
-        // ---------- Aportes ----------
-        Route::get('aportes', [AporteController::class, 'index'])->middleware('can:aportes.ver')->name('aportes.index');
-        Route::post('colaboradores/{colaborador}/aportes', [AporteController::class, 'store'])
-            ->middleware('can:aportes.registrar')->whereNumber('colaborador')->name('aportes.store');
-        Route::post('aportes/{aporte}/anular', [AporteController::class, 'anular'])
-            ->middleware('can:aportes.registrar')->whereNumber('aporte')->name('aportes.anular');
-
-        // ---------- Administración ----------
-        Route::prefix('admin')->name('admin.')->group(function () {
-            Route::middleware('can:usuarios.gestionar')->group(function () {
-                Route::get('usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
-                Route::post('usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
-                Route::put('usuarios/{usuario}', [UsuarioController::class, 'update'])->name('usuarios.update');
-            });
-
-            Route::middleware('can:profesiones.gestionar')->group(function () {
-                Route::get('profesiones', [ProfesionController::class, 'index'])->name('profesiones.index');
-                Route::post('profesiones', [ProfesionController::class, 'store'])->name('profesiones.store');
-                Route::put('profesiones/{profesion}', [ProfesionController::class, 'update'])->name('profesiones.update');
-                Route::delete('profesiones/{profesion}', [ProfesionController::class, 'destroy'])->name('profesiones.destroy');
-            });
+    Route::prefix('caja')
+    ->name('caja.')
+    ->where(['periodo' => '\d{4}-(0[1-9]|1[0-2])'])
+    ->group(function () {
+        Route::middleware('can:caja.ver')->group(function () {
+            Route::get('/', [CajaController::class, 'index'])->name('index');
+            Route::get('estado/{periodo?}', [CajaController::class, 'estado'])->name('estado');
+            Route::get('estado/{periodo}/pdf', [CajaController::class, 'pdf'])->name('estado.pdf');
         });
 
+        Route::middleware('can:caja.registrar')->group(function () {
+            Route::post('egresos', [EgresoController::class, 'store'])->name('egresos.store');
+            Route::post('egresos/{egreso}/anular', [EgresoController::class, 'anular'])
+                ->whereNumber('egreso')->name('egresos.anular');
+        });
+
+        Route::middleware('can:caja.cerrar')->group(function () {
+            Route::put('configuracion', [CajaController::class, 'configurar'])->name('configuracion');
+            Route::post('estado/{periodo}/cerrar', [CajaController::class, 'cerrar'])->name('cerrar');
+            Route::delete('estado/{periodo}/cierre', [CajaController::class, 'reabrir'])->name('reabrir');
+        });
+    });
 });
 
 require __DIR__.'/settings.php';

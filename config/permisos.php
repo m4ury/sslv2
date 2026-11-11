@@ -19,6 +19,9 @@ return [
             'cuotas.configurar' => 'Configurar cuotas y generarlas',
             'aportes.ver' => 'Ver aportes de colaboradores',
             'aportes.registrar' => 'Registrar y anular aportes',
+            'caja.ver' => 'Ver el flujo de caja y los estados de cuentas',
+            'caja.registrar' => 'Registrar y anular egresos',
+            'caja.cerrar' => 'Cerrar y reabrir meses, y definir el saldo inicial de caja',
         ],
         'Administración' => [
             'usuarios.gestionar' => 'Administrar usuarios',
@@ -32,6 +35,7 @@ return [
         'Tesorería' => [
             'personas.ver', 'cuotas.ver', 'cuotas.pagar', 'cuotas.configurar',
             'aportes.ver', 'aportes.registrar',
+            'caja.ver', 'caja.registrar', 'caja.cerrar',
         ],
         'Secretaría' => ['personas.ver', 'personas.gestionar', 'roles.gestionar', 'cuotas.ver', 'aportes.ver'],
     ],

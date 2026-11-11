@@ -7,6 +7,8 @@ use App\Models\Pago;
 use App\Services\RegistroPagos;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\CierreCaja;
+use App\Rules\MesAbierto;
 
 class PagoController extends Controller
 {
@@ -25,6 +27,7 @@ class PagoController extends Controller
                 Rule::unique('pagos', 'numero_comprobante')
                     ->where('medio_pago', $request->input('medio_pago'))
                     ->whereNull('anulado_at'),
+                'fecha_pago' => ['required', 'date', 'before_or_equal:today', new MesAbierto],
             ],
         ]);
 
@@ -35,9 +38,14 @@ class PagoController extends Controller
 
     public function anular(Request $request, Pago $pago, RegistroPagos $registro)
     {
+
         $data = $request->validate([
             'motivo' => ['required', 'string', 'min:5', 'max:500'],
         ]);
+
+        if (CierreCaja::fechaCerrada($pago->fecha_pago)) {
+            return back()->with('error', 'No se puede anular: el mes del pago ya está cerrado en caja.');
+        }
 
         $registro->anular($pago, $data['motivo'], $request->user()->id);
 

@@ -52,7 +52,7 @@ const form = useForm({
     fecha_aporte: '',
     monto: '',
     medio_pago: 'Efectivo',
-    num_comprobante: '',
+    numero_comprobante: '',
     observaciones: '',
 });
 
@@ -61,7 +61,7 @@ function abrirRegistro() {
         fecha_aporte: fechaLocal(),
         monto: '',
         medio_pago: 'Efectivo',
-        num_comprobante: '',
+        numero_comprobante: '',
         observaciones: '',
     });
     form.reset();
@@ -151,7 +151,7 @@ const selectClass =
                                 {{ formatCLP(a.monto) }}
                             </TableCell>
                             <TableCell>{{ a.medio_pago ?? '—' }}</TableCell>
-                            <TableCell>{{ a.num_comprobante ?? '—' }}</TableCell>
+                            <TableCell>{{ a.numero_comprobante ?? '—' }}</TableCell>
                             <TableCell>{{ a.usuario?.name ?? '—' }}</TableCell>
                             <TableCell>
                                 <div class="flex flex-col gap-1">
@@ -258,7 +258,7 @@ const selectClass =
                     </div>
 
                     <div class="flex flex-col gap-2">
-                        <Label for="num_comprobante">
+                        <Label for="numero_comprobante">
                             N° de comprobante
                             <span
                                 v-if="form.medio_pago !== 'Efectivo'"
@@ -267,13 +267,13 @@ const selectClass =
                             >
                         </Label>
                         <Input
-                            id="num_comprobante"
-                            v-model="form.num_comprobante"
+                            id="numero_comprobante"
+                            v-model="form.numero_comprobante"
                             type="text"
-                            :aria-invalid="!!form.errors.num_comprobante"
+                            :aria-invalid="!!form.errors.numero_comprobante"
                             :required="form.medio_pago !== 'Efectivo'"
                         />
-                        <InputError :message="form.errors.num_comprobante" />
+                        <InputError :message="form.errors.numero_comprobante" />
                     </div>
 
                     <div class="flex flex-col gap-2 sm:col-span-2">

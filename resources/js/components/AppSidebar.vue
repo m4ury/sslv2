@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { LayoutGrid, User, Wallet, HandCoins, Users, Stethoscope, UserCog, ShieldCheck } from '@lucide/vue';
+import { LayoutGrid, User, Wallet, HandCoins, Users, Stethoscope, UserCog, ShieldCheck, Landmark } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -29,6 +29,7 @@ const todos = [
     { title: 'Patologías', href: '/catalogos/patologias', icon: Stethoscope, permiso: 'patologias.catalogo' },
     { title: 'Usuarios', href: '/admin/usuarios', icon: UserCog, permiso: 'usuarios.gestionar' },
     { title: 'Profesiones', href: '/admin/profesiones', icon: ShieldCheck, permiso: 'profesiones.gestionar' },
+    { title: 'Caja', href: '/caja', icon: Landmark, permiso: 'caja.ver' },
 ];
 
 const mainNavItems: NavItem[] = [
@@ -64,6 +65,12 @@ const mainNavItems: NavItem[] = [
         title: 'Profesiones',
         href: '/admin/profesiones',
         icon: Stethoscope
+    },
+
+    {
+        title: 'Caja',
+        href: '/caja',
+        icon: Landmark
     },
 ];
 
