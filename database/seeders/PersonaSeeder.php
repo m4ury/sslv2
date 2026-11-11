@@ -50,7 +50,7 @@ class PersonaSeeder extends Seeder
                 ['rut' =>'13362295-0','apellido_paterno' =>'Tapia','apellido_materno' =>'Zapata','nombres' =>'Darwin Sadino','fecha_nacimiento' => '1978-02-22', 'telefono' =>'931489509', 'direccion' => 'Diego portales interior S/Nº'],
                 ['rut' =>'12200825-8','apellido_paterno' =>'Urrutia','apellido_materno' =>'Obando','nombres' =>'Claudio Marcelo','fecha_nacimiento' => '1972-07-04', 'telefono' =>'975826367', 'direccion' => 'Claudio Arrau, esquina los Andes s/n'],
                 ['rut' =>'7672201-3','apellido_paterno' =>'Valdivia','apellido_materno' =>'Caceres','nombres' =>'Emelino del Carmen','fecha_nacimiento' => '1955-08-08', 'telefono' =>'982662048', 'direccion' => 'El Molino s/n, ruta J60'],
-                ['rut' =>'13784257-2','apellido_paterno' =>'Véliz','apellido_materno' =>'Maturana','nombres' =>'José Agusto*','fecha_nacimiento' => '1980-09-11', 'telefono' =>'', 'direccion' => 'Edecan Araya s/n'],
+                ['rut' =>'13784257-2','apellido_paterno' =>'Véliz','apellido_materno' =>'Maturana','nombres' =>'José Agusto','fecha_nacimiento' => '1980-09-11', 'telefono' =>'', 'direccion' => 'Edecan Araya s/n'],
                 ['rut' =>'11787163-0','apellido_paterno' =>'Véliz','apellido_materno' =>'Maturana','nombres' =>'Marisol de Dios','fecha_nacimiento' => '1971-01-10', 'telefono' =>'97190932', 'direccion' => 'Edecan Araya s/n'],
                 ['rut' =>'11787301-3','apellido_paterno' =>'Vergara','apellido_materno' =>'Castro','nombres' =>'Juan Felipe','fecha_nacimiento' => '1971-09-11', 'telefono' =>'', 'direccion' => 'Mira rios s/n'],
                 ['rut' =>'7865888-6','apellido_paterno' =>'Vergara','apellido_materno' =>'Díaz','nombres' =>'Virginia Ester','fecha_nacimiento' => '1961-05-15', 'telefono' =>'982228705', 'direccion' => 'Constantue s/n'],
@@ -58,6 +58,7 @@ class PersonaSeeder extends Seeder
                 ['rut' =>'0','apellido_paterno' =>'Ahumada','apellido_materno' =>'','nombres' =>'Manuel ','fecha_nacimiento' => '1987-10-01', 'telefono' =>'', 'direccion' => ''],
                 ['rut' =>'0','apellido_paterno' =>'Valenzuela ','apellido_materno' =>'','nombres' =>'Francisco ','fecha_nacimiento' => '1987-10-01', 'telefono' =>'', 'direccion' => ''],
                 ['rut' =>'6055055-7','apellido_paterno' =>'Baeza ','apellido_materno' =>'Díaz','nombres' =>'Brígida Ester','fecha_nacimiento' => '1950-04-17', 'telefono' =>'998027521', 'direccion' => 'Rinconada de Nuñez Parcela N°6'],
+                ['rut' =>'93260369-1','apellido_paterno' =>'Anonimo ','apellido_materno' =>'Ssl','nombres' =>'Colaborador','fecha_nacimiento' => '1987-04-17', 'telefono' =>'000000000', 'direccion' => 'Lautaro'],
             ];
         foreach ($personas as $persona)
         {

@@ -28,7 +28,7 @@ class SocioRequest extends FormRequest
         $rules = [
             'fecha_ingreso' => ['required', 'date'],
             'contacto_emergencia_nombre' => ['nullable', 'string', 'max:255'],
-            'telefono_emergencia_telefono' => ['nullable', 'string', 'max:20'],
+            'telefono_emergencia_telefono' => ['nullable', 'string', 'max:20', 'cl_phone'],
             'observaciones' => ['nullable', 'string'],
         ];
 
