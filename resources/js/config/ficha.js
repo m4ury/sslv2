@@ -111,6 +111,7 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [], 
             vacio: 'Sin controles registrados.',
             columns: [
                 { key: 'fecha', label: 'Fecha', type: 'date' },
+                { key: 'hora', label: 'Hora', format: (i) => i.hora ?? '—' },
                 { key: 'tipo', label: 'Tipo' },
                 { key: 'mediciones', label: 'Mediciones', format: (i) => resumenMediciones(i, catalogos.mediciones) },
                 { key: 'autor', label: 'Registrado por', format: (i) => i.autor?.name ?? '—' },
@@ -118,6 +119,7 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [], 
             ],
             fields: [
                 { name: 'fecha', label: 'Fecha', type: 'date', required: true },
+                { name: 'hora', label: 'Hora', type: 'time' },
                 { name: 'tipo', label: 'Tipo de control', type: 'select', required: true, options: catalogos.tipos_control },
                 { name: 'observaciones', label: 'Observaciones', type: 'textarea', span: 2 },
                 ...camposMediciones,
@@ -157,7 +159,7 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [], 
             ],
         },
 
-        programados: {
+        /*programados: {
             titulo: 'Controles programados',
             singular: 'control programado',
             descripcion: 'Próximos controles agendados.',
@@ -170,6 +172,36 @@ export function crearSecciones({ catalogos, controles, catalogoPatologias = [], 
             ],
             fields: [
                 { name: 'fecha_programada', label: 'Fecha programada', type: 'date', required: true },
+                { name: 'tipo', label: 'Tipo de control', type: 'select', required: true, options: catalogos.tipos_control },
+                { name: 'estado', label: 'Estado', type: 'select', required: true, editOnly: true, options: catalogos.estados_programado },
+                { name: 'observaciones', label: 'Observaciones', type: 'textarea', span: 2 },
+            ],
+        },*/
+
+        programados: {
+            titulo: 'Controles programados',
+            singular: 'control programado',
+            descripcion: 'Próximos controles agendados, con su hora y duración.',
+            vacio: 'Sin controles programados.',
+            columns: [
+                { key: 'fecha_programada', label: 'Fecha', type: 'date' },
+                { key: 'hora', label: 'Hora', format: (i) => i.hora ?? 'Sin hora' },
+                { key: 'duracion_min', label: 'Duración', format: (i) => `${i.duracion_min} min` },
+                { key: 'tipo', label: 'Tipo' },
+                { key: 'estado', label: 'Estado', badge: true, variant: (i) => variante(i.estado) },
+                { key: 'observaciones', label: 'Observaciones', class: 'max-w-xs truncate' },
+            ],
+            fields: [
+                { name: 'fecha_programada', label: 'Fecha programada', type: 'date', required: true },
+                { name: 'hora', label: 'Hora', type: 'time', required: true },
+                {
+                    name: 'duracion_min',
+                    label: 'Duración',
+                    type: 'select',
+                    required: true,
+                    default: 30,
+                    options: [15, 30, 45, 60, 90, 120].map((m) => ({ value: m, label: `${m} min` })),
+                },
                 { name: 'tipo', label: 'Tipo de control', type: 'select', required: true, options: catalogos.tipos_control },
                 { name: 'estado', label: 'Estado', type: 'select', required: true, editOnly: true, options: catalogos.estados_programado },
                 { name: 'observaciones', label: 'Observaciones', type: 'textarea', span: 2 },

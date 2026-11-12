@@ -12,6 +12,7 @@ return [
             'ficha.registrar' => 'Registrar y editar controles, prestaciones, patologías, controles programados, credenciales y documentos',
             'patologias.catalogo' => 'Agregar y editar patologías del catálogo',
             'cuidadores.asignar' => 'Asignar cuidadores a un paciente',
+            'agenda.ver' => 'Ver la agenda de controles programados',
         ],
         'Tesorería' => [
             'cuotas.ver' => 'Ver cuotas',
@@ -37,6 +38,6 @@ return [
             'aportes.ver', 'aportes.registrar',
             'caja.ver', 'caja.registrar', 'caja.cerrar',
         ],
-        'Secretaría' => ['personas.ver', 'personas.gestionar', 'roles.gestionar', 'cuotas.ver', 'aportes.ver'],
+        'Secretaría' => ['personas.ver', 'personas.gestionar', 'roles.gestionar', 'cuotas.ver', 'aportes.ver', 'agenda.ver'],
     ],
 ];

@@ -93,6 +93,9 @@ const pendientes = computed(() =>
 );
 
 const proximoControl = computed(() => pendientes.value[0] ?? null);
+/*const proximoControl
+    ? `${formatDate(proximoControl.fecha_programada)}${proximoControl.hora ? ' ' + proximoControl.hora : ''} · ${proximoControl.tipo}`
+    : '—';*/
 
 const atrasados = computed(
     () =>

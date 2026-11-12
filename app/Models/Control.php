@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\ControlFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +21,7 @@ class Control extends Model
         'user_id',
         'fecha_control',
         'tipo_control',
+        'hora_control',
         'diagnostico_ingreso',
         'observacion',
         'indicaciones',
@@ -55,5 +57,10 @@ class Control extends Model
     public function prestaciones(): HasMany
     {
         return $this->hasMany(Prestacion::class);
+    }
+
+    protected function hora(): Attribute
+    {
+        return Attribute::get(fn (?string $valor) => $valor ? substr($valor, 0, 5) : null);
     }
 }

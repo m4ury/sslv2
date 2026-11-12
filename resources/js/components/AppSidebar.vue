@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { LayoutGrid, User, Wallet, HandCoins, Users, Stethoscope, UserCog, ShieldCheck, Landmark } from '@lucide/vue';
+import { LayoutGrid, User, Wallet, HandCoins, Users, Stethoscope, UserCog, ShieldCheck, Landmark, CalendarDays } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import  personas  from '@/routes/personas';
-/* import  socios  from '@/routes/socios'; */
 import type { NavItem } from '@/types';
 import { usePermisos } from '@/composables/usePermisos';
 
@@ -30,6 +29,7 @@ const todos = [
     { title: 'Usuarios', href: '/admin/usuarios', icon: UserCog, permiso: 'usuarios.gestionar' },
     { title: 'Profesiones', href: '/admin/profesiones', icon: ShieldCheck, permiso: 'profesiones.gestionar' },
     { title: 'Caja', href: '/caja', icon: Landmark, permiso: 'caja.ver' },
+    { title: 'Agenda', href: '/agenda', icon: CalendarDays, permiso: 'agenda.ver' },
 ];
 
 const mainNavItems: NavItem[] = [
@@ -71,6 +71,12 @@ const mainNavItems: NavItem[] = [
         title: 'Caja',
         href: '/caja',
         icon: Landmark
+    },
+
+    {
+        title: 'Agenda',
+        href: '/agenda',
+        icon: CalendarDays
     },
 ];
 

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('programado_id')->constrained('programados')->nullable();
             $table->foreignId('user_id')->constrained('users')->nullable();
             $table->date('fecha_control')->nullable();
+            $table->time('hora_control')->nullable();
             $table->enum('tipo_control', ['ingreso', 'control', 'egreso'])->nullable();
             $table->string('diagnostico_ingreso', 100)->nullable();
             $table->text('observacion')->nullable();

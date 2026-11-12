@@ -4,6 +4,7 @@ use App\Http\Controllers\ColaboradorController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\SocioController;
 use App\Http\Controllers\FichaClinicaController;
+use App\Http\Controllers\AgendaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PatologiaController;
 use App\Http\Controllers\CuidadorController;
@@ -95,6 +96,10 @@ Route::prefix('socios/{socio}/ficha')
         ->middleware('can:aportes.registrar')->whereNumber('colaborador')->name('aportes.store');
     Route::post('aportes/{aporte}/anular', [AporteController::class, 'anular'])
         ->middleware('can:aportes.registrar')->whereNumber('aporte')->name('aportes.anular');
+
+    Route::get('agenda', [AgendaController::class, 'index'])
+        ->middleware('can:agenda.ver')
+        ->name('agenda.index');
 
     // ---------- Administración ----------
     Route::prefix('admin')->name('admin.')->group(function () {

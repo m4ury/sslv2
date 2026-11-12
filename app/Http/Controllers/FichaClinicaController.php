@@ -53,10 +53,12 @@ class FichaClinicaController extends Controller
                 ]),
             'programados' => $socio->programados()
                 ->orderBy('fecha_programada')
+                ->orderBy('hora')
                 ->get()
                 ->map(fn (Programado $programado) => [
                     'id' => $programado->id,
                     'fecha_programada' => $programado->fecha_programada,
+                    'hora' => $programado->hora,
                     'tipo' => $programado->tipo_control,
                     'estado' => $programado->estado,
                     'observaciones' => $programado->observacion,
@@ -105,6 +107,7 @@ class FichaClinicaController extends Controller
                 'documentos' => $this->guardarDocumento($request, $socio, $data),
                 'programados' => $socio->programados()->create([
                     'fecha_programada' => $data['fecha_programada'],
+                    'hora' => $data['hora'],
                     'tipo_control' => $data['tipo'],
                     'estado' => 'Pendiente',
                     'observacion' => $data['observaciones'] ?? null,
@@ -137,6 +140,7 @@ class FichaClinicaController extends Controller
             } elseif ($seccion === 'programados') {
                 $registro->update([
                     'fecha_programada' => $data['fecha_programada'],
+                    'hora' => $data['hora'],
                     'tipo_control' => $data['tipo'],
                     'estado' => $data['estado'],
                     'observacion' => $data['observaciones'] ?? null,
@@ -186,11 +190,13 @@ class FichaClinicaController extends Controller
 
     private function guardarControl(Socio $socio, array $data, int $userId, ?Control $control = null): void
     {
-        $atributos = [
+        $atributos = Arr::only($data, ['fecha_control', 'hora_control', 'tipo_control', 'observacion']);
+
+        /*$atributos = [
             'fecha_control' => $data['fecha'],
             'tipo_control' => $data['tipo'],
             'observacion' => $data['observaciones'] ?? null,
-        ];
+        ];*/
 
         if ($control) {
             $control->update($atributos);
@@ -264,6 +270,7 @@ class FichaClinicaController extends Controller
             'controles' => [
                 'fecha' => ['required', 'date', 'before_or_equal:today'],
                 'tipo' => ['required', Rule::in($c['tipos_control'])],
+                'hora_conttol' => ['nullable', 'date_format:H:i'],
                 'observaciones' => ['nullable', 'string'],
                 ...collect($c['mediciones'])->mapWithKeys(fn ($def, $tipo) => [
                     "med_{$tipo}" => ['nullable', 'numeric', "between:{$def['min']},{$def['max']}"],
@@ -286,6 +293,8 @@ class FichaClinicaController extends Controller
                 'fecha_programada' => ['required', 'date', ...($editando ? [] : ['after_or_equal:today'])],
                 'tipo' => ['required', Rule::in($c['tipos_control'])],
                 'observaciones' => ['nullable', 'string'],
+                'hora' => ['required', 'date_format:H:i'],
+                'duracion_min' => ['required', 'integer', 'between:5,480'],
                 ...($editando ? ['estado' => ['required', Rule::in($c['estados_programado'])]] : []),
             ],
 

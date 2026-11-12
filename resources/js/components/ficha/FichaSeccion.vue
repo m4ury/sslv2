@@ -75,10 +75,17 @@ async function eliminar(item) {
     }
 }
 
-function valorInicial(field, item) {
+/*function valorInicial(field, item) {
     if (field.type === 'file') return null;
     const valor = item?.[field.name];
     if (valor == null) return '';
+    return field.type === 'date' ? String(valor).substring(0, 10) : valor;
+}*/
+
+function valorInicial(field, item) {
+    if (field.type === 'file') return null;
+    const valor = item?.[field.name];
+    if (valor == null) return field.default ?? '';
     return field.type === 'date' ? String(valor).substring(0, 10) : valor;
 }
 
