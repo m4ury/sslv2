@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { LayoutGrid, User, Wallet, HandCoins, Users, Stethoscope, UserCog, ShieldCheck, Landmark, CalendarDays } from '@lucide/vue';
+import { LayoutGrid, User, Wallet, HandCoins, Users, Stethoscope, UserCog, ShieldCheck, Landmark, CalendarDays, Banknote } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -23,13 +23,18 @@ const { puede } = usePermisos();
 
 const todos = [
     { title: 'Personas', href: '/personas', icon: Users, permiso: 'personas.ver' },
+    { title: 'Patologías', href: '/catalogos/patologias', icon: Stethoscope, permiso: 'patologias.catalogo' },
+    { title: 'Agenda', href: '/agenda', icon: CalendarDays, permiso: 'agenda.ver' },
+
+    { title: 'Caja', href: '/caja', icon: Landmark, permiso: 'caja.ver' },
+    { title: 'Banco', href: '/banco', icon: Banknote, permiso: 'banco.ver' },
     { title: 'Cuotas', href: '/cuotas', icon: Wallet, permiso: 'cuotas.ver' },
     { title: 'Aportes', href: '/aportes', icon: HandCoins, permiso: 'aportes.ver' },
-    { title: 'Patologías', href: '/catalogos/patologias', icon: Stethoscope, permiso: 'patologias.catalogo' },
+
     { title: 'Usuarios', href: '/admin/usuarios', icon: UserCog, permiso: 'usuarios.gestionar' },
     { title: 'Profesiones', href: '/admin/profesiones', icon: ShieldCheck, permiso: 'profesiones.gestionar' },
-    { title: 'Caja', href: '/caja', icon: Landmark, permiso: 'caja.ver' },
-    { title: 'Agenda', href: '/agenda', icon: CalendarDays, permiso: 'agenda.ver' },
+
+
 ];
 
 const mainNavItems: NavItem[] = [
@@ -42,6 +47,23 @@ const mainNavItems: NavItem[] = [
         title: 'Personas',
         href: personas.index.url(),
         icon: User,
+    },
+
+    {
+        title: 'Agenda',
+        href: '/agenda',
+        icon: CalendarDays
+    },
+
+    {
+        title: 'Caja',
+        href: '/caja',
+        icon: Landmark
+    },
+    {
+        title: 'Banco',
+        href: '/banco',
+        icon: Banknote
     },
     {
         title: 'Cuotas',
@@ -66,18 +88,7 @@ const mainNavItems: NavItem[] = [
         href: '/admin/profesiones',
         icon: Stethoscope
     },
-
-    {
-        title: 'Caja',
-        href: '/caja',
-        icon: Landmark
-    },
-
-    {
-        title: 'Agenda',
-        href: '/agenda',
-        icon: CalendarDays
-    },
+    
 ];
 
 

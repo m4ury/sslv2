@@ -6,6 +6,7 @@ use App\Models\Socio;
 use App\Models\Control;
 use App\Models\Patologia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;

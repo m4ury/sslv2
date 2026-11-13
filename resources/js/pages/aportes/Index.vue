@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Search } from '@lucide/vue';
+import { Search, FileText } from '@lucide/vue';
 import { onBeforeUnmount, reactive, watch } from 'vue';
 import Pagination from '@/components/Pagination.vue';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,16 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+
+import { Button } from '@/components/ui/button';
+
+
 import { formatCLP, formatDate } from '@/config/ficha';
+
+import { usePermisos } from '@/composables/usePermisos';
+
+const { puede } = usePermisos();
+
 
 const props = defineProps({
     aportes: { type: Object, required: true },
@@ -57,11 +66,20 @@ const selectClass =
     <Head title="Aportes" />
 
     <div class="mx-auto flex max-w-7xl flex-col gap-6 p-4 md:p-6">
-        <div>
-            <h1 class="text-2xl font-bold">Aportes voluntarios</h1>
-            <p class="text-sm text-muted-foreground">
-                Aportes entregados por los colaboradores de la agrupación.
-            </p>
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl font-bold">Aportes voluntarios</h1>
+                <p class="text-sm text-muted-foreground">
+                    Aportes entregados por los colaboradores de la agrupación.
+                </p>
+            </div>
+
+            <Button v-if="puede('aportes.informe')" as-child variant="outline">
+                <Link href="/aportes/informe">
+                    <FileText class="size-4" />
+                    Informe mensual
+                </Link>
+            </Button>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">

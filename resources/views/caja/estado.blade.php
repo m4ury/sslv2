@@ -40,7 +40,7 @@
     <table class="resumen">
         <tr><td>Saldo inicial</td><td class="r">{{ $fmt($r['saldo_inicial']) }}</td></tr>
         <tr><td>(+) Cuotas pagadas por socios</td><td class="r">{{ $fmt($r['total_cuotas']) }}</td></tr>
-        <tr><td>(+) Aportes de colaboradores</td><td class="r">{{ $fmt($r['total_aportes']) }}</td></tr>
+        <tr><td>(+) Otros ingresos (subvenciones, donaciones, etc.)</td><td class="r">{{ $fmt($r['total_otros']) }}</td></tr>
         <tr><td>(−) Egresos</td><td class="r">{{ $fmt($r['total_egresos']) }}</td></tr>
         <tr class="final"><td>Saldo final</td><td class="r">{{ $fmt($r['saldo_final']) }}</td></tr>
     </table>
@@ -68,26 +68,38 @@
         <div class="vacio">Sin pagos de cuotas en el mes.</div>
     @endif
 
-    <h2>Aportes de colaboradores ({{ count($r['aportes']) }})</h2>
-    @if (count($r['aportes']))
+    <h2>Otros ingresos por categoría</h2>
+    @if (count($r['otros_por_categoria']))
         <table>
-            <thead><tr><th>Fecha</th><th>Colaborador</th><th>RUT</th><th>Medio</th><th>Comprobante</th><th class="r">Monto</th></tr></thead>
+            <thead><tr><th>Categoría</th><th class="r">Movimientos</th><th class="r">Total</th></tr></thead>
             <tbody>
-            @foreach ($r['aportes'] as $a)
-                <tr>
-                    <td>{{ $fecha($a['fecha_aporte']) }}</td>
-                    <td>{{ $a['colaborador'] }}</td>
-                    <td>{{ $a['rut'] }}</td>
-                    <td>{{ $a['medio_pago'] ?? '—' }}</td>
-                    <td>{{ $a['numero_comprobante'] ?? '—' }}</td>
-                    <td class="r">{{ $fmt($a['monto_aportes']) }}</td>
-                </tr>
+            @foreach ($r['otros_por_categoria'] as $cat)
+                <tr><td>{{ $cat['categoria'] }}</td><td class="r">{{ $cat['cantidad'] }}</td><td class="r">{{ $fmt($cat['total']) }}</td></tr>
             @endforeach
-            <tr class="total"><td colspan="5">Total aportes</td><td class="r">{{ $fmt($r['total_aportes']) }}</td></tr>
+            <tr class="total"><td colspan="2">Total otros ingresos</td><td class="r">{{ $fmt($r['total_otros']) }}</td></tr>
             </tbody>
         </table>
     @else
-        <div class="vacio">Sin aportes en el mes.</div>
+        <div class="vacio">Sin otros ingresos en el mes.</div>
+    @endif
+
+    <h2>Detalle de otros ingresos ({{ count($r['otros']) }})</h2>
+    @if (count($r['otros']))
+        <table>
+            <thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Origen</th><th>Documento</th><th class="r">Monto</th></tr></thead>
+            <tbody>
+            @foreach ($r['otros'] as $o)
+                <tr>
+                    <td>{{ $fecha($o['fecha']) }}</td>
+                    <td>{{ $o['categoria'] }}</td>
+                    <td>{{ $o['descripcion'] }}</td>
+                    <td>{{ $o['origen'] ?? '—' }}</td>
+                    <td>{{ $o['documento'] ?: '—' }}</td>
+                    <td class="r">{{ $fmt($o['monto']) }}</td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
     @endif
 
     <h2>Egresos por categoría</h2>

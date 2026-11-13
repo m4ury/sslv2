@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Aporte;
 use App\Models\ConfiguracionCaja;
 use App\Models\Egreso;
+use App\Models\IngresoVario;
 use App\Models\Pago;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
@@ -23,7 +23,7 @@ class CajaService
 
         return [
             'cuotas' => (int) Pago::whereNull('anulado_at')->whereBetween('fecha_pago', $rango)->sum('monto_pagado'),
-            'aportes' => (int) Aporte::whereNull('anulado_at')->whereBetween('fecha_aporte', $rango)->sum('monto'),
+            'otros' => (int) IngresoVario::whereNull('anulado_at')->whereBetween('fecha', $rango)->sum('monto'),
             'egresos' => (int) Egreso::whereNull('anulado_at')->whereBetween('fecha_egreso', $rango)->sum('monto_egreso'),
         ];
     }
@@ -43,7 +43,7 @@ class CajaService
 
         $t = $this->totales($conf->fecha_inicio, $fecha);
 
-        return $conf->saldo_inicial + $t['cuotas'] + $t['aportes'] - $t['egresos'];
+        return $conf->saldo_inicial + $t['cuotas'] + $t['otros'] - $t['egresos'];
     }
 
     /** Meses con estado disponible: desde el inicio de la caja hasta el mes actual */
@@ -100,17 +100,17 @@ class CajaService
                 'monto_cuotas' => $p->monto_pagado,
             ])->values()->all();
 
-        $aportes = Aporte::with('colaborador.persona')
-            ->whereNull('anulado_at')->whereBetween('fecha_aporte', $rango)
-            ->orderBy('fecha_aporte')->orderBy('id')->get()
-            ->map(fn (Aporte $a) => [
-                'id' => $a->id,
-                'fecha_aporte' => $a->fecha_aporte->toDateString(),
-                'colaborador' => $a->colaborador?->persona?->full_name,
-                'rut' => $a->colaborador?->persona?->rut,
-                'medio_pago' => $a->medio_pago,
-                'numero_comprobante' => $a->numero_comprobante,
-                'monto_aportes' => $a->monto,
+        $otros = IngresoVario::whereNull('anulado_at')->whereBetween('fecha', $rango)
+            ->orderBy('fecha')->orderBy('id')->get()
+            ->map(fn (IngresoVario $i) => [
+                'id' => $i->id,
+                'fecha' => $i->fecha->toDateString(),
+                'categoria' => $i->categoria,
+                'descripcion' => $i->descripcion,
+                'origen' => $i->origen,
+                'documento' => trim($i->tipo_documento.' '.$i->num_documento),
+                'medio' => $i->medio_pago,
+                'monto' => $i->monto,
             ])->values()->all();
 
         $egresos = Egreso::whereNull('anulado_at')->whereBetween('fecha_egreso', $rango)
@@ -127,7 +127,7 @@ class CajaService
             ])->values()->all();
 
         $totalCuotas = (int) collect($cuotas)->sum('monto_cuotas');
-        $totalAportes = (int) collect($aportes)->sum('monto_aportes');
+        $totalOtros = (int) collect($otros)->sum('monto');
         $totalEgresos = (int) collect($egresos)->sum('monto_egresos');
 
         return [
@@ -135,21 +135,27 @@ class CajaService
             'etiqueta' => ucfirst($inicioMes->copy()->locale('es')->translatedFormat('F Y')),
             'saldo_inicial' => $saldoInicial,
             'total_cuotas' => $totalCuotas,
-            'total_aportes' => $totalAportes,
-            'total_ingresos' => $totalCuotas + $totalAportes,
+            'total_otros' => $totalOtros,
+            'total_ingresos' => $totalCuotas + $totalOtros,
             'total_egresos' => $totalEgresos,
-            'saldo_final' => $saldoInicial + $totalCuotas + $totalAportes - $totalEgresos,
+            'saldo_final' => $saldoInicial + $totalCuotas + $totalOtros - $totalEgresos,
             'cuotas' => $cuotas,
-            'aportes' => $aportes,
+            'otros' => $otros,
             'egresos' => $egresos,
-            'egresos_por_categoria' => collect($egresos)
-                ->groupBy('categoria')
-                ->map(fn ($g, $cat) => [
-                    'categoria' => $cat,
-                    'cantidad' => $g->count(),
-                    'total' => $g->sum('monto'),
-                ])
-                ->sortByDesc('total')->values()->all(),
+            'otros_por_categoria' => $this->porCategoria($otros),
+            'egresos_por_categoria' => $this->porCategoria($egresos),
+                
         ];
+    }
+    private function porCategoria(array $items): array
+    {
+        return collect($items)
+            ->groupBy('categoria')
+            ->map(fn ($g, $cat) => [
+                'categoria' => $cat,
+                'cantidad' => $g->count(),
+                'total' => $g->sum('monto'),
+            ])
+            ->sortByDesc('total')->values()->all();
     }
 }

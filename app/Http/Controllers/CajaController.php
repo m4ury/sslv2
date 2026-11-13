@@ -99,7 +99,7 @@ class CajaController extends Controller
             'periodo' => $periodo,
             'saldo_inicial' => $r['saldo_inicial'],
             'total_cuotas' => $r['total_cuotas'],
-            'total_aportes' => $r['total_aportes'],
+            'total_otros_ingresos' => $r['total_otros'],
             'total_egresos' => $r['total_egresos'],
             'saldo_final' => $r['saldo_final'],
         ]);

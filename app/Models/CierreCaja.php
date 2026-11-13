@@ -14,7 +14,7 @@ class CierreCaja extends Model
     protected $table = 'cierres_caja';
 
     protected $fillable = [
-        'periodo', 'saldo_inicial', 'total_cuotas', 'total_aportes', 'total_egresos', 'saldo_final',
+        'periodo', 'saldo_inicial', 'total_cuotas', 'total_otros_ingresos', 'total_egresos', 'saldo_final',
     ];
 
     protected function casts(): array

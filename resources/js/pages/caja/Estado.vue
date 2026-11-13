@@ -140,8 +140,8 @@ async function reabrirMes() {
                         <CardDescription>Ingresos</CardDescription>
                         <CardTitle class="text-xl">{{ formatCLP(resumen.total_ingresos) }}</CardTitle>
                         <p class="text-xs text-muted-foreground">
-                            Cuotas {{ formatCLP(resumen.total_cuotas) }} · Aportes
-                            {{ formatCLP(resumen.total_aportes) }}
+                            Cuotas {{ formatCLP(resumen.total_cuotas) }} · Otros
+                            {{ formatCLP(resumen.total_otros) }}
                         </p>
                     </CardHeader>
                 </Card>
@@ -205,40 +205,61 @@ async function reabrirMes() {
                 </CardContent>
             </Card>
 
-            <!-- Aportes -->
+            <!-- Otros ingresos -->
             <Card>
                 <CardHeader>
-                    <CardTitle>Aportes de colaboradores</CardTitle>
+                    <CardTitle>Otros ingresos</CardTitle>
                     <CardDescription>
-                        {{ resumen.aportes.length }} aportes · {{ formatCLP(resumen.total_aportes) }}
+                        {{ resumen.otros.length }} movimientos · {{ formatCLP(resumen.total_otros) }}
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent class="flex flex-col gap-4">
+                    <div v-if="resumen.otros_por_categoria.length" class="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Categoría</TableHead>
+                                    <TableHead class="text-right">Movimientos</TableHead>
+                                    <TableHead class="text-right">Total</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableRow v-for="c in resumen.otros_por_categoria" :key="c.categoria">
+                                    <TableCell>{{ c.categoria }}</TableCell>
+                                    <TableCell class="text-right">{{ c.cantidad }}</TableCell>
+                                    <TableCell class="text-right">{{ formatCLP(c.total) }}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </div>
+
                     <div class="rounded-md border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Fecha</TableHead>
-                                    <TableHead>Colaborador</TableHead>
-                                    <TableHead>Medio</TableHead>
-                                    <TableHead>Comprobante</TableHead>
+                                    <TableHead>Categoría</TableHead>
+                                    <TableHead>Descripción</TableHead>
+                                    <TableHead>Documento</TableHead>
                                     <TableHead class="text-right">Monto</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow v-for="a in resumen.aportes" :key="a.id">
-                                    <TableCell>{{ formatDate(a.fecha_aporte) }}</TableCell>
+                                <TableRow v-for="o in resumen.otros" :key="o.id">
+                                    <TableCell>{{ formatDate(o.fecha) }}</TableCell>
+                                    <TableCell>{{ o.categoria }}</TableCell>
                                     <TableCell>
-                                        {{ a.colaborador }}
-                                        <span class="block font-mono text-xs text-muted-foreground">{{ a.rut }}</span>
+                                        <div class="flex max-w-xs flex-col whitespace-normal">
+                                            <span>{{ o.descripcion }}</span>
+                                            <span v-if="o.origen" class="text-xs text-muted-foreground">{{ o.origen }}</span>
+                                        </div>
                                     </TableCell>
-                                    <TableCell>{{ a.medio_pago ?? '—' }}</TableCell>
-                                    <TableCell>{{ a.numero_comprobante ?? '—' }}</TableCell>
-                                    <TableCell class="text-right">{{ formatCLP(a.monto_aportes) }}</TableCell>
+                                    <TableCell>{{ o.documento || '—' }}</TableCell>
+                                    <TableCell class="text-right">{{ formatCLP(o.monto) }}</TableCell>
                                 </TableRow>
-                                <TableRow v-if="resumen.aportes.length === 0">
+                                <TableRow v-if="resumen.otros.length === 0">
                                     <TableCell colspan="5" class="h-16 text-center text-muted-foreground">
-                                        Sin aportes en el mes.
+                                        Sin otros ingresos en el mes.
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

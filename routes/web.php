@@ -16,6 +16,9 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProfesionController;
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\EgresoController;
+use App\Http\Controllers\IngresoBancarioController;
+use App\Http\Controllers\IngresoVarioController;
+use App\Http\Controllers\InformeIngresosController;
 
 
 
@@ -90,17 +93,6 @@ Route::prefix('socios/{socio}/ficha')
     Route::post('pagos/{pago}/anular', [PagoController::class, 'anular'])
         ->middleware('can:cuotas.pagar')->whereNumber('pago')->name('pagos.anular');
 
-    // ---------- Aportes ----------
-    Route::get('aportes', [AporteController::class, 'index'])->middleware('can:aportes.ver')->name('aportes.index');
-    Route::post('colaboradores/{colaborador}/aportes', [AporteController::class, 'store'])
-        ->middleware('can:aportes.registrar')->whereNumber('colaborador')->name('aportes.store');
-    Route::post('aportes/{aporte}/anular', [AporteController::class, 'anular'])
-        ->middleware('can:aportes.registrar')->whereNumber('aporte')->name('aportes.anular');
-
-    Route::get('agenda', [AgendaController::class, 'index'])
-        ->middleware('can:agenda.ver')
-        ->name('agenda.index');
-
     // ---------- Administración ----------
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::middleware('can:usuarios.gestionar')->group(function () {
@@ -139,6 +131,53 @@ Route::prefix('socios/{socio}/ficha')
             Route::delete('estado/{periodo}/cierre', [CajaController::class, 'reabrir'])->name('reabrir');
         });
     });
+
+    // ---------- Otros ingresos del flujo de caja ----------
+        // (agrégalas dentro del grupo Route::prefix('caja') que ya tienes)
+        Route::get('ingresos', [IngresoVarioController::class, 'index'])
+            ->middleware('can:caja.ver')->name('ingresos.index');
+        Route::post('ingresos', [IngresoVarioController::class, 'store'])
+            ->middleware('can:caja.registrar')->name('ingresos.store');
+        Route::post('ingresos/{ingreso}/anular', [IngresoVarioController::class, 'anular'])
+            ->middleware('can:caja.registrar')->whereNumber('ingreso')->name('ingresos.anular');
+
+        // ---------- Ingresos bancarios (libro aparte) ----------
+        Route::prefix('banco')->name('banco.')->group(function () {
+            Route::get('/', [IngresoBancarioController::class, 'index'])
+                ->middleware('can:banco.ver')->name('index');
+            Route::post('ingresos', [IngresoBancarioController::class, 'store'])
+                ->middleware('can:banco.registrar')->name('ingresos.store');
+            Route::post('ingresos/{ingreso}/anular', [IngresoBancarioController::class, 'anular'])
+                ->middleware('can:banco.registrar')->whereNumber('ingreso')->name('ingresos.anular');
+        });
+
+        // ---------- Informes mensuales reservados ----------
+        Route::where(['periodo' => '\d{4}-(0[1-9]|1[0-2])'])->group(function () {
+            Route::middleware('can:aportes.informe')->group(function () {
+                Route::get('aportes/informe/{periodo?}', [InformeIngresosController::class, 'mostrar'])
+                    ->defaults('libro', 'aportes')->name('informes.aportes');
+                Route::get('aportes/informe/{periodo}/pdf', [InformeIngresosController::class, 'pdf'])
+                    ->defaults('libro', 'aportes')->name('informes.aportes.pdf');
+            });
+
+            Route::middleware('can:banco.ver')->group(function () {
+                Route::get('banco/informe/{periodo?}', [InformeIngresosController::class, 'mostrar'])
+                    ->defaults('libro', 'banco')->name('informes.banco');
+                Route::get('banco/informe/{periodo}/pdf', [InformeIngresosController::class, 'pdf'])
+                    ->defaults('libro', 'banco')->name('informes.banco.pdf');
+            });
+        });
+
+        // ---------- Aportes ----------
+            Route::get('aportes', [AporteController::class, 'index'])->middleware('can:aportes.ver')->name('aportes.index');
+            Route::post('colaboradores/{colaborador}/aportes', [AporteController::class, 'store'])
+                ->middleware('can:aportes.registrar')->whereNumber('colaborador')->name('aportes.store');
+            Route::post('aportes/{aporte}/anular', [AporteController::class, 'anular'])
+                ->middleware('can:aportes.registrar')->whereNumber('aporte')->name('aportes.anular');
+
+            Route::get('agenda', [AgendaController::class, 'index'])
+                ->middleware('can:agenda.ver')
+                ->name('agenda.index');
 });
 
 require __DIR__.'/settings.php';

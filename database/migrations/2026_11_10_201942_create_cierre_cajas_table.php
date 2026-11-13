@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('periodo', 7)->unique(); // AAAA-MM
             $table->bigInteger('saldo_inicial');
             $table->bigInteger('total_cuotas');
-            $table->bigInteger('total_aportes');
+            $table->bigInteger('total_otros_ingresos')->default(0);
             $table->bigInteger('total_egresos');
             $table->bigInteger('saldo_final');
             $table->foreignId('cerrado_por')->nullable()->constrained('users')->nullOnDelete();
@@ -28,9 +28,9 @@ return new class extends Migration
         if (! Schema::hasIndex('pagos', ['fecha_pago'])) {
             Schema::table('pagos', fn (Blueprint $table) => $table->index('fecha_pago'));
         }
-        if (! Schema::hasIndex('aportes', ['fecha_aporte'])) {
+        /* if (! Schema::hasIndex('aportes', ['fecha_aporte'])) {
             Schema::table('aportes', fn (Blueprint $table) => $table->index('fecha_aporte'));
-        }
+        } */
     }
 
     /**

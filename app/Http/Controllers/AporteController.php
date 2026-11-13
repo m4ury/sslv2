@@ -7,8 +7,6 @@ use App\Models\Colaborador;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use App\Models\CierreCaja;
-use App\Rules\MesAbierto;
 
 class AporteController extends Controller
 {
@@ -71,7 +69,7 @@ class AporteController extends Controller
                 Rule::unique('aportes', 'numero_comprobante')
                     ->where('medio_pago', $request->input('medio_pago'))
                     ->whereNull('anulado_at'),
-                'fecha_aporte' => ['required', 'date', 'before_or_equal:today', new MesAbierto],
+                'fecha_aporte' => ['required', 'date', 'before_or_equal:today'],
             ],
             'observaciones' => ['nullable', 'string', 'max:500'],
         ]);
@@ -94,9 +92,9 @@ class AporteController extends Controller
             return back()->with('error', 'El aporte ya estaba anulado.');
         }
 
-        if (CierreCaja::fechaCerrada($aporte->fecha_aporte)) {
+        /* if (CierreCaja::fechaCerrada($aporte->fecha_aporte)) {
             return back()->with('error', 'No se puede anular: el mes del aporte ya está cerrado en caja.');
-        }
+        } */
 
         $aporte->forceFill([
             'anulado_at' => now(),

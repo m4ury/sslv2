@@ -166,7 +166,7 @@ function guardarConfig() {
             <div>
                 <h1 class="text-2xl font-bold">Flujo de caja</h1>
                 <p class="text-sm text-muted-foreground">
-                    Saldo = saldo inicial + cuotas y aportes recibidos − egresos.
+                    Saldo = saldo inicial + cuotas y otros ingresos − egresos.
                 </p>
             </div>
             <div class="flex flex-wrap gap-2">
@@ -183,6 +183,9 @@ function guardarConfig() {
                         <FileText class="size-4" />
                         Estado de cuentas
                     </Link>
+                </Button>
+                <Button as-child variant="outline">
+                    <Link href="/caja/ingresos">Otros ingresos</Link>
                 </Button>
                 <Button v-if="puede('caja.registrar') && configuracion" @click="abrirRegistro">
                     <Plus class="size-4" />
@@ -221,10 +224,10 @@ function guardarConfig() {
                     <CardHeader>
                         <CardDescription>Ingresos del mes</CardDescription>
                         <CardTitle class="text-2xl">
-                            {{ formatCLP(mes.cuotas + mes.aportes) }}
+                            {{ formatCLP(mes.cuotas + mes.otros) }}
                         </CardTitle>
                         <p class="text-xs text-muted-foreground">
-                            Cuotas {{ formatCLP(mes.cuotas) }} · Aportes {{ formatCLP(mes.aportes) }}
+                            Cuotas {{ formatCLP(mes.cuotas) }} · Aportes {{ formatCLP(mes.otros) }}
                         </p>
                     </CardHeader>
                 </Card>
