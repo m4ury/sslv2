@@ -34,7 +34,7 @@ const user = computed(() => page.props.auth.user);
         <Heading
             variant="small"
             title="Profile"
-            description="Actualiza tu nombre y correo electrónico"
+            description="Actualiza tu informacion"
         />
 
         <Form
@@ -42,6 +42,18 @@ const user = computed(() => page.props.auth.user);
             class="space-y-6"
             v-slot="{ errors, processing }"
         >
+            <div class="grid gap-2">
+                <Label for="rut">Rut</Label>
+                <Input
+                    id="rut"
+                    class="mt-1 block w-full"
+                    name="rut"
+                    :default-value="user.rut"
+                    required
+                    placeholder="Rut ej.: 16000000-k"
+                />
+                <InputError class="mt-2" :message="errors.rut" />
+            </div>
             <div class="grid gap-2">
                 <Label for="name">Nombres</Label>
                 <Input
@@ -54,6 +66,32 @@ const user = computed(() => page.props.auth.user);
                     placeholder="Nombre completo"
                 />
                 <InputError class="mt-2" :message="errors.name" />
+            </div>
+
+            <div class="grid gap-2">
+                <Label for="apellido_paterno">Apellido paterno</Label>
+                <Input
+                    id="apellido_paterno"
+                    class="mt-1 block w-full"
+                    name="apellido_paterno"
+                    :default-value="user.apellido_paterno"
+                    required
+                    placeholder="Apellido paterno"
+                />
+                <InputError class="mt-2" :message="errors.apellido_paterno" />
+            </div>
+
+            <div class="grid gap-2">
+                <Label for="apellido_materno">apellido_materno</Label>
+                <Input
+                    id="apellido_materno"
+                    class="mt-1 block w-full"
+                    name="apellido_materno"
+                    :default-value="user.apellido_materno"
+                    required
+                    placeholder="Apellido materno"
+                />
+                <InputError class="mt-2" :message="errors.apellido_materno" />
             </div>
 
             <div class="grid gap-2">

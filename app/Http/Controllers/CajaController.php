@@ -30,8 +30,8 @@ class CajaController extends Controller
                 });
             })
             ->when($request->filled('categoria'), fn ($q) => $q->where('categoria', $request->query('categoria')))
-            ->when($request->filled('desde'), fn ($q) => $q->whereDate('fecha', '>=', $request->query('desde')))
-            ->when($request->filled('hasta'), fn ($q) => $q->whereDate('fecha', '<=', $request->query('hasta')))
+            ->when($request->filled('desde'), fn ($q) => $q->whereDate('fecha_egreso', '>=', $request->query('desde')))
+            ->when($request->filled('hasta'), fn ($q) => $q->whereDate('fecha_egreso', '<=', $request->query('hasta')))
             ->when($request->filled('estado'), function ($q) use ($request) {
                 $request->query('estado') === 'Anulado'
                     ? $q->whereNotNull('anulado_at')
@@ -43,7 +43,7 @@ class CajaController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $mes = ['cuotas' => 0, 'aportes' => 0, 'egresos' => 0];
+        $mes = ['cuotas' => 0, 'otros' => 0, 'egresos' => 0];
 
         if ($conf) {
             $mes = $this->caja->totales($hoy->copy()->startOfMonth()->max($conf->fecha_inicio), $hoy);

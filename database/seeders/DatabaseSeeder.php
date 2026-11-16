@@ -20,9 +20,11 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'testUser',
+            'name' => 'usuario',
+            'rut' => '12345678-9',
+            'apellido_paterno' => 'prueba',
             'email' => 'test@mail.com',
-            'password' => Hash::make('test')
+            'password' => Hash::make('test1234')
         ]);
 
         $this->call(PersonaSeeder::class);

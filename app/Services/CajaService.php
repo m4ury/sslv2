@@ -123,12 +123,12 @@ class CajaService
                 'proveedor' => $e->proveedor,
                 'documento' => trim($e->tipo_documento.' '.$e->num_documento),
                 'medio_pago' => $e->medio_pago,
-                'monto_egresos' => $e->monto_egreso,
+                'monto' => $e->monto_egreso,
             ])->values()->all();
 
         $totalCuotas = (int) collect($cuotas)->sum('monto_cuotas');
         $totalOtros = (int) collect($otros)->sum('monto');
-        $totalEgresos = (int) collect($egresos)->sum('monto_egresos');
+        $totalEgresos = (int) collect($egresos)->sum('monto');
 
         return [
             'periodo' => $periodo,
@@ -144,9 +144,10 @@ class CajaService
             'egresos' => $egresos,
             'otros_por_categoria' => $this->porCategoria($otros),
             'egresos_por_categoria' => $this->porCategoria($egresos),
-                
+
         ];
     }
+
     private function porCategoria(array $items): array
     {
         return collect($items)

@@ -114,7 +114,7 @@ function celda(col, item) {
                 <CardTitle>{{ config.titulo }}</CardTitle>
                 <CardDescription>{{ config.descripcion }}</CardDescription>
             </div>
-            <Button v-if="puedeRegistrar" size="sm" @click="abrir">
+            <Button v-if="puedeRegistrar" size="sm" @click="abrir" >
                 <Plus class="size-4" />
                 Registrar
             </Button>

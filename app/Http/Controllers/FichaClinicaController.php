@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Socio;
 use App\Models\Control;
+use App\Models\Cuidador;
+use App\Models\Documento;
 use App\Models\Patologia;
+use App\Models\Prestacion;
+use App\Models\Programado;
+use App\Models\Socio;
+use App\Models\Tipo_documento;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use App\Models\Cuidador;
-use App\Models\Documento;
-use App\Models\Prestacion;
-use App\Models\Programado;
-use App\Models\Tipo_documento;
-use Illuminate\Support\Facades\Gate;
 
 class FichaClinicaController extends Controller
 {
@@ -37,6 +36,7 @@ class FichaClinicaController extends Controller
                 ->map(fn (Control $control) => [
                     'id' => $control->id,
                     'fecha' => $control->fecha_control,
+                    'hora' => $control->hora_control ? substr($control->hora_control, 0, 5) : null,
                     'tipo' => $control->tipo_control,
                     'observaciones' => $control->observacion,
                     'mediciones' => $control->mediciones,
@@ -191,13 +191,12 @@ class FichaClinicaController extends Controller
 
     private function guardarControl(Socio $socio, array $data, int $userId, ?Control $control = null): void
     {
-        $atributos = Arr::only($data, ['fecha_control', 'hora_control', 'tipo_control', 'observacion']);
-
-        /*$atributos = [
+        $atributos = [
             'fecha_control' => $data['fecha'],
+            'hora_control' => $data['hora'] ?? null,
             'tipo_control' => $data['tipo'],
             'observacion' => $data['observaciones'] ?? null,
-        ];*/
+        ];
 
         if ($control) {
             $control->update($atributos);
@@ -244,34 +243,34 @@ class FichaClinicaController extends Controller
         $c = config('ficha');
         $vigente = in_array($request->input('estado'), ['Activa', 'Controlada'], true);
         $existeCuidador = Rule::exists('cuidadores', 'id');
-        if (!$editando) {
+        if (! $editando) {
             // Solo se pueden asignar cuidadores activos; al editar se admite cualquiera
             $existeCuidador->where('estado', 'Activo');
         }
 
         return match ($seccion) {
             'patologias' => [
-            'patologia_id' => [
-                'required',
-                Rule::exists('patologias', 'id'),
-                // Evita dos registros vigentes de la misma patología en el mismo socio
-                ...($vigente ? [
-                    Rule::unique('patologia_socio', 'patologia_id')
-                        ->where('socio_id', $socio->id)
-                        ->whereNull('deleted_at')
-                        ->whereIn('estado', ['Activa', 'Controlada'])
-                        ->ignore($request->route('id')),
-                ] : []),
-            ],
-            'fecha_diagnostico' => ['nullable', 'date', 'before_or_equal:today'],
-            'estado' => ['required', Rule::in($c['estados_patologia'])],
-            'observaciones' => ['nullable', 'string'],
+                'patologia_id' => [
+                    'required',
+                    Rule::exists('patologias', 'id'),
+                    // Evita dos registros vigentes de la misma patología en el mismo socio
+                    ...($vigente ? [
+                        Rule::unique('patologia_socio', 'patologia_id')
+                            ->where('socio_id', $socio->id)
+                            ->whereNull('deleted_at')
+                            ->whereIn('estado', ['Activa', 'Controlada'])
+                            ->ignore($request->route('id')),
+                    ] : []),
+                ],
+                'fecha_diagnostico' => ['nullable', 'date', 'before_or_equal:today'],
+                'estado' => ['required', Rule::in($c['estados_patologia'])],
+                'observaciones' => ['nullable', 'string'],
             ],
 
             'controles' => [
                 'fecha' => ['required', 'date', 'before_or_equal:today'],
+                'hora' => ['nullable', 'date_format:H:i'],
                 'tipo' => ['required', Rule::in($c['tipos_control'])],
-                'hora_conttol' => ['nullable', 'date_format:H:i'],
                 'observaciones' => ['nullable', 'string'],
                 ...collect($c['mediciones'])->mapWithKeys(fn ($def, $tipo) => [
                     "med_{$tipo}" => ['nullable', 'numeric', "between:{$def['min']},{$def['max']}"],

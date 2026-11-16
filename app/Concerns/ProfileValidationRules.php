@@ -17,6 +17,7 @@ trait ProfileValidationRules
     protected function profileRules(?int $userId = null): array
     {
         return [
+            'rut' => $this->rutRules(),
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
         ];
@@ -27,6 +28,11 @@ trait ProfileValidationRules
      *
      * @return array<int, Unique|ValidationRule|array<mixed>|string>
      */
+    protected function rutRules(): array
+    {
+        return ['required', 'string', 'cl_rut'];
+    }
+
     protected function nameRules(): array
     {
         return ['required', 'string', 'max:255'];

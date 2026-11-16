@@ -118,7 +118,7 @@ class InformesIngresos
         $inicio = $primera ? Carbon::parse($primera)->startOfMonth() : now()->startOfMonth();
         $periodos = [];
 
-        for ($mes = now()->startOfMonth(); $mes->gte($inicio); $mes->subMonth()) {
+        for ($mes = now()->startOfMonth(); $mes->gte($inicio); $mes = $mes->subMonth()) {
             $periodos[] = $mes->format('Y-m');
         }
 

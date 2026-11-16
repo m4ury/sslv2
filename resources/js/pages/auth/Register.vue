@@ -33,18 +33,60 @@ defineOptions({
     >
         <div class="grid gap-6">
             <div class="grid gap-2">
+                <Label for="rut">Rut</Label>
+                <Input
+                    id="rut"
+                    type="text"
+                    required
+                    v-focus
+                    :tabindex="1"
+                    autocomplete="rut"
+                    name="rut"
+                    placeholder="Rut. ej.: 16000000-5"
+                />
+                <InputError :message="errors.rut" />
+            </div>
+
+            <div class="grid gap-2">
                 <Label for="name">Nombres</Label>
                 <Input
                     id="name"
                     type="text"
                     required
-                    v-focus
-                    :tabindex="1"
+                    :tabindex="2"
                     autocomplete="name"
                     name="name"
                     placeholder="Nombre completo"
                 />
                 <InputError :message="errors.name" />
+            </div>
+
+            <div class="grid gap-4">
+                <Label for="apellido_paterno">Apellido paterno</Label>
+                <Input
+                    id="apellido_paterno"
+                    type="text"
+                    required
+                    :tabindex="3"
+                    autocomplete="apellido_paterno"
+                    name="apellido_paterno"
+                    placeholder="Apellido paterno"
+                />
+                <InputError :message="errors.apellido_paterno" />
+            </div>
+
+            <div class="grid gap-4">
+                <Label for="apellido_materno">Apellido materno</Label>
+                <Input
+                    id="apellido_materno"
+                    type="text"
+                    required
+                    :tabindex="4"
+                    autocomplete="apellido_materno"
+                    name="apellido_materno"
+                    placeholder="Apellido materno"
+                />
+                <InputError :message="errors.apellido_materno" />
             </div>
 
             <div class="grid gap-2">
@@ -53,7 +95,7 @@ defineOptions({
                     id="email"
                     type="email"
                     required
-                    :tabindex="2"
+                    :tabindex="5"
                     autocomplete="email"
                     name="email"
                     placeholder="email@example.com"
@@ -66,7 +108,7 @@ defineOptions({
                 <PasswordInput
                     id="password"
                     required
-                    :tabindex="3"
+                    :tabindex="6"
                     autocomplete="new-password"
                     name="password"
                     placeholder="Contraseña"
@@ -80,7 +122,7 @@ defineOptions({
                 <PasswordInput
                     id="password_confirmation"
                     required
-                    :tabindex="4"
+                    :tabindex="7"
                     autocomplete="new-password"
                     name="password_confirmation"
                     placeholder="Confirmar contraseña"
@@ -92,7 +134,7 @@ defineOptions({
             <Button
                 type="submit"
                 class="mt-2 w-full"
-                tabindex="5"
+                tabindex="8"
                 :disabled="processing"
                 data-test="register-user-button"
             >
@@ -106,7 +148,7 @@ defineOptions({
             <TextLink
                 :href="login()"
                 class="underline underline-offset-4"
-                :tabindex="6"
+                :tabindex="9"
                 >Inicia sesion</TextLink
             >
         </div>

@@ -290,7 +290,7 @@ async function reabrirMes() {
                                 <TableRow v-for="c in resumen.egresos_por_categoria" :key="c.categoria">
                                     <TableCell>{{ c.categoria }}</TableCell>
                                     <TableCell class="text-right">{{ c.cantidad }}</TableCell>
-                                    <TableCell class="text-right">{{ formatCLP(c.monto_egreso) }}</TableCell>
+                                    <TableCell class="text-right">{{ formatCLP(c.total) }}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
@@ -313,14 +313,14 @@ async function reabrirMes() {
                                     <TableCell>{{ e.categoria }}</TableCell>
                                     <TableCell>
                                         <div class="flex max-w-xs flex-col whitespace-normal">
-                                            <span>{{ e.descripcion }}</span>
+                                            <span>{{ e.descripcion_egreso }}</span>
                                             <span v-if="e.proveedor" class="text-xs text-muted-foreground">
                                                 {{ e.proveedor }}
                                             </span>
                                         </div>
                                     </TableCell>
                                     <TableCell>{{ e.documento || '—' }}</TableCell>
-                                    <TableCell class="text-right">{{ formatCLP(e.monto_egresos) }}</TableCell>
+                                    <TableCell class="text-right">{{ formatCLP(e.monto) }}</TableCell>
                                 </TableRow>
                                 <TableRow v-if="resumen.egresos.length === 0">
                                     <TableCell colspan="5" class="h-16 text-center text-muted-foreground">

@@ -1,72 +1,76 @@
 <?php
 
-use App\Http\Controllers\ColaboradorController;
-use App\Http\Controllers\PersonaController;
-use App\Http\Controllers\SocioController;
-use App\Http\Controllers\FichaClinicaController;
 use App\Http\Controllers\AgendaController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PatologiaController;
-use App\Http\Controllers\CuidadorController;
-use App\Http\Controllers\ConfigCuotaController;
-use App\Http\Controllers\CuotaController;
-use App\Http\Controllers\PagoController;
 use App\Http\Controllers\AporteController;
-use App\Http\Controllers\UsuarioController;
-use App\Http\Controllers\ProfesionController;
 use App\Http\Controllers\CajaController;
+use App\Http\Controllers\ColaboradorController;
+use App\Http\Controllers\ConfigCuotaController;
+use App\Http\Controllers\CuidadorController;
+use App\Http\Controllers\CuotaController;
 use App\Http\Controllers\EgresoController;
+use App\Http\Controllers\FichaClinicaController;
+use App\Http\Controllers\InformeIngresosController;
 use App\Http\Controllers\IngresoBancarioController;
 use App\Http\Controllers\IngresoVarioController;
-use App\Http\Controllers\InformeIngresosController;
+use App\Http\Controllers\PagoController;
+use App\Http\Controllers\PatologiaController;
+use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\ProfesionController;
+use App\Http\Controllers\SocioController;
+use App\Http\Controllers\UsuarioController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\MovimientoInventarioController;
+use App\Http\Controllers\PrestamoInventarioController;
+use App\Http\Controllers\DashboardController;
 
-
+Route::get('dashboard', DashboardController::class)->name('dashboard');
 
 Route::inertia('/', 'Welcome')->name('home');
 
-Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+//Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // ---------- Personas ----------
-// El orden importa: "create" debe registrarse antes que "show" (personas/{persona})
-Route::resource('personas', PersonaController::class)
-    ->except(['index', 'show'])->middleware('can:personas.gestionar');
-Route::resource('personas', PersonaController::class)
-    ->only(['index', 'show'])->middleware('can:personas.ver');
+    // El orden importa: "create" debe registrarse antes que "show" (personas/{persona})
+    Route::resource('personas', PersonaController::class)
+        ->except(['index', 'show'])->middleware('can:personas.gestionar');
+    Route::resource('personas', PersonaController::class)
+        ->only(['index', 'show'])->middleware('can:personas.ver');
 
-// ---------- Roles: socios, colaboradores, cuidadores ----------
-Route::middleware('can:roles.gestionar')->group(function () {
-    // Mueve aquí tus Route::resource actuales de estos roles, con sus opciones
-    // (y las rutas de baja/reactivar, si las implementaste).
-    Route::resource('socios', SocioController::class)->except(['index']);
-    Route::patch('socios/{socio}/baja', [SocioController::class, 'baja'])->name('socios.baja');
-    Route::patch('socios/{socio}/reactivar', [SocioController::class, 'reactivar'])->name('socios.reactivar');
-    Route::resource('colaboradores', ColaboradorController::class)
-        ->parameters(['colaboradores' => 'colaborador']);
-    Route::resource('cuidadores', CuidadorController::class)
-        ->parameters(['cuidadores' => 'cuidador'])
-        ->only(['create', 'store', 'edit', 'update']);
-});
-
-// ---------- Ficha clínica ----------
-Route::prefix('socios/{socio}/ficha')
-    ->name('ficha.')
-    ->where([
-        'seccion' => 'patologias|controles|prestaciones|programados|credenciales|documentos|cuidadores',
-        'id' => '[0-9]+',
-        'documento' => '[0-9]+',
-    ])
-    ->group(function () {
-        Route::middleware('can:ficha.ver')->group(function () {
-            Route::get('/', [FichaClinicaController::class, 'show'])->name('show');
-            Route::get('documentos/{documento}/descargar', [FichaClinicaController::class, 'descargar'])->name('descargar');
-        });
-
-        // Escritura: cada sección exige su permiso dentro del controlador
-        Route::post('{seccion}', [FichaClinicaController::class, 'store'])->name('store');
-        Route::put('{seccion}/{id}', [FichaClinicaController::class, 'update'])->name('update');
-        Route::delete('{seccion}/{id}', [FichaClinicaController::class, 'destroy'])->name('destroy');
+    // ---------- Roles: socios, colaboradores, cuidadores ----------
+    Route::middleware('can:roles.gestionar')->group(function () {
+        // Mueve aquí tus Route::resource actuales de estos roles, con sus opciones
+        // (y las rutas de baja/reactivar, si las implementaste).
+        Route::resource('socios', SocioController::class)->except(['index']);
+        Route::patch('socios/{socio}/baja', [SocioController::class, 'baja'])->name('socios.baja');
+        Route::patch('socios/{socio}/reactivar', [SocioController::class, 'reactivar'])->name('socios.reactivar');
+        Route::resource('colaboradores', ColaboradorController::class)
+            ->parameters(['colaboradores' => 'colaborador']);
+        Route::resource('cuidadores', CuidadorController::class)
+            ->parameters(['cuidadores' => 'cuidador'])
+            ->only(['create', 'store', 'edit', 'update']);
     });
+
+    // ---------- Ficha clínica ----------
+    Route::prefix('socios/{socio}/ficha')
+        ->name('ficha.')
+        ->where([
+            'seccion' => 'patologias|controles|prestaciones|programados|credenciales|documentos|cuidadores',
+            'id' => '[0-9]+',
+            'documento' => '[0-9]+',
+        ])
+        ->group(function () {
+            Route::middleware('can:ficha.ver')->group(function () {
+                Route::get('/', [FichaClinicaController::class, 'show'])->name('show');
+                Route::get('documentos/{documento}/descargar', [FichaClinicaController::class, 'descargar'])->name('descargar');
+            });
+
+            // Escritura: cada sección exige su permiso dentro del controlador
+            Route::post('{seccion}', [FichaClinicaController::class, 'store'])->name('store');
+            Route::put('{seccion}/{id}', [FichaClinicaController::class, 'update'])->name('update');
+            Route::delete('{seccion}/{id}', [FichaClinicaController::class, 'destroy'])->name('destroy');
+        });
 
     // ---------- Catálogo de patologías ----------
     Route::prefix('catalogos')->name('catalogos.')->middleware('can:patologias.catalogo')->group(function () {
@@ -110,74 +114,96 @@ Route::prefix('socios/{socio}/ficha')
     });
 
     Route::prefix('caja')
-    ->name('caja.')
-    ->where(['periodo' => '\d{4}-(0[1-9]|1[0-2])'])
-    ->group(function () {
-        Route::middleware('can:caja.ver')->group(function () {
-            Route::get('/', [CajaController::class, 'index'])->name('index');
-            Route::get('estado/{periodo?}', [CajaController::class, 'estado'])->name('estado');
-            Route::get('estado/{periodo}/pdf', [CajaController::class, 'pdf'])->name('estado.pdf');
+        ->name('caja.')
+        ->where(['periodo' => '\d{4}-(0[1-9]|1[0-2])'])
+        ->group(function () {
+            Route::middleware('can:caja.ver')->group(function () {
+                Route::get('/', [CajaController::class, 'index'])->name('index');
+                Route::get('estado/{periodo?}', [CajaController::class, 'estado'])->name('estado');
+                Route::get('estado/{periodo}/pdf', [CajaController::class, 'pdf'])->name('estado.pdf');
+            });
+
+            Route::middleware('can:caja.registrar')->group(function () {
+                Route::post('egresos', [EgresoController::class, 'store'])->name('egresos.store');
+                Route::post('egresos/{egreso}/anular', [EgresoController::class, 'anular'])
+                    ->whereNumber('egreso')->name('egresos.anular');
+            });
+
+            Route::middleware('can:caja.cerrar')->group(function () {
+                Route::put('configuracion', [CajaController::class, 'configurar'])->name('configuracion');
+                Route::post('estado/{periodo}/cerrar', [CajaController::class, 'cerrar'])->name('cerrar');
+                Route::delete('estado/{periodo}/cierre', [CajaController::class, 'reabrir'])->name('reabrir');
+            });
+
+            // ---------- Otros ingresos del flujo de caja ----------
+            // (agrégalas dentro del grupo Route::prefix('caja') que ya tienes)
+            Route::get('ingresos', [IngresoVarioController::class, 'index'])
+                ->middleware('can:caja.ver')->name('ingresos.index');
+            Route::post('ingresos', [IngresoVarioController::class, 'store'])
+                ->middleware('can:caja.registrar')->name('ingresos.store');
+            Route::post('ingresos/{ingreso}/anular', [IngresoVarioController::class, 'anular'])
+                ->middleware('can:caja.registrar')->whereNumber('ingreso')->name('ingresos.anular');
         });
 
-        Route::middleware('can:caja.registrar')->group(function () {
-            Route::post('egresos', [EgresoController::class, 'store'])->name('egresos.store');
-            Route::post('egresos/{egreso}/anular', [EgresoController::class, 'anular'])
-                ->whereNumber('egreso')->name('egresos.anular');
+    // ---------- Ingresos bancarios (libro aparte) ----------
+    Route::prefix('banco')->name('banco.')->group(function () {
+        Route::get('/', [IngresoBancarioController::class, 'index'])
+            ->middleware('can:banco.ver')->name('index');
+        Route::post('ingresos', [IngresoBancarioController::class, 'store'])
+            ->middleware('can:banco.registrar')->name('ingresos.store');
+        Route::post('ingresos/{ingreso}/anular', [IngresoBancarioController::class, 'anular'])
+            ->middleware('can:banco.registrar')->whereNumber('ingreso')->name('ingresos.anular');
+    });
+
+    // ---------- Informes mensuales reservados ----------
+    Route::where(['periodo' => '\d{4}-(0[1-9]|1[0-2])'])->group(function () {
+        Route::middleware('can:aportes.informe')->group(function () {
+            Route::get('aportes/informe/{periodo?}', [InformeIngresosController::class, 'mostrar'])
+                ->defaults('libro', 'aportes')->name('informes.aportes');
+            Route::get('aportes/informe/{periodo}/pdf', [InformeIngresosController::class, 'pdf'])
+                ->defaults('libro', 'aportes')->name('informes.aportes.pdf');
         });
 
-        Route::middleware('can:caja.cerrar')->group(function () {
-            Route::put('configuracion', [CajaController::class, 'configurar'])->name('configuracion');
-            Route::post('estado/{periodo}/cerrar', [CajaController::class, 'cerrar'])->name('cerrar');
-            Route::delete('estado/{periodo}/cierre', [CajaController::class, 'reabrir'])->name('reabrir');
+        Route::middleware('can:banco.ver')->group(function () {
+            Route::get('banco/informe/{periodo?}', [InformeIngresosController::class, 'mostrar'])
+                ->defaults('libro', 'banco')->name('informes.banco');
+            Route::get('banco/informe/{periodo}/pdf', [InformeIngresosController::class, 'pdf'])
+                ->defaults('libro', 'banco')->name('informes.banco.pdf');
         });
     });
 
-    // ---------- Otros ingresos del flujo de caja ----------
-        // (agrégalas dentro del grupo Route::prefix('caja') que ya tienes)
-        Route::get('ingresos', [IngresoVarioController::class, 'index'])
-            ->middleware('can:caja.ver')->name('ingresos.index');
-        Route::post('ingresos', [IngresoVarioController::class, 'store'])
-            ->middleware('can:caja.registrar')->name('ingresos.store');
-        Route::post('ingresos/{ingreso}/anular', [IngresoVarioController::class, 'anular'])
-            ->middleware('can:caja.registrar')->whereNumber('ingreso')->name('ingresos.anular');
+    // ---------- Aportes ----------
+    Route::get('aportes', [AporteController::class, 'index'])->middleware('can:aportes.ver')->name('aportes.index');
+    Route::post('colaboradores/{colaborador}/aportes', [AporteController::class, 'store'])
+        ->middleware('can:aportes.registrar')->whereNumber('colaborador')->name('aportes.store');
+    Route::post('aportes/{aporte}/anular', [AporteController::class, 'anular'])
+        ->middleware('can:aportes.registrar')->whereNumber('aporte')->name('aportes.anular');
 
-        // ---------- Ingresos bancarios (libro aparte) ----------
-        Route::prefix('banco')->name('banco.')->group(function () {
-            Route::get('/', [IngresoBancarioController::class, 'index'])
-                ->middleware('can:banco.ver')->name('index');
-            Route::post('ingresos', [IngresoBancarioController::class, 'store'])
-                ->middleware('can:banco.registrar')->name('ingresos.store');
-            Route::post('ingresos/{ingreso}/anular', [IngresoBancarioController::class, 'anular'])
-                ->middleware('can:banco.registrar')->whereNumber('ingreso')->name('ingresos.anular');
+    Route::get('agenda', [AgendaController::class, 'index'])
+        ->middleware('can:agenda.ver')
+        ->name('agenda.index');
+
+    Route::prefix('inventario')->name('inventario.')->group(function () {
+        Route::middleware('can:inventario.ver')->group(function () {
+            Route::get('/', [InventarioController::class, 'index'])->name('index');
+            Route::get('prestamos', [PrestamoInventarioController::class, 'index'])->name('prestamos');
+            Route::get('{articulo}', [InventarioController::class, 'show'])
+                ->whereNumber('articulo')->name('show');
         });
 
-        // ---------- Informes mensuales reservados ----------
-        Route::where(['periodo' => '\d{4}-(0[1-9]|1[0-2])'])->group(function () {
-            Route::middleware('can:aportes.informe')->group(function () {
-                Route::get('aportes/informe/{periodo?}', [InformeIngresosController::class, 'mostrar'])
-                    ->defaults('libro', 'aportes')->name('informes.aportes');
-                Route::get('aportes/informe/{periodo}/pdf', [InformeIngresosController::class, 'pdf'])
-                    ->defaults('libro', 'aportes')->name('informes.aportes.pdf');
-            });
-
-            Route::middleware('can:banco.ver')->group(function () {
-                Route::get('banco/informe/{periodo?}', [InformeIngresosController::class, 'mostrar'])
-                    ->defaults('libro', 'banco')->name('informes.banco');
-                Route::get('banco/informe/{periodo}/pdf', [InformeIngresosController::class, 'pdf'])
-                    ->defaults('libro', 'banco')->name('informes.banco.pdf');
-            });
+        Route::middleware('can:inventario.articulos')->group(function () {
+            Route::post('articulos', [InventarioController::class, 'store'])->name('articulos.store');
+            Route::put('articulos/{articulo}', [InventarioController::class, 'update'])->name('articulos.update');
+            Route::delete('articulos/{articulo}', [InventarioController::class, 'destroy'])->name('articulos.destroy');
         });
 
-        // ---------- Aportes ----------
-            Route::get('aportes', [AporteController::class, 'index'])->middleware('can:aportes.ver')->name('aportes.index');
-            Route::post('colaboradores/{colaborador}/aportes', [AporteController::class, 'store'])
-                ->middleware('can:aportes.registrar')->whereNumber('colaborador')->name('aportes.store');
-            Route::post('aportes/{aporte}/anular', [AporteController::class, 'anular'])
-                ->middleware('can:aportes.registrar')->whereNumber('aporte')->name('aportes.anular');
-
-            Route::get('agenda', [AgendaController::class, 'index'])
-                ->middleware('can:agenda.ver')
-                ->name('agenda.index');
+        Route::middleware('can:inventario.registrar')->group(function () {
+            Route::post('{articulo}/movimientos', [MovimientoInventarioController::class, 'store'])
+                ->whereNumber('articulo')->name('movimientos.store');
+            Route::post('movimientos/{movimiento}/anular', [MovimientoInventarioController::class, 'anular'])
+                ->whereNumber('movimiento')->name('movimientos.anular');
+        });
+    });
 });
 
 require __DIR__.'/settings.php';

@@ -15,6 +15,9 @@ return new class extends Migration
             $table->foreignId('profesion_id')->nullable()->constrained('profesiones')->onDelete('set null');
             $table->boolean('activo')->default(true);
             $table->dateTime('ultimo_acceso')->nullable();
+            $table->string('rut')->unique();
+            $table->string('apellido_paterno')->nullable();
+            $table->string('apellido_materno')->nullable();
         });
     }
 

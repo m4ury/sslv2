@@ -24,6 +24,8 @@ class UsuarioController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'apellido_paterno' => ['required', 'string', 'max:255'],
+            'apellido_materno' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
             'profesion_id' => ['required', Rule::exists('profesiones', 'id')],
             'password' => ['required', Password::defaults()],
@@ -41,6 +43,8 @@ class UsuarioController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'apellido_paterno' => ['required', 'string', 'max:255'],
+            'apellido_materno' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($usuario)],
             'profesion_id' => ['required', Rule::exists('profesiones', 'id')],
             'activo' => ['required', 'boolean'],

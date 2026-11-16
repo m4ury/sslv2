@@ -129,7 +129,7 @@
                     <td>{{ $e['descripcion_egreso'] }}</td>
                     <td>{{ $e['proveedor'] ?? '—' }}</td>
                     <td>{{ $e['documento'] ?: '—' }}</td>
-                    <td class="r">{{ $fmt($e['monto_egresos']) }}</td>
+                    <td class="r">{{ $fmt($e['monto']) }}</td>
                 </tr>
             @endforeach
             </tbody>
