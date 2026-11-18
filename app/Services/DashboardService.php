@@ -33,7 +33,7 @@ class DashboardService
         $datos = [
             'agenda' => $puede('agenda.ver') ? $this->widgetAgenda() : null,
             'clinico' => $puede('ficha.ver') ? $this->widgetClinico() : null,
-            'personas' => $puede('personas.ver') ? $this->widgetPersonas() : null,
+            'personas' => $puede('personas.ver') ? $this->widgetPersonas($puede) : null,
             'cuotas' => $puede('cuotas.ver') ? $this->widgetCuotas() : null,
             'caja' => $puede('caja.ver') ? $this->widgetCaja() : null,
             'reservados' => $this->widgetReservados($puede),
@@ -116,11 +116,11 @@ class DashboardService
         ];
     }
 
-    private function widgetPersonas(): array
+    private function widgetPersonas(callable $puede): array
     {
         return [
             'socios' => Socio::where('estado', 'Activo')->count(),
-            'colaboradores' => Colaborador::where('estado', 'Activo')->count(),
+            'colaboradores' => $puede('aportes.ver') ? Colaborador::where('estado', 'Activo')->count() : null,
             'cuidadores' => Cuidador::where('estado', 'Activo')->count(),
             'socios_sin_cuidador' => Socio::where('estado', 'Activo')
                 ->whereDoesntHave('cuidadores', fn ($q) => $q->where('es_principal', true)->whereNull('fecha_fin'))

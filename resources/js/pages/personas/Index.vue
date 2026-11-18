@@ -11,14 +11,24 @@ import {
     Trash2,
     UserRound,
     Users,
+    Mars,
+    Venus,
 } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
+import { usePermisos } from '@/composables/usePermisos';
 import { create, destroy, edit, index, show } from '@/routes/personas';
 import Pagination from '@/components/Pagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {
     Tooltip,
     TooltipContent,
@@ -37,6 +47,7 @@ import {
 import { useConfirm } from '@/composables/useConfirm';
 
 const { confirmar } = useConfirm();
+const { puede } = usePermisos();
 
 const props = defineProps({
     personas: {
@@ -45,19 +56,23 @@ const props = defineProps({
     },
     filters: {
         type: Object,
-        default: () => ({ search: '' }),
+        default: () => ({ search: '', type: 'all' }),
     },
 });
 
 const search = ref(props.filters.search ?? '');
+const type = ref(props.filters.type ?? 'all');
 let timeout;
 
-watch(search, (value) => {
+watch([search, type], ([newSearch, newType]) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
         router.get(
             index.url(),
-            { search: value || undefined },
+            {
+                search: newSearch || undefined,
+                type: newType || undefined,
+            },
             { preserveState: true, preserveScroll: true, replace: true },
         );
     }, 300);
@@ -85,7 +100,12 @@ async function deletePersona(persona) {
 }
 
 function rolesFor(persona) {
-    return roleDefinitions.filter(({ key }) => persona[key]);
+    return roleDefinitions.filter(({ key }) => {
+        if (key === 'colaborador' && !puede('aportes.ver')) {
+            return false;
+        }
+        return !!persona[key];
+    });
 }
 
 function roleCaption(persona, role) {
@@ -93,6 +113,22 @@ function roleCaption(persona, role) {
 
     return estado ? `${role.label} · ${estado}` : role.label;
 }
+
+const getSexoVariant = (sexo) => {
+    if (!sexo) return 'secondary';
+    const s = sexo.toLowerCase();
+    if (s === 'masculino') return 'info';
+    if (s === 'femenino') return 'destructive';
+    return 'secondary';
+};
+
+const getSexoIcon = (sexo) => {
+    if (!sexo) return null;
+    const s = sexo.toLowerCase();
+    if (s === 'masculino') return Mars;
+    if (s === 'femenino') return Venus;
+    return null;
+};
 
 // Evita el desfase de zona horaria al parsear "YYYY-MM-DD"
 function formatDate(value) {
@@ -127,17 +163,35 @@ function formatDate(value) {
 
         <Card>
             <CardContent class="flex flex-col gap-4">
-                <!-- Buscador -->
-                <div class="relative max-w-sm">
-                    <Search
-                        class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-                    />
-                    <Input
-                        v-model="search"
-                        type="search"
-                        placeholder="Buscar por RUT, nombres y apellidos..."
-                        class="pl-9"
-                    />
+                <!-- Filtros -->
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <!-- Buscador -->
+                    <div class="relative w-full max-w-sm">
+                        <Search
+                            class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                        />
+                        <Input
+                            v-model="search"
+                            type="search"
+                            placeholder="Buscar por RUT, nombres y apellidos..."
+                            class="pl-9"
+                        />
+                    </div>
+
+                    <!-- Filtro por Tipo -->
+                    <Select v-model="type">
+                        <SelectTrigger class="w-full sm:w-[180px]">
+                            <SelectValue placeholder="Filtrar por tipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem v-if="puede('aportes.ver')" value="all">Todos</SelectItem>
+                            <SelectItem value="socio">Socios</SelectItem>
+                            <SelectItem v-if="puede('aportes.ver')" value="colaborador">
+                                Colaboradores
+                            </SelectItem>
+                            <SelectItem value="cuidador">Cuidadores</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <!-- Tabla -->
@@ -173,9 +227,14 @@ function formatDate(value) {
                                 <TableCell>{{ persona.edad }}</TableCell>
                                 <TableCell>
                                     <Badge
-                                        variant="secondary"
-                                        class="capitalize"
+                                        :variant="getSexoVariant(persona.sexo)"
+                                        class="gap-1 capitalize"
                                     >
+                                        <component
+                                            :is="getSexoIcon(persona.sexo)"
+                                            v-if="getSexoIcon(persona.sexo)"
+                                            class="size-3"
+                                        />
                                         {{ persona.sexo }}
                                     </Badge>
                                 </TableCell>

@@ -64,11 +64,7 @@ class User extends Authenticatable
             return false;
         }
 
-        if ($this->profesion?->es_admin) {
-            return true;
-        }
-
-        return in_array($permiso, $this->profesion?->permisos ?? [], true);
+        return $this->profesion?->es_admin || in_array($permiso, $this->profesion?->permisos ?? [], true);
     }
 
     public function getFullNameAttribute(): string

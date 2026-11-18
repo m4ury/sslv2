@@ -45,16 +45,16 @@ function resumenMediciones(control, catalogo) {
 }
 
 const VARIANTES = {
-    Activa: 'default',
-    Controlada: 'secondary',
+    Activa: 'success',
+    Controlada: 'info',
     Resuelta: 'outline',
-    Pendiente: 'default',
-    Realizado: 'secondary',
+    Pendiente: 'warning',
+    Realizado: 'success',
     Cancelado: 'outline',
     'No asistió': 'destructive',
     Vencida: 'destructive',
-    'Por vencer': 'default',
-    Vigente: 'secondary',
+    'Por vencer': 'warning',
+    Vigente: 'success',
 };
 
 const variante = (valor) => VARIANTES[valor] ?? 'secondary';

@@ -1,5 +1,22 @@
 <script setup>
 import { Head, Link, usePage } from '@inertiajs/vue3';
+import {
+    AlertCircle,
+    ArrowUpRight,
+    Calendar,
+    ChevronRight,
+    ClipboardCheck,
+    CreditCard,
+    DollarSign,
+    Heart,
+    LayoutDashboard,
+    Package,
+    ShieldAlert,
+    TrendingDown,
+    TrendingUp,
+    Users,
+    Wallet,
+} from '@lucide/vue';
 import { computed } from 'vue';
 import BarrasMensuales from '@/components/dashboard/BarrasMensuales.vue';
 import StatCard from '@/components/dashboard/StatCard.vue';
@@ -24,14 +41,6 @@ const page = usePage();
 const { puede } = usePermisos();
 
 const nombre = computed(() => (page.props.auth?.user?.name ?? '').split(' ')[0]);
-
-/*const nombreCompleto = computed(() => {
-    const user = page.props.auth?.user;
-    const texto = user?.full_name ?? user?.name ?? '';
-
-    // "JUAN PÉREZ" → "Juan Pérez"
-    return texto.toLowerCase().replace(/(^|\s)\p{L}/gu, (letra) => letra.toUpperCase());
-});*/
 
 const saludo = computed(() => {
     const hora = new Date().getHours();
@@ -65,7 +74,7 @@ const ESTADOS = { Pendiente: 'default', Realizado: 'secondary', 'No asistió': '
 const accesos = computed(() =>
     [
         { titulo: 'Agenda', href: '/agenda', permiso: 'agenda.ver' },
-        { titulo: 'Personas', href: '/personas', permiso: 'personas.ver' },
+        { titulo: 'Personas', href: '/personas?type=socio', permiso: 'personas.ver' },
         { titulo: 'Cuotas', href: '/cuotas', permiso: 'cuotas.ver' },
         { titulo: 'Flujo de caja', href: '/caja', permiso: 'caja.ver' },
         { titulo: 'Inventario', href: '/inventario', permiso: 'inventario.ver' },
@@ -80,9 +89,28 @@ const accesos = computed(() =>
 
     <div class="mx-3 flex max-w-7xl flex-col gap-6 p-4 md:p-6">
         <!-- Saludo -->
-        <div>
-            <h1 class="text-2xl font-bold">{{ saludo }}<span v-if="nombre">, {{ nombre }}</span></h1>
-            <p class="text-sm text-muted-foreground">{{ fechaHoy }}</p>
+        <div class="animate-in-up relative overflow-hidden rounded-2xl bg-linear-to-br from-primary/10 via-primary/5 to-transparent p-6 sm:p-8 shadow-sm">
+            <div class="relative z-10 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight">
+                        {{ saludo }}<span v-if="nombre" class="text-primary">, {{ nombre }}</span>
+                    </h1>
+                    <p class="text-muted-foreground flex items-center gap-2 mt-1">
+                        <Calendar class="size-4" />
+                        {{ fechaHoy }}
+                    </p>
+                </div>
+                <div class="mt-4 sm:mt-0">
+                    <Button as-child variant="default" size="sm" class="rounded-full px-6 shadow-lg transition-transform hover:scale-105 active:scale-95">
+                        <Link href="/agenda">
+                            <Calendar class="size-4 mr-2" />
+                            Ver mi agenda
+                        </Link>
+                    </Button>
+                </div>
+            </div>
+            <!-- Decorative circle -->
+            <div class="absolute -right-12 -top-12 size-48 rounded-full bg-primary/5 blur-3xl" />
         </div>
 
         <!-- Sin permisos -->
@@ -96,7 +124,7 @@ const accesos = computed(() =>
         </Card>
 
         <!-- Requiere atención -->
-        <Card v-if="alertas.length">
+        <Card v-if="alertas.length" class="animate-in-up stagger-1">
             <CardHeader>
                 <CardTitle>Requiere atención</CardTitle>
                 <CardDescription>Lo urgente de los módulos a los que tienes acceso.</CardDescription>
@@ -116,7 +144,7 @@ const accesos = computed(() =>
         </Card>
 
         <!-- Agenda y seguimiento clínico -->
-        <div v-if="agenda || clinico" class="grid gap-6 grid-cols-[repeat(auto-fit,minmax(min(100%,24rem),1fr))]">
+        <div v-if="agenda || clinico" class="animate-in-up stagger-2 grid gap-6 grid-cols-[repeat(auto-fit,minmax(min(100%,24rem),1fr))]">
             <Card v-if="agenda">
                 <CardHeader>
                     <CardTitle>Agenda de hoy</CardTitle>
@@ -134,11 +162,11 @@ const accesos = computed(() =>
                         <div class="flex min-w-0 flex-col">
                             <component
                                 :is="puede('ficha.ver') ? Link : 'span'"
-                                :href="puede('ficha.ver') ? `/socios/${c.socios_id}/ficha` : undefined"
+                                :href="puede('ficha.ver') ? `/socios/${c.socio_id}/ficha` : undefined"
                                 class="truncate font-medium"
                                 :class="{ 'underline-offset-4 hover:underline': puede('ficha.ver') }"
                             >
-                                {{ c.socios }}
+                                {{ c.socio }}
                             </component>
                             <span class="text-xs text-muted-foreground">
                                 {{ c.hora ? `${c.hora} – ${c.fin}` : 'Sin hora' }} · {{ c.tipo }}
@@ -163,7 +191,7 @@ const accesos = computed(() =>
             <Card v-if="clinico">
                 <CardHeader>
                     <CardTitle>Seguimiento clínico</CardTitle>
-                    <CardDescription>Credenciales y socioss que conviene revisar.</CardDescription>
+                    <CardDescription>Credenciales y socios que conviene revisar.</CardDescription>
                 </CardHeader>
                 <CardContent class="flex flex-col gap-5">
                     <section class="flex flex-col gap-2">
@@ -177,10 +205,10 @@ const accesos = computed(() =>
                         >
                             <div class="flex min-w-0 flex-col">
                                 <Link
-                                    :href="`/socioss/${c.socios_id}/ficha`"
+                                    :href="`/socios/${c.socio_id}/ficha`"
                                     class="truncate font-medium underline-offset-4 hover:underline"
                                 >
-                                    {{ c.socios }}
+                                    {{ c.socio }}
                                 </Link>
                                 <span class="text-xs text-muted-foreground">
                                     {{ c.tipo }} · vence {{ formatDate(c.vencimiento) }}
@@ -203,14 +231,14 @@ const accesos = computed(() =>
                         </h3>
                         <Link
                             v-for="a in clinico.sin_control_lista"
-                            :key="a.socios_id"
-                            :href="`/socioss/${a.socios_id}/ficha`"
+                            :key="a.socio_id"
+                            :href="`/socios/${a.socio_id}/ficha`"
                             class="text-sm underline-offset-4 hover:underline"
                         >
-                            {{ a.socios }}
+                            {{ a.socio }}
                         </Link>
                         <p v-if="clinico.sin_control === 0" class="text-sm text-muted-foreground">
-                            Todos los socioss activos tienen seguimiento reciente.
+                            Todos los socios activos tienen seguimiento reciente.
                         </p>
                         <p v-else-if="clinico.sin_control > clinico.sin_control_lista.length" class="text-xs text-muted-foreground">
                             Y {{ clinico.sin_control - clinico.sin_control_lista.length }} más.
@@ -221,23 +249,37 @@ const accesos = computed(() =>
         </div>
 
         <!-- Comunidad -->
-        <section v-if="personas" class="flex flex-col gap-3">
-            <h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Comunidad</h2>
+        <section v-if="personas" class="animate-in-up stagger-3 flex flex-col gap-3">
+            <div class="flex items-center gap-2">
+                <Users class="size-4 text-muted-foreground" />
+                <h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Comunidad</h2>
+            </div>
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <StatCard label="Socios activos" :value="personas.socios" href="/personas" />
-                <StatCard label="Colaboradores activos" :value="personas.colaboradores" href="/personas" />
-                <StatCard label="Cuidadores activos" :value="personas.cuidadores" href="/personas" />
+                <StatCard label="Socios activos" :value="personas.socios" href="/personas?type=socio" :icon="Users" />
                 <StatCard
-                    label="Pacientes sin cuidador principal"
+                    v-if="puede('aportes.ver') && personas.colaboradores !== null"
+                    label="Colaboradores activos"
+                    :value="personas.colaboradores"
+                    href="/personas?type=colaborador"
+                    :icon="Heart"
+                    tone="success"
+                />
+                <StatCard label="Cuidadores activos" :value="personas.cuidadores" href="/personas?type=cuidador" :icon="ShieldAlert" tone="info" />
+                <StatCard
+                    label="Sin cuidador principal"
                     :value="personas.socios_sin_cuidador"
                     :tone="personas.socios_sin_cuidador > 0 ? 'warning' : 'default'"
+                    :icon="AlertCircle"
                 />
             </div>
         </section>
 
         <!-- Cuotas -->
-        <section v-if="cuotas" class="flex flex-col gap-3">
-            <h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Cuotas</h2>
+        <section v-if="cuotas" class="animate-in-up stagger-4 flex flex-col gap-3">
+            <div class="flex items-center gap-2">
+                <CreditCard class="size-4 text-muted-foreground" />
+                <h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Cuotas</h2>
+            </div>
             <div class="grid gap-4 sm:grid-cols-3">
                 <StatCard
                     :label="`Cobranza de ${cuotas.periodo_etiqueta}`"
@@ -248,6 +290,8 @@ const accesos = computed(() =>
                             : `${formatCLP(cuotas.cobrado)} de ${formatCLP(cuotas.emitido)}`
                     "
                     href="/cuotas"
+                    :icon="TrendingUp"
+                    tone="info"
                 />
                 <StatCard
                     label="Cuotas vencidas"
@@ -255,19 +299,24 @@ const accesos = computed(() =>
                     :hint="`${cuotas.morosos} ${cuotas.morosos === 1 ? 'socio' : 'socios'} con deuda vencida`"
                     :tone="cuotas.vencidas > 0 ? 'danger' : 'default'"
                     href="/cuotas?estado=Vencida"
+                    :icon="AlertCircle"
                 />
                 <StatCard
                     label="Monto adeudado vencido"
                     :value="formatCLP(cuotas.adeudado)"
                     :tone="cuotas.adeudado > 0 ? 'danger' : 'default'"
                     href="/cuotas?estado=Vencida"
+                    :icon="DollarSign"
                 />
             </div>
         </section>
 
         <!-- Caja -->
-        <section v-if="caja" class="flex flex-col gap-3">
-            <h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Caja</h2>
+        <section v-if="caja" class="animate-in-up stagger-5 flex flex-col gap-3">
+            <div class="flex items-center gap-2">
+                <Wallet class="size-4 text-muted-foreground" />
+                <h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Caja</h2>
+            </div>
 
             <Card v-if="!caja.configurada">
                 <CardHeader>
@@ -288,9 +337,10 @@ const accesos = computed(() =>
                         :value="formatCLP(caja.saldo)"
                         :tone="caja.saldo < 0 ? 'danger' : 'default'"
                         href="/caja"
+                        :icon="Wallet"
                     />
-                    <StatCard label="Ingresos del mes" :value="formatCLP(caja.ingresos_mes)" href="/caja/estado" />
-                    <StatCard label="Egresos del mes" :value="formatCLP(caja.egresos_mes)" href="/caja/estado" />
+                    <StatCard label="Ingresos del mes" :value="formatCLP(caja.ingresos_mes)" href="/caja/estado" :icon="TrendingUp" tone="success" />
+                    <StatCard label="Egresos del mes" :value="formatCLP(caja.egresos_mes)" href="/caja/estado" :icon="TrendingDown" tone="danger" />
                 </div>
 
                 <Card class="lg:col-span-3">
@@ -307,9 +357,12 @@ const accesos = computed(() =>
 
         <!-- Ingresos reservados -->
         <section v-if="reservados" class="flex flex-col gap-3">
-            <h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
-                Ingresos reservados
-            </h2>
+            <div class="flex items-center gap-2">
+                <ShieldAlert class="size-4 text-muted-foreground" />
+                <h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+                    Ingresos reservados
+                </h2>
+            </div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <StatCard
                     v-if="reservados.aportes"
@@ -317,6 +370,8 @@ const accesos = computed(() =>
                     :value="formatCLP(reservados.aportes.total)"
                     :hint="`${reservados.aportes.cantidad} ${reservados.aportes.cantidad === 1 ? 'aporte' : 'aportes'}`"
                     href="/aportes/informe"
+                    :icon="Heart"
+                    tone="success"
                 />
                 <StatCard
                     v-if="reservados.banco"
@@ -324,30 +379,39 @@ const accesos = computed(() =>
                     :value="formatCLP(reservados.banco.total)"
                     :hint="`${reservados.banco.cantidad} ${reservados.banco.cantidad === 1 ? 'abono' : 'abonos'}`"
                     href="/banco"
+                    :icon="TrendingUp"
+                    tone="info"
                 />
             </div>
         </section>
 
         <!-- Inventario -->
         <section v-if="inventario" class="flex flex-col gap-3">
-            <h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Inventario</h2>
+            <div class="flex items-center gap-2">
+                <Package class="size-4 text-muted-foreground" />
+                <h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Inventario</h2>
+            </div>
             <div class="grid gap-4 sm:grid-cols-3">
                 <StatCard
                     label="Préstamos pendientes"
                     :value="inventario.prestamos_pendientes"
                     href="/inventario/prestamos"
+                    :icon="Package"
+                    tone="info"
                 />
                 <StatCard
                     label="Préstamos vencidos"
                     :value="inventario.vencidos"
                     :tone="inventario.vencidos > 0 ? 'danger' : 'default'"
                     href="/inventario/prestamos?estado=Vencido"
+                    :icon="AlertCircle"
                 />
                 <StatCard
                     label="Bajo el stock mínimo"
                     :value="inventario.bajo_stock"
                     :tone="inventario.bajo_stock > 0 ? 'warning' : 'default'"
                     href="/inventario"
+                    :icon="TrendingDown"
                 />
             </div>
 

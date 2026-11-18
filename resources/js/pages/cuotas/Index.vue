@@ -2,6 +2,7 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Eye, History, List, Search, Settings, Wallet } from '@lucide/vue';
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
+import { cn } from '@/lib/utils';
 import Pagination from '@/components/Pagination.vue';
 import PagosDialog from '@/components/cuotas/PagosDialog.vue';
 import RegistrarPagoDialog from '@/components/cuotas/RegistrarPagoDialog.vue';
@@ -33,9 +34,9 @@ const props = defineProps({
 const ESTADOS = ['Pendiente', 'Parcial', 'Vencida', 'Pagada'];
 
 const VARIANTES = {
-    Pagada: 'secondary',
-    Pendiente: 'outline',
-    Parcial: 'default',
+    Pagada: 'success',
+    Pendiente: 'warning',
+    Parcial: 'info',
     Vencida: 'destructive',
 };
 
@@ -82,7 +83,7 @@ const selectClass =
 <template>
     <Head title="Cuotas" />
 
-    <div class="mx-auto flex max-w-7xl flex-col gap-6 p-4 md:p-6">
+    <div class="flex max-w-7xl flex-col gap-6 p-4 md:p-6">
         <!-- Encabezado -->
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -119,7 +120,7 @@ const selectClass =
             <CardContent class="flex flex-col gap-4">
                 <!-- Filtros -->
                 <div class="flex flex-col gap-3 md:flex-row">
-                    <div class="relative md:max-w-sm md:flex-1">
+                    <div class="relative w-full md:max-w-sm">
                         <Search
                             class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
                         />
@@ -131,28 +132,30 @@ const selectClass =
                         />
                     </div>
 
-                    <select v-model="filtros.estado" :class="selectClass">
-                        <option value="">Todos los estados</option>
-                        <option v-for="e in ESTADOS" :key="e" :value="e">{{ e }}</option>
-                    </select>
+                    <div class="flex flex-wrap gap-2 md:flex-nowrap">
+                        <select v-model="filtros.estado" :class="cn(selectClass, 'flex-1 md:w-40')">
+                            <option value="">Todos los estados</option>
+                            <option v-for="e in ESTADOS" :key="e" :value="e">{{ e }}</option>
+                        </select>
 
-                    <select v-model="filtros.periodo" :class="selectClass">
-                        <option value="">Todos los períodos</option>
-                        <option v-for="p in periodos" :key="p" :value="p">
-                            {{ formatPeriodo(p) }}
-                        </option>
-                    </select>
+                        <select v-model="filtros.periodo" :class="cn(selectClass, 'flex-1 md:w-40')">
+                            <option value="">Todos los períodos</option>
+                            <option v-for="p in periodos" :key="p" :value="p">
+                                {{ formatPeriodo(p) }}
+                            </option>
+                        </select>
 
-                    <select v-model="filtros.config" :class="selectClass">
-                        <option value="">Todas las cuotas</option>
-                        <option v-for="c in configuraciones" :key="c.id" :value="String(c.id)">
-                            {{ c.nombre }}
-                        </option>
-                    </select>
+                        <select v-model="filtros.config" :class="cn(selectClass, 'flex-1 md:w-44')">
+                            <option value="">Todas las cuotas</option>
+                            <option v-for="c in configuraciones" :key="c.id" :value="String(c.id)">
+                                {{ c.nombre }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Tabla -->
-                <div class="rounded-md border">
+                <div class="overflow-x-auto rounded-md border">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -171,20 +174,20 @@ const selectClass =
                             <TableRow v-for="c in cuotas.data" :key="c.id">
                                 <TableCell>
                                     <div class="flex flex-col">
-                                        <span class="font-medium">
+                                        <span class="font-medium whitespace-nowrap">
                                             {{ c.socio?.persona?.full_name }}
                                         </span>
-                                        <span class="font-mono text-xs text-muted-foreground">
+                                        <span class="font-mono text-xs text-muted-foreground whitespace-nowrap">
                                             {{ c.socio?.persona?.rut }}
                                         </span>
                                     </div>
                                 </TableCell>
-                                <TableCell>{{ c.configuracion?.nombre }}</TableCell>
-                                <TableCell>{{ formatPeriodo(c.periodo) }}</TableCell>
+                                <TableCell class="whitespace-nowrap">{{ c.configuracion?.nombre }}</TableCell>
+                                <TableCell class="whitespace-nowrap">{{ formatPeriodo(c.periodo) }}</TableCell>
                                 <TableCell class="text-right">{{ formatCLP(c.monto_cuota) }}</TableCell>
                                 <TableCell class="text-right">{{ formatCLP(c.pagado) }}</TableCell>
                                 <TableCell class="text-right font-medium">{{ formatCLP(c.saldo) }}</TableCell>
-                                <TableCell>{{ formatDate(c.fecha_vencimiento) }}</TableCell>
+                                <TableCell class="whitespace-nowrap">{{ formatDate(c.fecha_vencimiento) }}</TableCell>
                                 <TableCell>
                                     <Badge :variant="VARIANTES[c.estado_efectivo] ?? 'secondary'">
                                         {{ c.estado_efectivo }}
@@ -229,10 +232,12 @@ const selectClass =
                                         <Button
                                             v-if="c.saldo > 0"
                                             size="sm"
+                                            class="px-2 md:px-3"
                                             @click="pagoId = c.id"
                                         >
                                             <Wallet class="size-4" />
-                                            Registrar pago
+                                            <span class="hidden md:inline">Registrar pago</span>
+                                            <span class="md:hidden">Pagar</span>
                                         </Button>
                                         <Button
                                             variant="ghost"

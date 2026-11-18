@@ -28,7 +28,7 @@ const props = defineProps({
 
 const { puede } = usePermisos();
 
-const ESTADOS_PRESTAMO = { Vigente: 'default', Vencido: 'destructive', Devuelto: 'secondary' };
+const ESTADOS_PRESTAMO = { Vigente: 'info', Vencido: 'destructive', Devuelto: 'success' };
 
 const selectClass =
     'h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50';

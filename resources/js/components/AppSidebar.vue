@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { LayoutGrid, User, Wallet, HandCoins, Users, Stethoscope, UserCog, ShieldCheck, Landmark, CalendarDays, Banknote, Package } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
@@ -38,64 +39,70 @@ const todos = [
 
 ];
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Tablero',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Personas',
-        href: personas.index.url(),
-        icon: User,
-    },
-
-    {
-        title: 'Agenda',
-        href: '/agenda',
-        icon: CalendarDays
-    },
-
-    {
-        title: 'Caja',
-        href: '/caja',
-        icon: Landmark
-    },
-    {
-        title: 'Banco',
-        href: '/banco',
-        icon: Banknote
-    },
-    {
-        title: 'Cuotas',
-        href: '/cuotas',
-        icon: Wallet
-    },
-
-    {
-        title: 'Aportes',
-        href: '/aportes',
-        icon: HandCoins
-    },
-
-    {
-        title: 'Usuarios',
-        href: '/admin/usuarios',
-        icon: Users
-    },
-
-    {
-        title: 'Profesiones',
-        href: '/admin/profesiones',
-        icon: Stethoscope
-    },
-
-    {
-        title: 'Inventario',
-        href: '/inventario',
-        icon: Package
-    },
-];
+const mainNavItems = computed(() =>
+    [
+        {
+            title: 'Tablero',
+            href: dashboard(),
+            icon: LayoutGrid,
+            permiso: null,
+        },
+        {
+            title: 'Personas',
+            href: '/personas?type=socio',
+            icon: User,
+            permiso: 'personas.ver',
+        },
+        {
+            title: 'Agenda',
+            href: '/agenda',
+            icon: CalendarDays,
+            permiso: 'agenda.ver',
+        },
+        {
+            title: 'Caja',
+            href: '/caja',
+            icon: Landmark,
+            permiso: 'caja.ver',
+        },
+        {
+            title: 'Banco',
+            href: '/banco',
+            icon: Banknote,
+            permiso: 'banco.ver',
+        },
+        {
+            title: 'Cuotas',
+            href: '/cuotas',
+            icon: Wallet,
+            permiso: 'cuotas.ver',
+        },
+        {
+            title: 'Aportes',
+            href: '/aportes',
+            icon: HandCoins,
+            permiso: 'aportes.ver',
+        },
+        {
+            title: 'Usuarios',
+            href: '/admin/usuarios',
+            icon: Users,
+            permiso: 'usuarios.gestionar',
+        },
+        {
+            title: 'Profesiones',
+            href: '/admin/profesiones',
+            icon: Stethoscope,
+            permiso: 'profesiones.gestionar',
+        },
+        {
+            title: 'Inventario',
+            href: '/inventario',
+            icon: Package,
+            permiso: 'inventario.ver',
+        },
+    ].filter((item) => !item.permiso || puede(item.permiso)),
+);
 
 
 
@@ -118,7 +125,7 @@ const footerNavItems: NavItem[] = [
         <SidebarHeader>
             <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton size="lg" as-child>
+                    <SidebarMenuButton size="lg" as-child class="group-data-[collapsible=icon]:h-10!">
                         <Link :href="dashboard()">
                             <AppLogo />
                         </Link>

@@ -1,7 +1,8 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { Pencil } from '@lucide/vue';
+import { Pencil, Mars, Venus } from '@lucide/vue';
 import { computed } from 'vue';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -35,7 +36,7 @@ const datos = computed(() => [
         value:
             props.persona.edad != null ? `${props.persona.edad} años` : null,
     },
-    { label: 'Sexo', value: props.persona.sexo, capitalize: true },
+    { label: 'Sexo', value: props.persona.sexo, capitalize: true, isSexo: true },
     { label: 'Email', value: props.persona.email },
     { label: 'Direccion', value: props.persona.direccion, capitalize: true },
     { label: 'Comuna', value: props.persona.comuna },
@@ -77,7 +78,19 @@ const datos = computed(() => [
                             capitalize: dato.capitalize,
                         }"
                     >
-                        {{ dato.value || '—' }}
+                        <template v-if="dato.isSexo && dato.value">
+                            <Badge
+                                :variant="dato.value.toLowerCase() === 'masculino' ? 'info' : (dato.value.toLowerCase() === 'femenino' ? 'destructive' : 'secondary')"
+                                class="gap-1 capitalize"
+                            >
+                                <Mars v-if="dato.value.toLowerCase() === 'masculino'" class="size-3" />
+                                <Venus v-if="dato.value.toLowerCase() === 'femenino'" class="size-3" />
+                                {{ dato.value }}
+                            </Badge>
+                        </template>
+                        <template v-else>
+                            {{ dato.value || '—' }}
+                        </template>
                     </dd>
                 </div>
             </dl>

@@ -96,9 +96,7 @@ const rightNavItems: NavItem[] = [
                                 >Menu de Navegacion</SheetTitle
                             >
                             <SheetHeader class="flex justify-start text-left">
-                                <AppLogoIcon
-                                    class="size-6 fill-current text-black dark:text-white"
-                                />
+                                <AppLogoIcon class="size-8" />
                             </SheetHeader>
                             <div
                                 class="flex h-full flex-1 flex-col justify-between space-y-4 py-6"

@@ -15,7 +15,10 @@ class PersonaController extends Controller
     public function index(Request $request)
     {
         $search = trim((string) $request->query('search', ''));
-        $rutSearch = str_replace(['.', ' '], '', $search); // permite buscar "12.345.678-9"
+        $type = $request->query('type', 'all'); // all, socio, colaborador, cuidador
+        $rutSearch = str_replace(['.', ' '], '', $search);
+
+        $puedeVerAportes = $request->user()?->tienePermiso('aportes.ver');
 
         $personas = Persona::query()
             ->with([
@@ -23,6 +26,41 @@ class PersonaController extends Controller
                 'colaborador:id,persona_id,estado',
                 'cuidador:id,persona_id,estado',
             ])
+            ->when($type !== 'all', function ($query) use ($type, $puedeVerAportes) {
+                $query->where(function ($q) use ($type, $puedeVerAportes) {
+                    if ($type === 'socio') {
+                        $q->has('socio');
+                    } elseif ($type === 'colaborador') {
+                        if ($puedeVerAportes) {
+                            $q->has('colaborador');
+                        } else {
+                            // Si no tiene permiso, forzar una condición que no devuelva nada
+                            // o redirigir/abortar, pero aquí en la query simplemente no match nada
+                            $q->whereRaw('1 = 0');
+                        }
+                    } elseif ($type === 'cuidador') {
+                        $q->has('cuidador');
+                    }
+                });
+            })
+            ->when($type === 'all' && ! $puedeVerAportes, function ($query) {
+                // Si no puede ver aportes y pide "todos", exclude a los que SON colaboradores
+                // No deben ser visibles si tienen el rol de colaborador, incluso si tienen otros roles?
+                // El requerimiento dice: "solo deberia mostrar socios y cuidadores"
+                // Pero luego dijo que falten los que no tienen rol.
+                // La interpretación segura: Si no tienes permiso de aportes, NO VES el rol de colaborador.
+                // Si la persona es Socio Y Colaborador, el clínico la ve como Socio.
+                // Si la persona es SOLO Colaborador, el clínico NO la ve.
+                $query->where(function ($q) {
+                    $q->has('socio')
+                        ->orHas('cuidador')
+                        ->orWhere(function ($q2) {
+                            $q2->doesntHave('socio')
+                                ->doesntHave('cuidador')
+                                ->doesntHave('colaborador');
+                        });
+                });
+            })
             ->when($search !== '', function ($query) use ($search, $rutSearch) {
                 $query->where(function ($q) use ($search, $rutSearch) {
                     $q->where('rut', 'like', "%{$rutSearch}%")
@@ -38,7 +76,10 @@ class PersonaController extends Controller
 
         return Inertia::render('personas/Index', [
             'personas' => $personas,
-            'filters' => ['search' => $search],
+            'filters' => [
+                'search' => $search,
+                'type' => $type,
+            ],
         ]);
     }
 

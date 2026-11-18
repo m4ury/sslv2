@@ -9,7 +9,9 @@ import {
     Pencil,
     Trash2,
     UserRound,
-    RotateCcw
+    RotateCcw,
+    Mars,
+    Venus,
 } from '@lucide/vue';
 import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
@@ -58,7 +60,7 @@ const datos = computed(() => [
         value:
             props.persona.edad != null ? `${props.persona.edad} años` : '—',
     },
-    { label: 'Sexo', value: props.persona.sexo, capitalize: true },
+    { label: 'Sexo', value: props.persona.sexo, capitalize: true, isSexo: true },
     { label: 'Email', value: props.persona.email },
 ]);
 
@@ -208,7 +210,19 @@ function formatDate(value) {
                                     capitalize: dato.capitalize,
                                 }"
                             >
-                                {{ dato.value || '—' }}
+                                <template v-if="dato.isSexo && dato.value">
+                                    <Badge
+                                        :variant="dato.value.toLowerCase() === 'masculino' ? 'info' : (dato.value.toLowerCase() === 'femenino' ? 'destructive' : 'secondary')"
+                                        class="gap-1 capitalize"
+                                    >
+                                        <Mars v-if="dato.value.toLowerCase() === 'masculino'" class="size-3" />
+                                        <Venus v-if="dato.value.toLowerCase() === 'femenino'" class="size-3" />
+                                        {{ dato.value }}
+                                    </Badge>
+                                </template>
+                                <template v-else>
+                                    {{ dato.value || '—' }}
+                                </template>
                             </dd>
                         </div>
                     </dl>

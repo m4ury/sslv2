@@ -36,17 +36,17 @@ return [
         ],
 
         'Inventario' => [
-        'inventario.ver' => 'Ver el inventario y los préstamos',
-        'inventario.registrar' => 'Registrar entradas, bajas, préstamos y devoluciones',
-        'inventario.articulos' => 'Crear y editar artículos del inventario',
+            'inventario.ver' => 'Ver el inventario y los préstamos',
+            'inventario.registrar' => 'Registrar entradas, bajas, préstamos y devoluciones',
+            'inventario.articulos' => 'Crear y editar artículos del inventario',
         ],
     ],
 
     // Atajos para marcar varios permisos a la vez en el mantenedor de profesiones
     'plantillas' => [
-        'Clínico' => ['personas.ver', 'ficha.ver', 'ficha.registrar', 'patologias.catalogo'],
+        'Clínico' => ['personas.ver', 'ficha.ver', 'ficha.registrar', 'patologias.catalogo', 'agenda.ver'],
 
-        'Tesorería' => ['personas.ver', 'cuotas.ver', 'cuotas.pagar', 'cuotas.configurar','caja.ver', 'caja.registrar', 'caja.cerrar',],
+        'Tesorería' => ['personas.ver', 'cuotas.ver', 'cuotas.pagar', 'cuotas.configurar', 'caja.ver', 'caja.registrar', 'caja.cerrar'],
 
         'Encargado de aportes' => ['personas.ver', 'aportes.ver', 'aportes.registrar', 'aportes.informe'],
 
