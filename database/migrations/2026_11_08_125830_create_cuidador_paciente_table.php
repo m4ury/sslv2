@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cuidador_socio', function (Blueprint $table) {
+        Schema::create('cuidador_paciente', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('socio_id')->constrained();
+            $table->foreignId('paciente_id')->constrained('pacientes');
             $table->foreignId('cuidador_id')->constrained('cuidadores');
             $table->string('vinculo')->nullable(); // Hija, vecino, cuidador contratado...
             $table->boolean('es_principal')->default(false);
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cuidador_socio');
+        Schema::dropIfExists('cuidador_paciente');
     }
 };

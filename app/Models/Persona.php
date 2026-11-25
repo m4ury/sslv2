@@ -40,6 +40,11 @@ class Persona extends Model
         return null;
     }
 
+    public function paciente()
+    {
+        return $this->hasOne(Paciente::class);
+    }
+
     public function socio()
     {
         return $this->hasOne(Socio::class);

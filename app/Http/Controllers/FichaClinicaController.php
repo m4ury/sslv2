@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Control;
 use App\Models\Cuidador;
 use App\Models\Documento;
+use App\Models\Paciente;
 use App\Models\Patologia;
 use App\Models\Prestacion;
 use App\Models\Programado;
-use App\Models\Socio;
 use App\Models\Tipo_documento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,17 +19,18 @@ use Inertia\Inertia;
 
 class FichaClinicaController extends Controller
 {
-    public function show(Socio $socio)
+    public function show(Paciente $paciente)
     {
-        return Inertia::render('socios/Ficha', [
-            'socio' => $socio->only('id', 'estado', 'fecha_ingreso'),
-            'persona' => $socio->persona,
-            'patologias' => $socio->patologias()
+        return Inertia::render('pacientes/Ficha', [
+            'paciente' => $paciente->only('id', 'estado', 'fecha_ingreso'),
+            'persona' => $paciente->persona,
+            'socio' => $paciente->persona->socio,
+            'patologias' => $paciente->patologias()
                 ->with('patologia:id,nombre')
                 ->orderByDesc('fecha_diagnostico')
                 ->get(),
             'catalogoPatologias' => Patologia::orderBy('nombre')->get(['id', 'nombre']),
-            'controles' => $socio->controles()
+            'controles' => $paciente->controles()
                 ->with(['mediciones', 'user:id,name'])
                 ->orderByDesc('created_at')->orderByDesc('id')
                 ->get()
@@ -42,7 +43,7 @@ class FichaClinicaController extends Controller
                     'mediciones' => $control->mediciones,
                     'autor' => $control->user,
                 ]),
-            'prestaciones' => $socio->prestaciones()
+            'prestaciones' => $paciente->prestaciones()
                 ->orderByDesc('created_at')
                 ->get()
                 ->map(fn (Prestacion $prestacion) => [
@@ -52,7 +53,7 @@ class FichaClinicaController extends Controller
                     'control_id' => $prestacion->control_id,
                     'detalle' => $prestacion->descripcion,
                 ]),
-            'programados' => $socio->programados()
+            'programados' => $paciente->programados()
                 ->orderBy('fecha_programada')
                 ->orderBy('hora')
                 ->get()
@@ -64,8 +65,8 @@ class FichaClinicaController extends Controller
                     'estado' => $programado->estado,
                     'observaciones' => $programado->observacion,
                 ]),
-            'credenciales' => $socio->credenciales()->orderBy('fecha_expiracion')->get(),
-            'documentos' => $socio->documentos()
+            'credenciales' => $paciente->credenciales()->orderBy('fecha_expiracion')->get(),
+            'documentos' => $paciente->documentos()
                 ->with('tipoDocumento:id,nombre')
                 ->latest()
                 ->get()
@@ -77,13 +78,13 @@ class FichaClinicaController extends Controller
                     'tamano' => $documento->tamanio_bytes,
                 ]),
             'catalogos' => config('ficha'),
-            'cuidadores' => $socio->cuidadores()
+            'cuidadores' => $paciente->cuidadores()
                 ->with('cuidador.persona')
                 ->orderByDesc('es_principal')
                 ->orderByDesc('fecha_inicio')
                 ->get(),
             'catalogoCuidadores' => Cuidador::with('persona')
-                ->where('persona_id', '!=', $socio->persona_id) // nadie es cuidador de sí mismo
+                ->where('persona_id', '!=', $paciente->persona_id) // nadie es cuidador de sí mismo
                 ->get()
                 ->map(fn ($c) => [
                     'id' => $c->id,
@@ -96,24 +97,24 @@ class FichaClinicaController extends Controller
         ]);
     }
 
-    public function store(Request $request, Socio $socio, string $seccion)
+    public function store(Request $request, Paciente $paciente, string $seccion)
     {
         Gate::authorize($this->permisoDe($seccion));
 
-        $data = $request->validate($this->reglas($seccion, $socio, $request, false));
+        $data = $request->validate($this->reglas($seccion, $paciente, $request, false));
 
-        DB::transaction(function () use ($request, $socio, $seccion, $data) {
+        DB::transaction(function () use ($request, $paciente, $seccion, $data) {
             match ($seccion) {
-                'controles' => $this->guardarControl($socio, $data, $request->user()->id),
-                'documentos' => $this->guardarDocumento($request, $socio, $data),
-                'programados' => $socio->programados()->create([
+                'controles' => $this->guardarControl($paciente, $data, $request->user()->id),
+                'documentos' => $this->guardarDocumento($request, $paciente, $data),
+                'programados' => $paciente->programados()->create([
                     'fecha_programada' => $data['fecha_programada'],
                     'hora' => $data['hora'],
                     'tipo_control' => $data['tipo'],
                     'estado' => 'Pendiente',
-                    'observacion' => $data['observaciones'] ?? null,
+                    'observacion' => $data['observacion'] ?? null,
                 ]),
-                'prestaciones' => $socio->controles()
+                'prestaciones' => $paciente->controles()
                     ->findOrFail($data['control_id'])
                     ->prestaciones()
                     ->create([
@@ -121,23 +122,23 @@ class FichaClinicaController extends Controller
                         'nombre_prestacion' => $data['nombre'],
                         'descripcion' => $data['detalle'] ?? null,
                     ]),
-                default => $socio->{$seccion}()->create($data),
+                default => $paciente->{$seccion}()->create($data),
             };
         });
 
         return back()->with('success', 'Registro guardado correctamente.');
     }
 
-    public function update(Request $request, Socio $socio, string $seccion, int $id)
+    public function update(Request $request, Paciente $paciente, string $seccion, int $id)
     {
         Gate::authorize($this->permisoDe($seccion));
-        // Se busca a través de la relación: solo registros de este socio
-        $registro = $socio->{$seccion}()->findOrFail($id);
-        $data = $request->validate($this->reglas($seccion, $socio, $request, true));
+        // Se busca a través de la relación: solo registros de este $paciente
+        $registro = $paciente->{$seccion}()->findOrFail($id);
+        $data = $request->validate($this->reglas($seccion, $paciente, $request, true));
 
-        DB::transaction(function () use ($request, $socio, $seccion, $registro, $data) {
+        DB::transaction(function () use ($request, $paciente, $seccion, $registro, $data) {
             if ($seccion === 'controles') {
-                $this->guardarControl($socio, $data, $request->user()->id, $registro);
+                $this->guardarControl($paciente, $data, $request->user()->id, $registro);
             } elseif ($seccion === 'programados') {
                 $registro->update([
                     'fecha_programada' => $data['fecha_programada'],
@@ -171,25 +172,25 @@ class FichaClinicaController extends Controller
         return back()->with('success', 'Registro actualizado correctamente.');
     }
 
-    public function destroy(Socio $socio, string $seccion, int $id)
+    public function destroy(Paciente $paciente, string $seccion, int $id)
     {
         Gate::authorize($this->permisoDe($seccion));
 
         // Soft delete: el registro deja de mostrarse pero se conserva en la base
-        $socio->{$seccion}()->findOrFail($id)->delete();
+        $paciente->{$seccion}()->findOrFail($id)->delete();
 
         return back()->with('success', 'Registro eliminado.');
     }
 
-    public function descargar(Socio $socio, int $documento)
+    public function descargar(Paciente $paciente, int $documento)
     {
-        $doc = $socio->documentos()->findOrFail($documento);
+        $doc = $paciente->documentos()->findOrFail($documento);
 
         // Disco privado: el archivo no es accesible por URL directa
         return Storage::disk('local')->download($doc->archivo_ruta, $doc->archivo_original);
     }
 
-    private function guardarControl(Socio $socio, array $data, int $userId, ?Control $control = null): void
+    private function guardarControl(Paciente $paciente, array $data, int $userId, ?Control $control = null): void
     {
         $atributos = [
             'fecha_control' => $data['fecha'],
@@ -201,7 +202,7 @@ class FichaClinicaController extends Controller
         if ($control) {
             $control->update($atributos);
         } else {
-            $control = $socio->controles()->create([...$atributos, 'user_id' => $userId]);
+            $control = $paciente->controles()->create([...$atributos, 'user_id' => $userId]);
         }
 
         $control->mediciones()->delete();
@@ -219,26 +220,26 @@ class FichaClinicaController extends Controller
         }
     }
 
-    private function guardarDocumento(Request $request, Socio $socio, array $data): void
+    private function guardarDocumento(Request $request, Paciente $paciente, array $data): void
     {
         $archivo = $request->file('archivo');
         $tipoDocumento = Tipo_documento::query()->firstOrCreate([
             'nombre' => $data['tipo'],
         ]);
 
-        $socio->documentos()->create([
+        $paciente->documentos()->create([
             'user_id' => $request->user()->id,
             'nombre' => $data['nombre'],
             'tipo_documento_id' => $tipoDocumento->id,
             'fecha_documento' => $data['fecha_documento'] ?? null,
-            'archivo_ruta' => $archivo->store("fichas/{$socio->id}", 'local'),
+            'archivo_ruta' => $archivo->store("fichas/{$paciente->id}", 'local'),
             'archivo_original' => $archivo->getClientOriginalName(),
             'mime_type' => $archivo->getMimeType(),
             'tamanio_bytes' => $archivo->getSize(),
         ]);
     }
 
-    private function reglas(string $seccion, Socio $socio, Request $request, bool $editando): array
+    private function reglas(string $seccion, Paciente $paciente, Request $request, bool $editando): array
     {
         $c = config('ficha');
         $vigente = in_array($request->input('estado'), ['Activa', 'Controlada'], true);
@@ -253,10 +254,10 @@ class FichaClinicaController extends Controller
                 'patologia_id' => [
                     'required',
                     Rule::exists('patologias', 'id'),
-                    // Evita dos registros vigentes de la misma patología en el mismo socio
+                    // Evita dos registros vigentes de la misma patología en el mismo paciente
                     ...($vigente ? [
-                        Rule::unique('patologia_socio', 'patologia_id')
-                            ->where('socio_id', $socio->id)
+                        Rule::unique('paciente_patologia', 'patologia_id')
+                            ->where('paciente_id', $paciente->id)
                             ->whereNull('deleted_at')
                             ->whereIn('estado', ['Activa', 'Controlada'])
                             ->ignore($request->route('id')),
@@ -282,8 +283,8 @@ class FichaClinicaController extends Controller
                 'nombre' => ['required', 'string', 'max:255'],
                 'control_id' => [
                     'required',
-                    Rule::exists('controls', 'id')
-                        ->where('socio_id', $socio->id)
+                    Rule::exists('controles', 'id')
+                        ->where('paciente_id', $paciente->id)
                         ->whereNull('deleted_at'),
                 ],
                 'detalle' => ['nullable', 'string'],
@@ -326,15 +327,15 @@ class FichaClinicaController extends Controller
                 'cuidador_id' => [
                     'required',
                     $existeCuidador,
-                    function ($attribute, $value, $fail) use ($socio) {
-                        if (Cuidador::whereKey($value)->where('persona_id', $socio->persona_id)->exists()) {
+                    function ($attribute, $value, $fail) use ($paciente) {
+                        if (Cuidador::whereKey($value)->where('persona_id', $paciente->persona_id)->exists()) {
                             $fail('Una persona no puede ser cuidadora de sí misma.');
                         }
                     },
-                    // Evita dos asignaciones vigentes del mismo cuidador al mismo socio
+                    // Evita dos asignaciones vigentes del mismo cuidador al mismo paciente
                     ...($request->filled('fecha_fin') ? [] : [
-                        Rule::unique('cuidador_socio', 'cuidador_id')
-                            ->where('socio_id', $socio->id)
+                        Rule::unique('cuidador_paciente', 'cuidador_id')
+                            ->where('paciente_id', $paciente->id)
                             ->whereNull('deleted_at')
                             ->whereNull('fecha_fin')
                             ->ignore($request->route('id')),

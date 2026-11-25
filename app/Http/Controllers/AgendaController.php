@@ -30,7 +30,7 @@ class AgendaController extends Controller
             $hasta = $desde->copy()->addDays(62);
         }
 
-        $items = Programado::with('socio.persona')
+        $items = Programado::with('paciente.persona')
             ->whereBetween('fecha_programada', [$desde->toDateString(), $hasta->toDateString()])
             ->when(
                 $request->filled('estado'),
@@ -39,21 +39,21 @@ class AgendaController extends Controller
             )
             ->when($request->filled('tipo'), fn ($q) => $q->where('tipo_control', $request->query('tipo')))
             ->orderBy('fecha_programada')
-            ->orderBy('socio_id')
+            ->orderBy('paciente_id')
             ->get();
 
         // Formato de evento de FullCalendar. Sin observaciones: son notas clínicas.
         $eventos = $items->map(function (Programado $p) {
             $dia = $p->fecha_programada->toDateString();
-            $persona = $p->socio?->persona;
+            $persona = $p->paciente?->persona;
 
             $evento = [
                 'id' => $p->id,
-                'title' => $persona?->full_name ?? 'Socio',
+                'title' => $persona?->full_name ?? 'Paciente',
                 'allDay' => $p->hora === null,
                 'start' => $p->hora ? "{$dia}T{$p->hora}:00" : $dia,
                 'extendedProps' => [
-                    'socio_id' => $p->socio_id,
+                    'paciente_id' => $p->paciente_id,
                     'rut' => $persona?->rut,
                     'tipo' => $p->tipo_control,
                     'estado' => $p->estado,

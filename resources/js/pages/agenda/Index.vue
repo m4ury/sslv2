@@ -175,7 +175,7 @@ watch(
             <div>
                 <h1 class="text-2xl font-bold">Agenda de controles</h1>
                 <p class="text-sm text-muted-foreground">
-                    Controles programados de los adultos, por fecha y hora. Pasa
+                    Controles programados de los pacientes, por fecha y hora. Pasa
                     el cursor sobre un bloque para ver de quién es.
                 </p>
             </div>
@@ -359,8 +359,8 @@ watch(
                         >Cerrar</Button
                     >
                     <Button v-if="seleccionado && puede('ficha.ver')" as-child>
-                        <Link :href="`/adultos/${seleccionado.adulto_id}/ficha`"
-                            >Abrir ficha del adulto</Link
+                        <Link :href="`/pacientes/${seleccionado.paciente_id}/ficha`"
+                            >Abrir ficha del paciente</Link
                         >
                     </Button>
                 </DialogFooter>

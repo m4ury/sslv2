@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -26,12 +25,24 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'rut', 'apellido_paterno', 'apellido_materno'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'rut',
+        'apellido_paterno',
+        'apellido_materno',
+        'profesion_id',
+        'activo',
+    ];
+
+    protected $appends = ['full_name'];
 
     /**
      * Get the attributes that should be cast.
@@ -45,8 +56,6 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-    protected $fillable = ['profesion_id'];
 
     public function profesion()
     {

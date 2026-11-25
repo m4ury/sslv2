@@ -82,7 +82,7 @@ const user = computed(() => page.props.auth.user);
             </div>
 
             <div class="grid gap-2">
-                <Label for="apellido_materno">apellido_materno</Label>
+                <Label for="apellido_materno">Apellido materno</Label>
                 <Input
                     id="apellido_materno"
                     class="mt-1 block w-full"

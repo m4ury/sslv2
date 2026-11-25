@@ -26,5 +26,5 @@ return [
     'estados_patologia' => ['Activa', 'Controlada', 'Resuelta'],
     'estados_programado' => ['Pendiente', 'Realizado', 'Cancelado', 'No asistió'],
     'tipo_discapacidad' => ['fisica', 'sensorial', 'intelectual', 'otra'],
-    'tipos_documento' => ['Examen', 'Epicrisis', 'Receta', 'Informe', 'Consentimiento', 'Otro'],
+    'tipos_documento' => ['Examen', 'Epicrisis', 'Receta', 'Informe', 'Consentimiento', 'Otro', 'Compromiso'],
 ];

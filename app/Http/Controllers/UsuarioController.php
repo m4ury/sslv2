@@ -23,6 +23,7 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
+            'rut' => ['required', 'string', 'max:255', 'unique:users', 'cl_rut'],
             'name' => ['required', 'string', 'max:255'],
             'apellido_paterno' => ['required', 'string', 'max:255'],
             'apellido_materno' => ['nullable', 'string', 'max:255'],
@@ -42,8 +43,9 @@ class UsuarioController extends Controller
     public function update(Request $request, User $usuario)
     {
         $data = $request->validate([
+            'rut' => ['required', 'string', 'max:255', 'cl_rut', Rule::unique('users', 'rut')->ignore($usuario)],
             'name' => ['required', 'string', 'max:255'],
-            'apellido_paterno' => ['nullable', 'string', 'max:255'],
+            'apellido_paterno' => ['required', 'string', 'max:255'],
             'apellido_materno' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($usuario)],
             'profesion_id' => ['required', Rule::exists('profesiones', 'id')],
@@ -65,7 +67,15 @@ class UsuarioController extends Controller
             return back()->with('error', 'Debe quedar al menos un administrador activo.');
         }
 
-        $usuario->fill(Arr::only($data, ['name', 'email', 'profesion_id', 'activo']));
+        $usuario->fill(Arr::only($data, [
+            'name',
+            'apellido_paterno',
+            'apellido_materno',
+            'rut',
+            'email',
+            'profesion_id',
+            'activo',
+        ]));
 
         if (! empty($data['password_nueva'])) {
             $usuario->password = $data['password_nueva'];

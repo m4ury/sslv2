@@ -15,8 +15,10 @@ class Control extends Model
     /** @use HasFactory<ControlFactory> */
     use HasFactory, softDeletes;
 
+    protected $table = 'controles';
+
     protected $fillable = [
-        'socio_id',
+        'paciente_id',
         'programado_id',
         'user_id',
         'fecha_control',
@@ -34,7 +36,7 @@ class Control extends Model
         ];
     }
 
-    public function socio(): BelongsTo
+    public function paciente(): BelongsTo
     {
         return $this->belongsTo(Socio::class);
     }

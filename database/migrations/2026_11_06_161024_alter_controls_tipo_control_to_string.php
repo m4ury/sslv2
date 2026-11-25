@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('controls', function (Blueprint $table) {
+        Schema::table('controles', function (Blueprint $table) {
             $table->string('tipo_control')->nullable()->change();
         });
     }
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        $hasUnsupportedTypes = DB::table('controls')
+        $hasUnsupportedTypes = DB::table('controles')
             ->whereNotNull('tipo_control')
             ->whereNotIn('tipo_control', ['ingreso', 'control', 'egreso'])
             ->exists();
@@ -31,7 +31,7 @@ return new class extends Migration
             throw new RuntimeException('Cannot restore the controls enum while ficha control types are stored.');
         }
 
-        Schema::table('controls', function (Blueprint $table) {
+        Schema::table('controles', function (Blueprint $table) {
             $table->enum('tipo_control', ['ingreso', 'control', 'egreso'])->nullable()->change();
         });
     }

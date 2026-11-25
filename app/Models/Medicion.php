@@ -12,6 +12,8 @@ class Medicion extends Model
     /** @use HasFactory<MedicionFactory> */
     use HasFactory;
 
+    protected $table = 'mediciones';
+
     protected $fillable = [
         'control_id',
         /* 'presion_sistolica',

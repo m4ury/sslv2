@@ -12,8 +12,11 @@ class Documento extends Model
     /** @use HasFactory<DocumentoFactory> */
     use HasFactory;
 
+    protected $table = 'documentos';
+
     protected $fillable = [
-        'socio_id',
+        'paciente_id',
+        'colaborador_id',
         'user_id',
         'tipo_documento_id',
         'nombre',
@@ -36,5 +39,15 @@ class Documento extends Model
     protected function casts(): array
     {
         return ['fecha_documento' => 'date:Y-m-d'];
+    }
+
+    public function paciente(): BelongsTo
+    {
+        return $this->belongsTo(Paciente::class, 'paciente_id');
+    }
+
+    public function colaborador(): BelongsTo
+    {
+        return $this->belongsTo(Colaborador::class, 'colaborador_id');
     }
 }

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('credencials', function (Blueprint $table) {
+        Schema::create('credenciales', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('socio_id')->constrained('socios')->onDelete('cascade');
+            $table->foreignId('paciente_id')->constrained('pacientes')->onDelete('cascade');
             $table->string('numero', 255)->unique();
             $table->date('fecha_emision')->nullable();
             $table->date('fecha_expiracion')->nullable();
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('credencials');
+        Schema::dropIfExists('credenciales');
     }
 };

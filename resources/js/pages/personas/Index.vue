@@ -84,6 +84,8 @@ const roleDefinitions = [
     { key: 'socio', label: 'Socio', icon: Handshake },
     { key: 'colaborador', label: 'Colaborador', icon: HandHeart },
     { key: 'cuidador', label: 'Cuidador', icon: HeartHandshake },
+    { key: 'paciente', label: 'Paciente', icon: UserRound },
+
 ];
 
 async function deletePersona(persona) {
@@ -186,6 +188,7 @@ function formatDate(value) {
                         <SelectContent>
                             <SelectItem v-if="puede('aportes.ver')" value="all">Todos</SelectItem>
                             <SelectItem value="socio">Socios</SelectItem>
+                            <SelectItem value="paciente">Pacientes</SelectItem>
                             <SelectItem v-if="puede('aportes.ver')" value="colaborador">
                                 Colaboradores
                             </SelectItem>

@@ -22,8 +22,9 @@ const props = defineProps({
         :update-url="update.url(socio.id)"
         :baja-url="baja.url(socio.id)"
         :reactivar-url="reactivar.url(socio.id)"
-    />
-    <div class="mx-auto w-full max-w-3xl px-4 pb-6 md:px-6">
-        <CuotasSocio :cuotas="cuotas" :medios="medios" />
-    </div>
+    >
+        <template #inferior>
+            <CuotasSocio :cuotas="cuotas" :medios="medios" />
+        </template>
+    </RolForm>
 </template>

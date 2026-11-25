@@ -162,11 +162,11 @@ const accesos = computed(() =>
                         <div class="flex min-w-0 flex-col">
                             <component
                                 :is="puede('ficha.ver') ? Link : 'span'"
-                                :href="puede('ficha.ver') ? `/socios/${c.socio_id}/ficha` : undefined"
+                                :href="puede('ficha.ver') ? `/pacientes/${c.paciente_id}/ficha` : undefined"
                                 class="truncate font-medium"
                                 :class="{ 'underline-offset-4 hover:underline': puede('ficha.ver') }"
                             >
-                                {{ c.socio }}
+                                {{ c.paciente }}
                             </component>
                             <span class="text-xs text-muted-foreground">
                                 {{ c.hora ? `${c.hora} – ${c.fin}` : 'Sin hora' }} · {{ c.tipo }}
@@ -205,10 +205,10 @@ const accesos = computed(() =>
                         >
                             <div class="flex min-w-0 flex-col">
                                 <Link
-                                    :href="`/socios/${c.socio_id}/ficha`"
+                                    :href="`/pacientes/${c.paciente_id}/ficha`"
                                     class="truncate font-medium underline-offset-4 hover:underline"
                                 >
-                                    {{ c.socio }}
+                                    {{ c.paciente }}
                                 </Link>
                                 <span class="text-xs text-muted-foreground">
                                     {{ c.tipo }} · vence {{ formatDate(c.vencimiento) }}
@@ -231,14 +231,14 @@ const accesos = computed(() =>
                         </h3>
                         <Link
                             v-for="a in clinico.sin_control_lista"
-                            :key="a.socio_id"
-                            :href="`/socios/${a.socio_id}/ficha`"
+                            :key="a.paciente_id"
+                            :href="`/pacientes/${a.paciente_id}/ficha`"
                             class="text-sm underline-offset-4 hover:underline"
                         >
-                            {{ a.socio }}
+                            {{ a.paciente }}
                         </Link>
                         <p v-if="clinico.sin_control === 0" class="text-sm text-muted-foreground">
-                            Todos los socios activos tienen seguimiento reciente.
+                            Todos los pacientes activos tienen seguimiento reciente.
                         </p>
                         <p v-else-if="clinico.sin_control > clinico.sin_control_lista.length" class="text-xs text-muted-foreground">
                             Y {{ clinico.sin_control - clinico.sin_control_lista.length }} más.
@@ -255,7 +255,7 @@ const accesos = computed(() =>
                 <h2 class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Comunidad</h2>
             </div>
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <StatCard label="Socios activos" :value="personas.socios" href="/personas?type=socio" :icon="Users" />
+                <StatCard label="Pacientes activos" :value="personas.pacientes" href="/personas?type=paciente" :icon="Users" />
                 <StatCard
                     v-if="puede('aportes.ver') && personas.colaboradores !== null"
                     label="Colaboradores activos"
@@ -267,8 +267,8 @@ const accesos = computed(() =>
                 <StatCard label="Cuidadores activos" :value="personas.cuidadores" href="/personas?type=cuidador" :icon="ShieldAlert" tone="info" />
                 <StatCard
                     label="Sin cuidador principal"
-                    :value="personas.socios_sin_cuidador"
-                    :tone="personas.socios_sin_cuidador > 0 ? 'warning' : 'default'"
+                    :value="personas.pacientes_sin_cuidador"
+                    :tone="personas.pacientes_sin_cuidador > 0 ? 'warning' : 'default'"
                     :icon="AlertCircle"
                 />
             </div>

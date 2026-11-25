@@ -7,28 +7,29 @@ use App\Http\Controllers\ColaboradorController;
 use App\Http\Controllers\ConfigCuotaController;
 use App\Http\Controllers\CuidadorController;
 use App\Http\Controllers\CuotaController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EgresoController;
 use App\Http\Controllers\FichaClinicaController;
 use App\Http\Controllers\InformeIngresosController;
 use App\Http\Controllers\IngresoBancarioController;
 use App\Http\Controllers\IngresoVarioController;
+use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\MovimientoInventarioController;
+use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\PatologiaController;
 use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\PrestamoInventarioController;
 use App\Http\Controllers\ProfesionController;
 use App\Http\Controllers\SocioController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\InventarioController;
-use App\Http\Controllers\MovimientoInventarioController;
-use App\Http\Controllers\PrestamoInventarioController;
-use App\Http\Controllers\DashboardController;
 
 Route::get('dashboard', DashboardController::class)->name('dashboard');
 
 Route::inertia('/', 'Welcome')->name('home');
 
-//Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+// Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // ---------- Personas ----------
@@ -42,6 +43,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('can:roles.gestionar')->group(function () {
         // Mueve aquí tus Route::resource actuales de estos roles, con sus opciones
         // (y las rutas de baja/reactivar, si las implementaste).
+        Route::resource('pacientes', PacienteController::class)
+            ->only(['create', 'store', 'edit', 'update']);
         Route::resource('socios', SocioController::class)->except(['index']);
         Route::patch('socios/{socio}/baja', [SocioController::class, 'baja'])->name('socios.baja');
         Route::patch('socios/{socio}/reactivar', [SocioController::class, 'reactivar'])->name('socios.reactivar');
@@ -53,7 +56,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // ---------- Ficha clínica ----------
-    Route::prefix('socios/{socio}/ficha')
+    Route::prefix('pacientes/{paciente}/ficha')
         ->name('ficha.')
         ->where([
             'seccion' => 'patologias|controles|prestaciones|programados|credenciales|documentos|cuidadores',

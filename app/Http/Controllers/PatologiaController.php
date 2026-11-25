@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePatologiaRequest;
-use App\Http\Requests\UpdatePatologiaRequest;
-use App\Models\Socio;
+use App\Models\Paciente;
 use App\Models\Patologia;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -14,13 +12,13 @@ class PatologiaController extends Controller
 {
     public function index(Request $request)
     {
-        $socio = Socio::with('persona')->find($request->integer('socio'));
+        $paciente = Paciente::with('persona')->find($request->integer('paciente'));
 
         return Inertia::render('catalogos/Patologias', [
             'patologias' => Patologia::withCount('registros')->orderBy('nombre')->get(),
-            'volver' => $socio ? [
-                'url' => "/socios/{$socio->id}/ficha",
-                'nombre' => $socio->persona?->full_name,
+            'volver' => $paciente ? [
+                'url' => "/pacientes/{$paciente->id}/ficha",
+                'nombre' => $paciente->persona?->full_name,
             ] : null,
         ]);
     }

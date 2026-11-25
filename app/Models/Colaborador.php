@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\ColaboradorFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Colaborador extends Model
 {
@@ -28,6 +29,11 @@ class Colaborador extends Model
     public function aportes()
     {
         return $this->hasMany(Aporte::class);
+    }
+
+    public function documentos(): HasMany
+    {
+        return $this->hasMany(Documento::class);
     }
 
     public const ESTADO_INICIAL = 'Activo';

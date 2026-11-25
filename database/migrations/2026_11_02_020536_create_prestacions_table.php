@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('prestacions', function (Blueprint $table) {
+        Schema::create('prestaciones', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('control_id')->constrained('controls')->onDelete('cascade');
+            $table->foreignId('control_id')->constrained('controles')->onDelete('cascade');
             $table->string('nombre_prestacion', 100)->nullable();
             $table->text('descripcion')->nullable();
             $table->float('parametro', 10, 2)->nullable();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('prestacions');
+        Schema::dropIfExists('prestaciones');
     }
 };

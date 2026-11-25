@@ -15,8 +15,10 @@ class Programado extends Model
     /** @use HasFactory<ProgramadoFactory> */
     use HasFactory;
 
+    protected $table = 'programados';
+
     protected $fillable = [
-        'socio_id',
+        'paciente_id',
         'fecha_programada',
         'hora',
         'duracion_min',
@@ -33,9 +35,9 @@ class Programado extends Model
         ];
     }
 
-    public function socio(): BelongsTo
+    public function paciente(): BelongsTo
     {
-        return $this->belongsTo(Socio::class);
+        return $this->belongsTo(Paciente::class);
     }
 
     /** Control realizado a partir de esta hora programada */

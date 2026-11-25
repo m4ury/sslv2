@@ -11,8 +11,10 @@ class Credencial extends Model
     /** @use HasFactory<CredencialFactory> */
     use HasFactory;
 
+    protected $table = 'credenciales';
+
     protected $fillable = [
-        'socio_id',
+        'paciente_id',
         'fecha_emision',
         'fecha_expiracion',
         'numero',
@@ -32,8 +34,8 @@ class Credencial extends Model
         ];
     }
 
-    public function socio()
+    public function paciente()
     {
-        return $this->belongsTo(Socio::class);
+        return $this->belongsTo(Paciente::class);
     }
 }

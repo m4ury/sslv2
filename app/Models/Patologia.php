@@ -2,25 +2,26 @@
 
 namespace App\Models;
 
+use Database\Factories\PatologiaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Patologia extends Model
 {
-    /** @use HasFactory<\Database\Factories\PatologiaFactory> */
+    /** @use HasFactory<PatologiaFactory> */
     use HasFactory;
 
     protected $fillable = ['nombre', 'descripcion'];
 
     public function registros()
     {
-        return $this->hasMany(PatologiaSocio::class);
+        return $this->hasMany(PacientePatologia::class);
     }
 
-    // Socios que tienen esta patología (útil para reportes)
-    public function socios()
+    // Pacientes que tienen esta patología (útil para reportes)
+    public function pacientes()
     {
-        return $this->belongsToMany(Socio::class, 'patologia_socio')
+        return $this->belongsToMany(Paciente::class, 'paciente_patologia')
             ->wherePivotNull('deleted_at')
             ->withPivot('estado', 'fecha_diagnostico');
     }

@@ -119,7 +119,7 @@ function minFor(field) {
 <template>
     <Head :title="title" />
 
-    <div class="mx-auto flex max-w-3xl flex-col gap-6 p-4 md:p-6">
+    <div class="mx-auto flex max-w-7xl flex-col gap-6 p-4 md:p-6">
         <!-- Encabezado -->
         <div
             class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
@@ -138,125 +138,144 @@ function minFor(field) {
             </Button>
         </div>
 
-        <PersonaResumen :persona="persona" />
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
+            <div class="order-2 lg:order-1 lg:col-span-3">
+                <form @submit.prevent="submitForm">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>
+                                Datos de {{ rolLabel.toLowerCase() }}
+                            </CardTitle>
+                            <CardDescription>
+                                Los campos marcados con
+                                <span class="text-destructive">*</span> son
+                                obligatorios.
+                            </CardDescription>
+                        </CardHeader>
 
-        <!-- <RolEstadoCard
-            v-if="isEdit && bajaUrl && reactivarUrl"
-            :registro="registro"
-            :rol-label="rolLabel"
-            :nombre="fullName"
-            :baja-url="bajaUrl"
-            :reactivar-url="reactivarUrl"
-        /> -->
+                        <CardContent class="flex flex-col gap-8">
+                            <InputError :message="form.errors.persona_id" />
 
-        <form @submit.prevent="submitForm">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Datos de {{ rolLabel.toLowerCase() }}</CardTitle>
-                    <CardDescription>
-                        Los campos marcados con
-                        <span class="text-destructive">*</span> son
-                        obligatorios.
-                    </CardDescription>
-                </CardHeader>
-
-                <CardContent class="flex flex-col gap-8">
-                    <InputError :message="form.errors.persona_id" />
-
-                    <section
-                        v-for="section in visibleSections"
-                        :key="section.title"
-                        class="flex flex-col gap-4"
-                    >
-                        <h2
-                            class="border-b pb-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase"
-                        >
-                            {{ section.title }}
-                        </h2>
-
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <div
-                                v-for="field in section.fields"
-                                :key="field.name"
-                                class="flex flex-col gap-2"
-                                :class="{ 'md:col-span-2': field.span === 2 }"
+                            <section
+                                v-for="section in visibleSections"
+                                :key="section.title"
+                                class="flex flex-col gap-4"
                             >
-                                <Label :for="field.name">
-                                    {{ field.label }}
-                                    <span
-                                        v-if="field.required"
-                                        class="text-destructive"
-                                        >*</span
-                                    >
-                                </Label>
-
-                                <Textarea
-                                    v-if="field.type === 'textarea'"
-                                    :id="field.name"
-                                    v-model="form[field.name]"
-                                    :rows="field.rows ?? 4"
-                                    :placeholder="field.placeholder"
-                                    :aria-invalid="!!form.errors[field.name]"
-                                />
-
-                                <select
-                                    v-else-if="field.type === 'select'"
-                                    :id="field.name"
-                                    v-model="form[field.name]"
-                                    class="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive"
-                                    :aria-invalid="!!form.errors[field.name]"
-                                    :required="field.required"
+                                <h2
+                                    class="border-b pb-2 text-sm font-semibold tracking-wide text-muted-foreground uppercase"
                                 >
-                                    <option value="">Seleccione...</option>
-                                    <option
-                                        v-for="option in optionsFor(field)"
-                                        :key="option.value"
-                                        :value="option.value"
+                                    {{ section.title }}
+                                </h2>
+
+                                <div class="grid gap-4 md:grid-cols-2">
+                                    <div
+                                        v-for="field in section.fields"
+                                        :key="field.name"
+                                        class="flex flex-col gap-2"
+                                        :class="{
+                                            'md:col-span-2': field.span === 2,
+                                        }"
                                     >
-                                        {{ option.label }}
-                                    </option>
-                                </select>
+                                        <Label :for="field.name">
+                                            {{ field.label }}
+                                            <span
+                                                v-if="field.required"
+                                                class="text-destructive"
+                                                >*</span
+                                            >
+                                        </Label>
 
-                                <Input
-                                    v-else
-                                    :id="field.name"
-                                    v-model="form[field.name]"
-                                    :type="field.type ?? 'text'"
-                                    :placeholder="field.placeholder"
-                                    :min="minFor(field)"
-                                    :aria-invalid="!!form.errors[field.name]"
-                                    :required="field.required"
+                                        <Textarea
+                                            v-if="field.type === 'textarea'"
+                                            :id="field.name"
+                                            v-model="form[field.name]"
+                                            :rows="field.rows ?? 4"
+                                            :placeholder="field.placeholder"
+                                            :aria-invalid="
+                                                !!form.errors[field.name]
+                                            "
+                                        />
+
+                                        <select
+                                            v-else-if="field.type === 'select'"
+                                            :id="field.name"
+                                            v-model="form[field.name]"
+                                            class="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive"
+                                            :aria-invalid="
+                                                !!form.errors[field.name]
+                                            "
+                                            :required="field.required"
+                                        >
+                                            <option value="">
+                                                Seleccione...
+                                            </option>
+                                            <option
+                                                v-for="option in optionsFor(
+                                                    field,
+                                                )"
+                                                :key="option.value"
+                                                :value="option.value"
+                                            >
+                                                {{ option.label }}
+                                            </option>
+                                        </select>
+
+                                        <Input
+                                            v-else
+                                            :id="field.name"
+                                            v-model="form[field.name]"
+                                            :type="field.type ?? 'text'"
+                                            :placeholder="field.placeholder"
+                                            :min="minFor(field)"
+                                            :aria-invalid="
+                                                !!form.errors[field.name]
+                                            "
+                                            :required="field.required"
+                                        />
+
+                                        <InputError
+                                            :message="form.errors[field.name]"
+                                        />
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Para casos especiales que el esquema no cubra -->
+                            <slot :form="form" />
+                        </CardContent>
+
+                        <CardFooter class="flex justify-end gap-2 border-t pt-6">
+                            <Button as-child variant="outline">
+                                <Link :href="showPersona.url(persona.id)">
+                                    Cancelar
+                                </Link>
+                            </Button>
+                            <Button type="submit" :disabled="form.processing">
+                                <Loader2
+                                    v-if="form.processing"
+                                    class="size-4 animate-spin"
                                 />
+                                <Save v-else class="size-4" />
+                                {{
+                                    isEdit
+                                        ? 'Guardar cambios'
+                                        : `Registrar ${rolLabel.toLowerCase()}`
+                                }}
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </form>
+            </div>
 
-                                <InputError :message="form.errors[field.name]" />
-                            </div>
-                        </div>
-                    </section>
+            <div class="order-1 flex flex-col gap-6 lg:order-2 lg:col-span-2">
+                <PersonaResumen :persona="persona" />
+                <slot name="lateral" />
+            </div>
+        </div>
 
-                    <!-- Para casos especiales que el esquema no cubra -->
-                    <slot :form="form" />
-                </CardContent>
-
-                <CardFooter class="flex justify-end gap-2 border-t pt-6">
-                    <Button as-child variant="outline">
-                        <Link :href="showPersona.url(persona.id)">
-                            Cancelar
-                        </Link>
-                    </Button>
-                    <Button type="submit" :disabled="form.processing">
-                        <Loader2
-                            v-if="form.processing"
-                            class="size-4 animate-spin"
-                        />
-                        <Save v-else class="size-4" />
-                        {{
-                            isEdit
-                                ? 'Guardar cambios'
-                                : `Registrar ${rolLabel.toLowerCase()}`
-                        }}
-                    </Button>
-                </CardFooter>
-            </Card>
-        </form>
+        <!-- Slot inferior para contenido ancho -->
+        <div v-if="$slots.inferior" class="flex flex-col gap-6">
+            <slot name="inferior" />
+        </div>
     </div>
 </template>

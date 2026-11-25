@@ -22,13 +22,16 @@ class PersonaController extends Controller
 
         $personas = Persona::query()
             ->with([
-                'socio:id,persona_id,estado',
+                'paciente:id,persona_id,estado',
                 'colaborador:id,persona_id,estado',
                 'cuidador:id,persona_id,estado',
+                'socio:id,persona_id,estado',
             ])
             ->when($type !== 'all', function ($query) use ($type, $puedeVerAportes) {
                 $query->where(function ($q) use ($type, $puedeVerAportes) {
-                    if ($type === 'socio') {
+                    if ($type === 'paciente') {
+                        $q->has('paciente');
+                    } elseif ($type === 'socio') {
                         $q->has('socio');
                     } elseif ($type === 'colaborador') {
                         if ($puedeVerAportes) {
@@ -46,13 +49,13 @@ class PersonaController extends Controller
             ->when($type === 'all' && ! $puedeVerAportes, function ($query) {
                 // Si no puede ver aportes y pide "todos", exclude a los que SON colaboradores
                 // No deben ser visibles si tienen el rol de colaborador, incluso si tienen otros roles?
-                // El requerimiento dice: "solo deberia mostrar socios y cuidadores"
+                // El requerimiento dice: "solo deberia mostrar Pacientes, Socios y cuidadores"
                 // Pero luego dijo que falten los que no tienen rol.
                 // La interpretación segura: Si no tienes permiso de aportes, NO VES el rol de colaborador.
-                // Si la persona es Socio Y Colaborador, el clínico la ve como Socio.
+                // Si la persona es Paciente Y Colaborador, el clínico la ve como Paciente.
                 // Si la persona es SOLO Colaborador, el clínico NO la ve.
                 $query->where(function ($q) {
-                    $q->has('socio')
+                    $q->has('paciente')
                         ->orHas('cuidador')
                         ->orWhere(function ($q2) {
                             $q2->doesntHave('socio')
@@ -106,12 +109,13 @@ class PersonaController extends Controller
      */
     public function show(Persona $persona)
     {
-        $persona->load(['socio', 'colaborador', 'cuidador']);
+        $persona->load(['socio', 'colaborador', 'cuidador', 'paciente']);
 
         return Inertia::render('personas/Show', [
             'persona' => $persona,
             'roles' => [
                 'socio' => $persona->socio?->only('id', 'estado'),
+                'paciente' => $persona->paciente?->only('id', 'estado'),
                 'colaborador' => $persona->colaborador?->only('id', 'estado'),
                 'cuidador' => $persona->cuidador?->only('id', 'estado'),
             ],

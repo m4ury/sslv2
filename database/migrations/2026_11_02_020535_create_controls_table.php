@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('controls', function (Blueprint $table) {
+        Schema::create('controles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('socio_id')->constrained('socios')->nullable();
+            $table->foreignId('paciente_id')->constrained('pacientes')->nullable();
             $table->foreignId('programado_id')->constrained('programados')->nullable();
             $table->foreignId('user_id')->constrained('users')->nullable();
             $table->date('fecha_control')->nullable();
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('controls');
+        Schema::dropIfExists('controles');
     }
 };

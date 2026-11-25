@@ -12,6 +12,8 @@ class Prestacion extends Model
     /** @use HasFactory<PrestacionFactory> */
     use HasFactory;
 
+    protected $table = 'prestaciones';
+
     protected $fillable = [
         'control_id',
         'fecha',

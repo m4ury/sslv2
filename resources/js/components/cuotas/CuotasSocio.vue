@@ -68,7 +68,7 @@ const vencidas = computed(
         </CardHeader>
 
         <CardContent>
-            <div class="rounded-md border">
+            <div class="overflow-x-auto rounded-md border">
                 <Table>
                     <TableHeader>
                         <TableRow>

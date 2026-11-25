@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('prestacions', function (Blueprint $table) {
+        Schema::table('prestaciones', function (Blueprint $table) {
             $table->date('fecha')->nullable()->after('control_id');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('prestacions', function (Blueprint $table) {
+        Schema::table('prestaciones', function (Blueprint $table) {
             $table->dropColumn('fecha');
         });
     }

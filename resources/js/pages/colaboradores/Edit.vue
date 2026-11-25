@@ -20,8 +20,13 @@ const props = defineProps({
         :sections="colaboradorSections"
         :store-url="store.url()"
         :update-url="update.url(colaborador.id)"
-    />
-    <div class="mx-auto w-full max-w-3xl px-4 pb-6 md:px-6"> <!-- max-w-5xl -->
-        <AportesColaborador :colaborador="colaborador" :aportes="aportes" :medios="medios" />
-    </div>
+    >
+        <template #lateral>
+            <AportesColaborador
+                :colaborador="colaborador"
+                :aportes="aportes"
+                :medios="medios"
+            />
+        </template>
+    </RolForm>
 </template>

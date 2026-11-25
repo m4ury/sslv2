@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('controls', function (Blueprint $table) {
+        Schema::table('controles', function (Blueprint $table) {
             $table->foreignId('programado_id')->nullable()->change();
         });
     }
@@ -22,11 +22,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (DB::table('controls')->whereNull('programado_id')->exists()) {
+        if (DB::table('controles')->whereNull('programado_id')->exists()) {
             throw new RuntimeException('Cannot require a programado for controls while unscheduled controls exist.');
         }
 
-        Schema::table('controls', function (Blueprint $table) {
+        Schema::table('controles', function (Blueprint $table) {
             $table->foreignId('programado_id')->nullable(false)->change();
         });
     }

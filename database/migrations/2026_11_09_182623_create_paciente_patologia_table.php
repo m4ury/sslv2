@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('patologia_socio', function (Blueprint $table) {
+        Schema::create('paciente_patologia', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('socio_id')->constrained('socios');
+            $table->foreignId('paciente_id')->constrained('pacientes');
             $table->foreignId('patologia_id')->constrained('patologias');
-            $table->string('estado')->default('Activa');
+            $table->enum('estado', ['Activa', 'Egreso', 'Alta transitoria'])->default('Activa');
             $table->date('fecha_diagnostico')->nullable();
+            $table->date('fecha_alta_tr')->nullable();
+            $table->date('fecha_egreso')->nullable();
             $table->string('observaciones', 255)->nullable();
             $table->timestamps();
             $table->softDeletes();

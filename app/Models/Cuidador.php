@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TieneEstadoDeRol;
 use Database\Factories\CuidadorFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Concerns\TieneEstadoDeRol;
 
 class Cuidador extends Model
 {
-    /** @use HasFactory<\Database\Factories\CuidadorFactory> */
+    /** @use HasFactory<CuidadorFactory> */
     use HasFactory, TieneEstadoDeRol;
 
     protected $table = 'cuidadores';
@@ -34,13 +34,13 @@ class Cuidador extends Model
     // Asignaciones con sus datos (las usa la pantalla del cuidador)
     public function asignaciones()
     {
-        return $this->hasMany(CuidadorSocio::class);
+        return $this->hasMany(CuidadorPaciente::class);
     }
 
     // Acceso n:m directo a los socios
-    public function socios()
+    public function pacientes()
     {
-        return $this->belongsToMany(socio::class, 'cuidador_socio')
+        return $this->belongsToMany(Paciente::class, 'cuidador_paciente')
             ->wherePivotNull('deleted_at')
             ->withPivot('vinculo', 'es_principal', 'fecha_inicio', 'fecha_fin');
     }

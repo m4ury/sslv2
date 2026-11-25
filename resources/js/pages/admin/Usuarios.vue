@@ -10,7 +10,7 @@ const props = defineProps({
 
 // El select de estado trabaja con 1/0
 const items = computed(() =>
-    props.usuarios.map((u) => ({ ...u, activo: u.activo ? 1 : 0 })),
+    props.usuarios.map((u) => ({ ...u, activo: u.activo ? 1 : 0 }))
 );
 
 const seccion = computed(() => ({
@@ -19,7 +19,8 @@ const seccion = computed(() => ({
     descripcion: 'Personas con acceso al sistema. Su profesión define lo que pueden hacer.',
     vacio: 'No hay usuarios registrados.',
     columns: [
-        { key: 'name', label: 'Nombre' },
+        { key: 'rut', label: 'Rut' },
+        { key: 'full_name', label: 'Nombre completo' },
         { key: 'email', label: 'Correo' },
         { key: 'profesion', label: 'Profesión', format: (i) => i.profesion?.nombre ?? 'Sin profesión' },
         {
@@ -31,7 +32,10 @@ const seccion = computed(() => ({
         },
     ],
     fields: [
-        { name: 'name', label: 'Nombre', required: true },
+        { name: 'rut', label: 'Rut' },
+        { name: 'name', label: 'Nombres', required: true },
+        { name: 'apellido_paterno', label: 'Apellido paterno', required: true },
+        { name: 'apellido_materno', label: 'Apellido materno'},
         { name: 'email', label: 'Correo', type: 'email', required: true },
         {
             name: 'profesion_id',

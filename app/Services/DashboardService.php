@@ -11,6 +11,7 @@ use App\Models\Cuidador;
 use App\Models\Cuota;
 use App\Models\IngresoBancario;
 use App\Models\MovimientoInventario;
+use App\Models\Paciente;
 use App\Models\Pago;
 use App\Models\Programado;
 use App\Models\Socio;
@@ -81,13 +82,13 @@ class DashboardService
         $dias = (int) config('dashboard.dias_credencial', 30);
         $diasSinControl = (int) config('dashboard.dias_sin_control', 90);
 
-        $credenciales = Credencial::with('socio.persona')
+        $credenciales = Credencial::with('paciente.persona')
             ->whereNotNull('fecha_expiracion')
             ->whereDate('fecha_expiracion', '<=', $hoy->copy()->addDays($dias))
-            ->whereHas('socio', fn ($q) => $q->where('estado', 'Activo'));
+            ->whereHas('paciente', fn ($q) => $q->where('estado', 'Activo'));
 
         // Socio activos sin control reciente y sin control programado a futuro
-        $sinControl = Socio::with('persona')
+        $sinControl = Paciente::with('persona')
             ->where('estado', 'Activo')
             ->whereDoesntHave('controles', fn ($q) => $q->whereDate('fecha_control', '>=', $hoy->copy()->subDays($diasSinControl)))
             ->whereDoesntHave('programados', fn ($q) => $q
@@ -100,8 +101,8 @@ class DashboardService
             'credenciales' => (clone $credenciales)->orderBy('fecha_expiracion')->limit(5)->get()
                 ->map(fn (Credencial $c) => [
                     'id' => $c->id,
-                    'socio_id' => $c->socio_id,
-                    'socio' => $c->socio?->persona?->full_name,
+                    'paciente_id' => $c->paciente_id,
+                    'paciente' => $c->paciente?->persona?->full_name,
                     'tipo' => $c->tipo,
                     'vencimiento' => $c->fecha_expiracion->toDateString(),
                     'vencida' => $c->fecha_expiracion->lt($hoy),
@@ -109,9 +110,9 @@ class DashboardService
             'dias_sin_control' => $diasSinControl,
             'sin_control' => (clone $sinControl)->count(),
             'sin_control_lista' => (clone $sinControl)->orderBy('id')->limit(5)->get()
-                ->map(fn (Socio $a) => [
-                    'socio_id' => $a->id,
-                    'socio' => $a->persona?->full_name,
+                ->map(fn (Paciente $a) => [
+                    'paciente_id' => $a->id,
+                    'paciente' => $a->persona?->full_name,
                 ])->values()->all(),
         ];
     }
@@ -119,10 +120,10 @@ class DashboardService
     private function widgetPersonas(callable $puede): array
     {
         return [
-            'socios' => Socio::where('estado', 'Activo')->count(),
+            'pacientes' => Paciente::where('estado', 'Activo')->count(),
             'colaboradores' => $puede('aportes.ver') ? Colaborador::where('estado', 'Activo')->count() : null,
             'cuidadores' => Cuidador::where('estado', 'Activo')->count(),
-            'socios_sin_cuidador' => Socio::where('estado', 'Activo')
+            'pacientes_sin_cuidador' => Paciente::where('estado', 'Activo')
                 ->whereDoesntHave('cuidadores', fn ($q) => $q->where('es_principal', true)->whereNull('fecha_fin'))
                 ->count(),
         ];

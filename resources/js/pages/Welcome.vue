@@ -51,9 +51,9 @@ import { dashboard, login, register } from '@/routes';
                     <div class="relative">
                         <!-- Círculos decorativos en el fondo -->
                         <div class="absolute inset-0 -m-4 animate-pulse rounded-full bg-primary/20 blur-2xl"></div>
-                        <AppLogoIcon class="relative size-32 object-contain transition-transform duration-500 hover:scale-110 lg:size-48" />
+                        <AppLogoIcon class="relative size-68 object-contain transition-transform duration-500 hover:scale-110 lg:size-78" />
                     </div>
-                    <div class="mt-6 text-center">
+                    <div class="mt-2 text-center">
                         <p class="text-xs font-semibold tracking-widest text-muted-foreground uppercase">Fundada el</p>
                         <p class="mt-1 text-sm font-medium text-foreground">20 de agosto de 2009</p>
                     </div>
@@ -76,7 +76,7 @@ import { dashboard, login, register } from '@/routes';
 
                         <p class="text-base text-muted-foreground">
                             Bienvenido a Sueños Sin Límites, una plataforma integral diseñada para gestionar nuestra comunidad,
-                            socios y colaboradores de manera eficiente y moderna.
+                            socios y pacientes de manera eficiente y moderna.
                         </p>
 
                         <div class="flex flex-wrap gap-4 pt-4">
